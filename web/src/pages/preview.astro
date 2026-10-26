@@ -1,18 +1,63 @@
 ---
 /**
- * Headless preview for Wagtail editors (wagtail-headless-preview).
- * Wagtail opens /preview/?content_type=...&token=... ; the page is fetched client-side
- * from the CMS, so this route stays static and no draft content lands in the build.
- * The actual rendering happens in the PreviewClient island which re-uses the same
- * block components via a small SSR endpoint – see docs/03-technik.md "Preview".
+ * Live preview for Wagtail editors (wagtail-headless-preview).
+ *
+ * Server-rendered on every request (prerender = false, @astrojs/node). Wagtail's
+ * preview panel loads /preview/?content_type=<app.model>&token=<signed token>;
+ * we fetch the unsaved draft from /api/v2/page_preview/ and render it with the
+ * same PageContent.astro as the static site, so preview == live rendering.
  */
 import Base from "@/layouts/Base.astro";
-import { getNavigation, getSettings } from "@/lib/wagtail";
-const [settings, nav] = await Promise.all([getSettings(), getNavigation()]);
+import PageContent from "@/components/PageContent.astro";
+import { WagtailApiError, getNavigation, getPreviewPage, getSettings, normalizePage, pathFromHtmlUrl } from "@/lib/wagtail";
+import type { PageData } from "@/lib/types";
+
+export const prerender = false;
+
+Astro.response.headers.set("Cache-Control", "no-store");
+Astro.response.headers.set("X-Robots-Tag", "noindex, nofollow");
+
+const contentType = Astro.url.searchParams.get("content_type") ?? "";
+const token = Astro.url.searchParams.get("token") ?? "";
+
+const [settings, nav] = await Promise.all([getSettings({ fresh: true }), getNavigation({ fresh: true })]);
+
+let page: PageData | null = null;
+let error = "";
+if (!contentType || !token) {
+  error = "Diese Seite wird aus dem Wagtail-Admin über „Vorschau“ geöffnet.";
+  Astro.response.status = 400;
+} else {
+  try {
+    page = normalizePage(await getPreviewPage(contentType, token));
+  } catch (e) {
+    const status = e instanceof WagtailApiError ? e.status : 502;
+    Astro.response.status = status === 404 ? 404 : 502;
+    error = status === 404
+      ? "Die Vorschau ist abgelaufen oder ungültig. Bitte im Wagtail-Admin erneut auf „Vorschau“ klicken."
+      : "Das CMS ist gerade nicht erreichbar.";
+  }
+}
+
+// html_url is null for pages that have never been saved.
+let path = "/preview/";
+if (page?.meta.html_url) {
+  try { path = pathFromHtmlUrl(page.meta.html_url); } catch { /* keep /preview/ */ }
+}
 ---
-<Base settings={settings} nav={nav} title="Vorschau" path="/preview/" noindex>
-  <section class="section"><div class="container-x prose-site">
-    <h1>Vorschau</h1>
-    <p>Die Live-Vorschau für Redakteure wird in Phase 2 fertiggestellt (Aufgabe „Preview-Route“ in <code>docs/04-aufgaben.md</code>). Bis dahin: Seite veröffentlichen, der Rebuild dauert ca. eine Minute.</p>
-  </div></section>
+<Base settings={settings} nav={nav} title={page ? `Vorschau: ${page.title}` : "Vorschau"} path={path} noindex>
+  <div class="sticky top-16 z-30 bg-accent-400 text-ink-900" role="status">
+    <div class="container-x flex flex-wrap items-center justify-between gap-2 py-2 text-sm font-medium">
+      <span>Vorschau – diese Version ist noch nicht veröffentlicht.</span>
+      {page && <span class="text-ink-700">{page.meta.type.split(".")[1]} · {path}</span>}
+    </div>
+  </div>
+  {page ? (
+    <PageContent page={page} settings={settings} path={path} />
+  ) : (
+    <section class="section"><div class="container-x max-w-2xl">
+      <h1 class="h2">Keine Vorschau verfügbar</h1>
+      <p class="mt-4 text-ink-700">{error}</p>
+    </div></section>
+  )}
 </Base>

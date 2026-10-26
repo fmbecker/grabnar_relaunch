@@ -1,12 +1,20 @@
 /**
- * Build-time client for the Wagtail API v2 (cms/grabnar/api.py).
- * Runs only on the server (getStaticPaths / frontmatter); never in the browser.
+ * Client for the Wagtail API v2 (cms/grabnar/api.py).
+ * Runs only on the server: at build time (static pages) and in the SSR preview
+ * route (/preview/). Never in the browser.
+ *
+ * Responses are memoised for the duration of a static build. The preview route
+ * passes { fresh: true } so drafts, settings and navigation are always current
+ * in the long-running preview server.
  */
 
 import type { ApiImage, Navigation, PageData, PageType, RedirectItem, Settings } from "./types";
 
-const API_URL = (import.meta.env.WAGTAIL_API_URL ?? "http://127.0.0.1:8000/api/v2").replace(/\/$/, "");
-const MEDIA_URL = (import.meta.env.WAGTAIL_MEDIA_URL ?? "").replace(/\/$/, "");
+// Runtime env (preview server) wins over build-time values.
+const runtimeEnv = (key: string): string | undefined =>
+  typeof process !== "undefined" ? process.env[key] : undefined;
+const API_URL = (runtimeEnv("WAGTAIL_API_URL") ?? import.meta.env.WAGTAIL_API_URL ?? "http://127.0.0.1:8000/api/v2").replace(/\/$/, "");
+const MEDIA_URL = (runtimeEnv("WAGTAIL_MEDIA_URL") ?? import.meta.env.WAGTAIL_MEDIA_URL ?? "").replace(/\/$/, "");
 
 const PAGE_TYPES: PageType[] = [
   "home.HomePage",
@@ -19,15 +27,29 @@ const PAGE_TYPES: PageType[] = [
 
 const cache = new Map<string, unknown>();
 
-async function get<T>(path: string, params: Record<string, string> = {}): Promise<T> {
+export interface FetchOptions {
+  /** Bypass the build-time memo cache (used by the SSR preview). */
+  fresh?: boolean;
+}
+
+export class WagtailApiError extends Error {
+  constructor(
+    public status: number,
+    url: string,
+  ) {
+    super(`Wagtail API ${status} for ${url}`);
+  }
+}
+
+async function get<T>(path: string, params: Record<string, string> = {}, opts: FetchOptions = {}): Promise<T> {
   const url = new URL(`${API_URL}${path}`);
   for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v);
   const key = url.toString();
-  if (cache.has(key)) return cache.get(key) as T;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`Wagtail API ${res.status} for ${url}`);
+  if (!opts.fresh && cache.has(key)) return cache.get(key) as T;
+  const res = await fetch(url, opts.fresh ? { cache: "no-store" } : undefined);
+  if (!res.ok) throw new WagtailApiError(res.status, key);
   const data = (await res.json()) as T;
-  cache.set(key, data);
+  if (!opts.fresh) cache.set(key, data);
   return data;
 }
 
@@ -79,8 +101,13 @@ export async function getPage(id: number): Promise<PageData> {
   return get<PageData>(`/pages/${id}/`);
 }
 
-export async function getSettings(): Promise<Settings> {
-  const s = await get<Settings>("/settings/");
+/** Draft behind a wagtail-headless-preview token. Throws WagtailApiError(404) if invalid/expired. */
+export async function getPreviewPage(contentType: string, token: string): Promise<PageData> {
+  return get<PageData>("/page_preview/", { content_type: contentType, token }, { fresh: true });
+}
+
+export async function getSettings(opts: FetchOptions = {}): Promise<Settings> {
+  const s = await get<Settings>("/settings/", {}, opts);
   return {
     ...s,
     site: {
@@ -91,8 +118,8 @@ export async function getSettings(): Promise<Settings> {
   };
 }
 
-export async function getNavigation(): Promise<Navigation> {
-  return get<Navigation>("/navigation/");
+export async function getNavigation(opts: FetchOptions = {}): Promise<Navigation> {
+  return get<Navigation>("/navigation/", {}, opts);
 }
 
 export async function getRedirects(): Promise<RedirectItem[]> {

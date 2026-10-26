@@ -100,3 +100,60 @@ def test_contact_form_spam_and_success(client):
     from forms_api.models import ContactSubmission
 
     assert ContactSubmission.objects.count() == 1
+
+
+def test_page_preview_returns_unsaved_draft(client):
+    from services.models import ServicePage
+
+    page = ServicePage.objects.get(slug="winterdienst")
+    page.title = "Winterdienst (Entwurf)"
+    page.teaser = "Geänderter Teaser nur in der Vorschau."
+    preview = page.create_page_preview()
+
+    res = client.get(
+        "/api/v2/page_preview/", {"content_type": "services.servicepage", "token": preview.token}
+    )
+    assert res.status_code == 200
+    data = res.json()
+    assert data["title"] == "Winterdienst (Entwurf)"
+    assert data["teaser"] == "Geänderter Teaser nur in der Vorschau."
+    assert data["meta"]["type"] == "services.ServicePage"
+    assert res["Cache-Control"] == "no-store"
+    # live page is untouched
+    assert ServicePage.objects.get(slug="winterdienst").title == "Winterdienst"
+
+
+def test_page_preview_rejects_bad_tokens(client):
+    bad = client.get(
+        "/api/v2/page_preview/", {"content_type": "services.servicepage", "token": "id=1:forged"}
+    )
+    assert bad.status_code == 404
+    wrong_type = client.get("/api/v2/page_preview/", {"content_type": "auth.user", "token": "x"})
+    assert wrong_type.status_code == 404
+
+
+def test_preview_settings_are_picked_up():
+    from wagtail_headless_preview.settings import headless_preview_settings
+
+    assert headless_preview_settings.CLIENT_URLS["default"].endswith("/preview/")
+
+
+def test_all_pages_pass_admin_validation():
+    """Every imported page must be saveable in the Wagtail admin (StreamField clean).
+
+    Regression: CTA links pointed at a not-yet-saved page and were stored as null,
+    which made the editor refuse to save or preview those pages.
+    """
+    from wagtail.fields import StreamField
+    from wagtail.models import Page
+
+    failures = []
+    for page in Page.objects.filter(depth__gt=1).specific():
+        for field in page._meta.get_fields():
+            if isinstance(field, StreamField):
+                value = getattr(page, field.name)
+                try:
+                    field.stream_block.clean(value)
+                except Exception as exc:  # noqa: BLE001
+                    failures.append(f"{page.url_path} {field.name}: {exc}")
+    assert not failures, "\n".join(failures)

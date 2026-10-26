@@ -7,10 +7,14 @@ Endpoints (all under /api/v2/):
   settings/         ContactSettings + SiteSettings for the default site
   redirects/        wagtail.contrib.redirects, resolved to frontend paths
   navigation/       main menu derived from the page tree (show_in_menus)
+  page_preview/     draft content for wagtail-headless-preview (?content_type=&token=)
 """
 
 from __future__ import annotations
 
+from django.apps import apps
+from django.core.signing import BadSignature
+from django.http import Http404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from wagtail.api.v2.router import WagtailAPIRouter
@@ -28,6 +32,60 @@ class GrabnarPagesAPIViewSet(PagesAPIViewSet):
 
     # Allow the frontend to filter/select by these in list requests.
     known_query_parameters = PagesAPIViewSet.known_query_parameters.union(["show_in_menus"])
+
+
+class PagePreviewAPIViewSet(GrabnarPagesAPIViewSet):
+    """Serialises the unsaved draft behind a headless-preview token.
+
+    The Astro SSR route /preview/ calls
+    GET /api/v2/page_preview/?content_type=services.servicepage&token=...
+    The token is signed by HeadlessPreviewMixin, so it cannot be guessed; drafts
+    are only reachable for whoever got the URL from the Wagtail admin.
+    """
+
+    known_query_parameters = GrabnarPagesAPIViewSet.known_query_parameters.union(
+        ["content_type", "token"]
+    )
+
+    def get_object(self):
+        if hasattr(self, "_preview_page"):
+            return self._preview_page
+        content_type = self.request.GET.get("content_type", "")
+        token = self.request.GET.get("token", "")
+        try:
+            app_label, model_name = content_type.split(".")
+            model = apps.get_model(app_label, model_name)
+        except (ValueError, LookupError) as exc:
+            raise Http404("Unknown content_type") from exc
+        if not hasattr(model, "get_page_from_preview_token"):
+            raise Http404("Not a previewable page type")
+        try:
+            page = model.get_page_from_preview_token(token)
+        except BadSignature as exc:
+            raise Http404("Invalid token") from exc
+        if page is None:
+            raise Http404("Preview expired")
+        if not page.pk:
+            page.pk = 0  # unsaved new page; serializer needs an id
+        self._preview_page = page
+        return page
+
+    def get_serializer_class(self):
+        # Detail mode for the concrete page type: all api_fields, like /pages/<id>/.
+        return self._get_serializer_class(
+            self.request.wagtailapi_router, type(self.get_object()), [], show_details=True
+        )
+
+    def listing_view(self, request):
+        page = self.get_object()
+        serializer = self.get_serializer_class()(page, context=self.get_serializer_context())
+        response = Response(serializer.data)
+        response["Cache-Control"] = "no-store"
+        response["X-Robots-Tag"] = "noindex"
+        return response
+
+    def detail_view(self, request, pk):
+        return self.listing_view(request)
 
 
 class SettingsAPIView(APIView):
@@ -80,5 +138,6 @@ class NavigationAPIView(APIView):
 
 api_router = WagtailAPIRouter("wagtailapi")
 api_router.register_endpoint("pages", GrabnarPagesAPIViewSet)
+api_router.register_endpoint("page_preview", PagePreviewAPIViewSet)
 api_router.register_endpoint("images", ImagesAPIViewSet)
 api_router.register_endpoint("documents", DocumentsAPIViewSet)

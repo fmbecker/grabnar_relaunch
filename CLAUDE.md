@@ -18,7 +18,8 @@ Betreut von Felix (Administrator der Seite, Full-Stack-Entwickler, GitHub `fmbec
 |---|---|---|
 | CMS / Backend | Wagtail (aktuelle LTS), Django, Postgres, `wagtail.api.v2`, ohne coderedcms | `cms/` |
 | Frontend | Astro (statisch, SSG), Tailwind CSS, React-Islands nur für Interaktion (Formulare, Filter, Slider) | `web/` |
-| Hosting | bestehender Linode-VPS: Nginx liefert `web/dist/` statisch aus und proxyt `/admin/`, `/api/` an Wagtail (Docker Compose); `/admin/` per IP-Allowlist/Basic-Auth | `deploy/` |
+| Hosting | bestehender Linode-VPS: Nginx liefert `web/dist/client/` statisch aus und proxyt `/admin/`, `/api/` an Wagtail (Docker Compose); `/admin/` per IP-Allowlist/Basic-Auth | `deploy/` |
+| Live-Vorschau | `/preview/` als einzige SSR-Route (`@astrojs/node`), Nginx → `127.0.0.1:4322`; Entwurf aus `/api/v2/page_preview/` | `web/src/pages/preview.astro`, `deploy/systemd/grabnar-preview.service` |
 | Build-Trigger | Wagtail `page_published`-Signal → lokaler Webhook (:9000) → `pnpm build` auf dem Server | `cms/grabnar/signals.py`, `deploy/rebuild-hook.py` |
 
 Begründung und Alternativen: `docs/03-technik.md`.
@@ -70,6 +71,8 @@ Prüfen vor jedem Commit: `cd cms && uv run ruff check . && uv run pytest -q` ·
 - Formulare (Kontakt, Bewerbung) senden an einen eigenen Endpunkt im CMS (`cms/forms_api/`), nicht an Drittanbieter, wegen Datenschutz (Bewerbungsdaten!).
 - Bilder: ausschließlich über Wagtail-Renditions aus der API, nie Originaldateien im Frontend.
 - Inhalte der Altseite: `docs/content-export/*.md` + `docs/redirects.csv` sind die Quelle für `manage.py import_legacy`. Der Import ersetzt den kompletten Seitenbaum – in Produktion nur einmal vor dem Go-Live ausführen, danach pflegen Redakteure im CMS.
+- Preview-Setting heißt `WAGTAIL_HEADLESS_PREVIEW` (nicht `HEADLESS_PREVIEW` – wird sonst still ignoriert). `wagtail.ts` cached nur im statischen Build; SSR-Code muss `{ fresh: true }` übergeben.
+- Beim Anlegen von Seiten per Code: Seiten, auf die Links zeigen (PageChooser), müssen vorher gespeichert sein, sonst landet `null` im StreamField. `test_all_pages_pass_admin_validation` prüft das.
 - `grabnar/urls.py` registriert `wagtail_urls` immer (auch in Produktion): `page.url` braucht `reverse("wagtail_serve")`. Nicht entfernen.
 - Vor größeren Entscheidungen (Hosting, Domainumzug, Löschen alter Inhalte) Felix fragen.
 
@@ -82,6 +85,5 @@ Prüfen vor jedem Commit: `cd cms && uv run ruff check . && uv run pytest -q` ·
 
 ## Offene Punkte (siehe docs/04-aufgaben.md)
 
-- Headless-Preview-Route im Frontend ist ein Platzhalter (siehe docs/04-aufgaben.md, Phase 2).
 - Zustand des Linode-VPS (OS, Nginx-Config, Docker, certbot) noch nicht erfasst.
 - Empfänger des alten Kontaktformulars ist `mail@aivii.de` – Klärung durch Felix offen.

@@ -30,7 +30,7 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 - [x] 🤖 `signals.py`: Publish → Build-Hook mit Debounce
 - [x] 🤖 Dockerfile, ruff-Konfiguration, GitHub-Workflow `cms.yml`
 
-## Phase 2 – Frontend-Grundgerüst (`web/`) ✅ bis auf Preview erledigt am 26.10.2026 (Astro 7, Tailwind 4, React 19)
+## Phase 2 – Frontend-Grundgerüst (`web/`) ✅ erledigt am 26.10.2026 (Astro 7, Tailwind 4, React 19)
 
 - [x] 🤖 Astro + Tailwind + React-Integration initialisieren, `pnpm`
 - [x] 🤖 `src/lib/types.ts` aus dem Block-Vertrag ableiten
@@ -40,7 +40,7 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 - [x] 🤖 Islands: `ContactForm.tsx` (Kontakt + Bewerbung in einer Komponente, `variant`), `JobFilter.tsx`
 - [x] 🤖 `Seo.astro`, Sitemap, JSON-LD (`LocalBusiness`, `JobPosting`)
 - [x] 🤖 Nginx-`map`-Generierung aus der Redirects-API (`web/scripts/redirects.mjs`)
-- [ ] 🤖 Preview-Route für Headless-Preview fertigstellen: `web/src/pages/preview.astro` ist nur ein Platzhalter. Plan: kleine SSR-Route (Astro `output: 'static'` + `prerender = false` für `/preview/`, Node-Adapter oder separater `astro dev`-Prozess auf dem Server), die `?content_type=&token=` an `GET <CMS>/api/v2/page_preview/1/?content_type=…&token=…` weiterreicht und `PageContent.astro` rendert
+- [x] 🤖 Live-Vorschau: `/preview/` als Astro-SSR-Route (`@astrojs/node`), API `/api/v2/page_preview/`, Dienst `grabnar-preview.service`, Nginx-Route; E2E-Test `e2e/preview_admin.py` (bestehende + neue Seite, Live-Update beim Tippen)
 - [x] 🤖 GitHub-Workflow `web.yml`
 
 ## Phase 3 – Design & Inhalte
@@ -61,6 +61,7 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 - [x] 🤖 `deploy/`: `docker-compose.yml`, `nginx/grabnar.conf`, `rebuild-hook.py` + systemd-Unit, `build-web.sh`, `deploy.sh`, Backup-Skript
 - [ ] 🤝 Docker, Node/pnpm (fnm) auf dem Linode installieren, CMS parallel zur Altseite hochfahren
 - [ ] 🤝 Staging-Server-Block (Port 8443, Basic-Auth) für Abnahme
+- [ ] 🤝 Vorschau-Dienst einrichten: `grabnar-preview.service`, sudoers-Eintrag, `FRONTEND_URL` in `cms.env` (siehe `deploy/README.md`)
 - [ ] 🤝 Backup nach `/srv/backup/` + Offsite-Ziel einrichten und Restore einmal testen
 - [x] Redirect-Tabelle `docs/redirects.csv` erstellt; Import erfolgt über `import_legacy`
 - [ ] 👤 Mailversand (SMTP-Zugang) für Formulare

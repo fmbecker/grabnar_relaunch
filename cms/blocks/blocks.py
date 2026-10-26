@@ -27,7 +27,7 @@ class ApiImageChooserBlock(ImageChooserBlock):
 class LinkBlock(blocks.StructBlock):
     """Internal page or external URL plus label. Exactly one target required."""
 
-    label = blocks.CharBlock(label=_("Beschriftung"), max_length=60)
+    label = blocks.CharBlock(label=_("Beschriftung"), max_length=60, required=False)
     page = blocks.PageChooserBlock(label=_("Interne Seite"), required=False)
     url = blocks.URLBlock(label=_("Externe URL"), required=False)
     style = blocks.ChoiceBlock(
@@ -42,14 +42,23 @@ class LinkBlock(blocks.StructBlock):
 
     def clean(self, value):
         result = super().clean(value)
-        if bool(result.get("page")) == bool(result.get("url")):
-            raise blocks.StructBlockValidationError(
-                non_block_errors=[_("Bitte entweder eine interne Seite oder eine URL angeben.")]
-            )
+        has_page, has_url = bool(result.get("page")), bool(result.get("url"))
+        has_label = bool((result.get("label") or "").strip())
+        if not self.required and not (has_page or has_url or has_label):
+            return result  # optional link left completely empty
+        errors = []
+        if has_page == has_url:
+            errors.append(_("Bitte entweder eine interne Seite oder eine URL angeben."))
+        if not has_label:
+            errors.append(_("Bitte eine Beschriftung angeben."))
+        if errors:
+            raise blocks.StructBlockValidationError(non_block_errors=errors)
         return result
 
     def get_api_representation(self, value, context=None):
         page = value.get("page")
+        if not page and not value.get("url"):
+            return None  # optional link left empty
         return {
             "label": value.get("label"),
             "href": page.url if page else value.get("url"),

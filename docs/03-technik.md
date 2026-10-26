@@ -23,7 +23,7 @@ Geprüfte Alternativen:
 - API: `wagtail.api.v2` unter `/api/v2/`; eigener `PagesAPIViewSet` in `cms/grabnar/api.py`, der StreamField als JSON (`api_fields`) liefert, Bilder als Renditions (`ImageRenditionField` mit festen Größen `fill-800x450`, `width-1600` usw.).
 - Site-Settings per API: eigener kleiner Endpunkt `/api/v2/settings/` (Wagtail liefert Settings nicht von Haus aus).
 - Redirects per API: `/api/v2/redirects/` → Frontend erzeugt daraus `_redirects` (Cloudflare/Netlify) bzw. Nginx-Map beim Build.
-- Preview: `wagtail-headless-preview` → `PREVIEW_URL` zeigt auf eine Astro-Route `/preview/` im SSR-Modus oder auf einen laufenden `astro dev`.
+- Preview: `wagtail-headless-preview` (Setting **`WAGTAIL_HEADLESS_PREVIEW`**, `CLIENT_URLS.default = FRONTEND_URL + "/preview/"`). Endpunkt `/api/v2/page_preview/?content_type=&token=` liefert den ungespeicherten Entwurf (Token ist signiert, Antwort `no-store`). Details im Abschnitt „Live-Vorschau“.
 - Formulare: `cms/forms_api/` als Django-Views (DRF optional): `POST /api/forms/contact/`, `POST /api/forms/application/` (multipart, Lebenslauf max. 10 MB, erlaubte Typen PDF/DOCX). Speicherung als `FormSubmission`-Model im Admin + Mail an Firma. Spam-Schutz: Honeypot + Zeitstempel, kein externes CAPTCHA.
 - Publish-Hook: `cms/grabnar/signals.py` lauscht auf `page_published`/`page_unpublished` und ruft `FRONTEND_BUILD_HOOK_URL` (Deploy-Hook) auf, mit 60 s Debounce.
 - Deployment: `cms/Dockerfile` (gunicorn), `docker-compose.yml` mit `cms`, `db`, optional `nginx`. Admin nur über VPN/IP-Allowlist oder Basic-Auth vor `/admin/`.
@@ -39,6 +39,23 @@ Geprüfte Alternativen:
 - Fonts selbst gehostet (`public/fonts/`), kein externes CDN.
 - Hosting: siehe Abschnitt „Hosting auf dem Linode-VPS“ – statisches Build-Verzeichnis `web/dist/` wird von Nginx ausgeliefert.
 
+## Live-Vorschau für Redakteure
+
+```
+Wagtail-Editor (Vorschau-Panel)
+  └─ iframe /admin/pages/<id>/edit/preview/      Wagtail speichert Entwurf als PagePreview (signierter Token)
+       └─ iframe /preview/?content_type=…&token=…  Nginx → 127.0.0.1:4322 (grabnar-preview.service)
+            └─ Astro SSR (web/src/pages/preview.astro, prerender = false)
+                 └─ GET /api/v2/page_preview/…    Entwurf als JSON → PageContent.astro (gleiche Komponenten wie live)
+```
+
+- Das Frontend bleibt statisch; nur `/preview/` wird pro Anfrage gerendert (`@astrojs/node`, standalone). Build-Ausgabe: `web/dist/client/` (statisch) und `web/dist/server/` (Vorschau-Server).
+- Kein Cache: `wagtail.ts` memoisiert API-Antworten nur im statischen Build; die Vorschau ruft mit `{ fresh: true }` ab.
+- Wagtail aktualisiert das Panel beim Tippen automatisch (Intervall 500 ms) – auch für noch nie gespeicherte Seiten.
+- Vorschau-Banner, `noindex`, `Cache-Control: no-store`; `/preview/` ist in `robots.txt` gesperrt und nicht in der Sitemap.
+- Lokal: `pnpm dev` bedient `/preview/` auf Port 4321 (Standard-`FRONTEND_URL` des CMS). Gegen den gebauten Server: `node web/dist/server/entry.mjs` mit `PORT=4322` und CMS mit `FRONTEND_URL=http://127.0.0.1:4322`.
+- E2E-Test aus Redakteurssicht: `e2e/preview_admin.py` (Playwright).
+
 ## Hosting auf dem Linode-VPS (entschieden)
 
 Die bestehende Linode-Instanz bleibt. `www.grabnar.de` zeigt extern verwaltet auf deren IP – deshalb **keine neue Subdomain**, CMS und Frontend laufen unter derselben Domain, getrennt nach Pfad. So ist kein DNS-Eingriff nötig.
@@ -49,6 +66,7 @@ Internet → Nginx (:443, www.grabnar.de)
             ├── /admin/, /api/   → proxy_pass http://127.0.0.1:8000  (Wagtail, Docker)
             ├── /media/          → /srv/grabnar/media/            (Wagtail-Uploads, Renditions)
             ├── /django-static/  → /srv/grabnar/cms-static/       (Admin-Assets)
+            ├── /preview/        → proxy_pass http://127.0.0.1:4322  (Astro-SSR, Live-Vorschau)
             └── /_hooks/rebuild  → proxy_pass http://127.0.0.1:9000  (Build-Webhook)
 ```
 

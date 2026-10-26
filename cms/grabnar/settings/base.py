@@ -136,7 +136,8 @@ WAGTAILSEARCH_BACKENDS = {
 
 FRONTEND_URL = env("FRONTEND_URL", default="http://localhost:4321")
 
-HEADLESS_PREVIEW = {
+# Key must be WAGTAIL_HEADLESS_PREVIEW – wagtail-headless-preview ignores anything else.
+WAGTAIL_HEADLESS_PREVIEW = {
     "CLIENT_URLS": {"default": f"{FRONTEND_URL}/preview/"},
     "SERVE_BASE_URL": FRONTEND_URL,
     "REDIRECT_ON_PREVIEW": False,

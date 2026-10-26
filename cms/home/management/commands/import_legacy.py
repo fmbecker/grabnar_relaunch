@@ -274,6 +274,10 @@ class Command(BaseCommand):
             ],
         )
 
+        # Save Kontakt now: CTAs below reference it, and an unsaved page would be
+        # stored as a null reference. It is moved to the end of the menu later.
+        home.add_child(instance=contact)
+
         def cta(heading: str) -> tuple:
             return (
                 "cta",
@@ -383,7 +387,8 @@ class Command(BaseCommand):
             ],
         )
         home.add_child(instance=jobs)
-        home.add_child(instance=contact)
+        contact.move(home, pos="last-child")
+        contact.refresh_from_db()
 
         # --- Legal pages ----------------------------------------------------------
         legal_pages = []

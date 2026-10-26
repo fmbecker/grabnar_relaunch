@@ -1,0 +1,26 @@
+[Unit]
+Description=Grabnar headless preview (Astro SSR for /preview/)
+After=network.target
+
+[Service]
+User=felix
+WorkingDirectory=/srv/grabnar/web
+Environment=HOST=127.0.0.1
+Environment=PORT=4322
+Environment=NODE_ENV=production
+Environment=WAGTAIL_API_URL=http://127.0.0.1:8000/api/v2
+Environment=WAGTAIL_MEDIA_URL=
+# fnm/node must be on PATH:
+Environment=PATH=/home/felix/.local/share/fnm/aliases/default/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/usr/bin/env node /srv/grabnar/web/server/entry.mjs
+Restart=always
+RestartSec=3
+# Hardening – the preview only needs to talk to the CMS on localhost.
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadOnlyPaths=/srv/grabnar
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
