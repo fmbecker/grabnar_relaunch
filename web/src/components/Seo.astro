@@ -1,0 +1,28 @@
+---
+import type { ApiImage } from "@/lib/types";
+interface Props {
+  title: string;
+  description?: string;
+  image?: ApiImage | null;
+  path: string;
+  noindex?: boolean;
+  jsonLd?: object | object[];
+}
+const { title, description = "", image, path, noindex = false, jsonLd } = Astro.props;
+const site = import.meta.env.PUBLIC_SITE_URL ?? Astro.site?.toString() ?? "";
+const canonical = new URL(path, site).toString();
+const ogImage = image ? new URL(image.renditions.wide.url, site).toString() : null;
+const ld = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
+---
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex,nofollow" />}
+<meta property="og:type" content="website" />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:locale" content="de_DE" />
+{ogImage && <meta property="og:image" content={ogImage} />}
+<meta name="twitter:card" content={ogImage ? "summary_large_image" : "summary"} />
+{ld.map((obj) => <script type="application/ld+json" set:html={JSON.stringify(obj)} />)}

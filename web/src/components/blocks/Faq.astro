@@ -1,0 +1,21 @@
+---
+import type { FaqValue } from "@/lib/types";
+interface Props { value: FaqValue }
+const { value } = Astro.props;
+---
+<section class="section">
+  <div class="container-x max-w-3xl">
+    {value.heading && <h2 class="h2 mb-6">{value.heading}</h2>}
+    <div class="divide-y divide-ink-100 rounded-lg border border-ink-100">
+      {value.items.map((item) => (
+        <details class="group p-5">
+          <summary class="flex cursor-pointer list-none items-center justify-between font-semibold">
+            {item.question}
+            <span class="ml-4 text-brand-600 transition group-open:rotate-45" aria-hidden="true">+</span>
+          </summary>
+          <div class="prose-site mt-3 text-sm" set:html={item.answer} />
+        </details>
+      ))}
+    </div>
+  </div>
+</section>

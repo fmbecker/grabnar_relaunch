@@ -1,0 +1,6 @@
+.venv
+db.sqlite3
+media
+collected-static
+.env
+__pycache__

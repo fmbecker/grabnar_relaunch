@@ -1,0 +1,29 @@
+---
+/** Responsive image from Wagtail renditions. */
+import type { ApiImage } from "@/lib/types";
+interface Props {
+  image: ApiImage;
+  variant?: "card" | "wide" | "hero" | "full";
+  class?: string;
+  loading?: "lazy" | "eager";
+  sizes?: string;
+}
+const { image, variant = "card", class: cls = "", loading = "lazy", sizes = "(min-width: 1024px) 50vw, 100vw" } = Astro.props;
+const r = image.renditions;
+const main = r[variant];
+const srcset = [r.thumb, r.card, r.wide, r.hero]
+  .filter((x, i, a) => a.findIndex((y) => y.url === x.url) === i)
+  .map((x) => `${x.url} ${x.width}w`)
+  .join(", ");
+---
+<img
+  src={main.url}
+  srcset={srcset}
+  sizes={sizes}
+  width={main.width}
+  height={main.height}
+  alt={image.alt}
+  loading={loading}
+  decoding="async"
+  class={cls}
+/>

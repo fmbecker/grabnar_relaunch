@@ -9,3 +9,9 @@ dist/
 !.env.example
 media/
 .DS_Store
+
+# cms
+cms/db.sqlite3
+cms/media/
+cms/collected-static/
+cms/grabnar/settings/local.py

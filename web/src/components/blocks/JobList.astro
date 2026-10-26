@@ -1,0 +1,26 @@
+---
+import type { JobListValue } from "@/lib/types";
+import JobFilter from "@/components/islands/JobFilter";
+import Icon from "@/components/ui/Icon.astro";
+interface Props { value: JobListValue }
+const { value } = Astro.props;
+---
+<section class="section bg-ink-50" id="stellen">
+  <div class="container-x">
+    {value.heading && <h2 class="h2 mb-8">{value.heading}</h2>}
+    {value.jobs.length === 0 ? (
+      <p class="text-ink-700">{value.empty_text}</p>
+    ) : value.show_filter ? (
+      <JobFilter client:idle jobs={value.jobs} />
+    ) : (
+      <ul class="grid gap-4">
+        {value.jobs.map((j) => (
+          <li><a href={j.href} class="flex items-center justify-between rounded-lg border border-ink-100 bg-white p-5 hover:border-brand-300">
+            <div><h3 class="h3">{j.title}</h3><p class="mt-1 text-sm text-ink-500">{j.location} · {j.employment_type_label} · {j.start_date}</p></div>
+            <Icon name="arrow" class="h-5 w-5 text-brand-600" />
+          </a></li>
+        ))}
+      </ul>
+    )}
+  </div>
+</section>

@@ -1,0 +1,22 @@
+---
+/** Static, tracking-free map: OSM link + address. Phase 3 may swap in self-hosted Leaflet. */
+import type { ContactSettings, MapValue } from "@/lib/types";
+interface Props { value: MapValue; contact: ContactSettings }
+const { value, contact } = Astro.props;
+const q = encodeURIComponent(`${contact.street}, ${contact.postal_code} ${contact.city}`);
+const osm = contact.latitude && contact.longitude
+  ? `https://www.openstreetmap.org/?mlat=${contact.latitude}&mlon=${contact.longitude}#map=${value.zoom}/${contact.latitude}/${contact.longitude}`
+  : `https://www.openstreetmap.org/search?query=${q}`;
+---
+<section class="section">
+  <div class="container-x grid gap-8 lg:grid-cols-2">
+    <div>
+      {value.heading && <h2 class="h2 mb-4">{value.heading}</h2>}
+      <address class="not-italic leading-relaxed text-ink-700">
+        <strong class="text-ink-900">{contact.company_name}</strong><br />{contact.street}<br />{contact.postal_code} {contact.city}
+      </address>
+      <p class="mt-4"><a class="btn-link" href={osm} rel="noopener" target="_blank">Auf OpenStreetMap anzeigen</a></p>
+    </div>
+    <div class="flex aspect-[4/3] items-center justify-center rounded-lg bg-ink-100 text-sm text-ink-500">Kartenansicht (ohne externe Tracker) – Phase 3</div>
+  </div>
+</section>

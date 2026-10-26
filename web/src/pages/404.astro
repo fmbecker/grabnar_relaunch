@@ -1,0 +1,12 @@
+---
+import Base from "@/layouts/Base.astro";
+import { getNavigation, getSettings } from "@/lib/wagtail";
+const [settings, nav] = await Promise.all([getSettings(), getNavigation()]);
+---
+<Base settings={settings} nav={nav} title="Seite nicht gefunden" path="/404/" noindex>
+  <section class="section"><div class="container-x text-center">
+    <h1 class="h1">Seite nicht gefunden</h1>
+    <p class="mt-4 text-ink-700">Die Adresse existiert nicht mehr oder wurde verschoben.</p>
+    <a href="/" class="btn-primary mt-8">Zur Startseite</a>
+  </div></section>
+</Base>

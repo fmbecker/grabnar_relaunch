@@ -1,0 +1,19 @@
+name: cms
+on:
+  push: { paths: ["cms/**", ".github/workflows/cms.yml"] }
+  pull_request: { paths: ["cms/**"] }
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: cms } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --frozen
+      - run: uv run ruff check . && uv run ruff format --check .
+      - run: uv run manage.py check
+      - run: uv run manage.py makemigrations --check --dry-run
+      - run: uv run manage.py migrate -v 0 && uv run manage.py seed_dev
+      - run: uv run pytest -q
+      - name: Docker build
+        run: docker build -t grabnar-cms:ci .

@@ -1,0 +1,19 @@
+---
+import type { FeatureListValue } from "@/lib/types";
+import Icon from "@/components/ui/Icon.astro";
+interface Props { value: FeatureListValue }
+const { value } = Astro.props;
+---
+<section class="section">
+  <div class="container-x">
+    {value.heading && <h2 class="h2 mb-10">{value.heading}</h2>}
+    <ul class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      {value.features.map((f) => (
+        <li class="flex gap-4">
+          <span class="shrink-0 rounded-md bg-brand-600 p-2.5 text-white"><Icon name={f.icon} class="h-6 w-6" /></span>
+          <div><h3 class="h3">{f.title}</h3><p class="mt-1 text-ink-700">{f.text}</p></div>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>

@@ -1,0 +1,11 @@
+---
+import type { TestimonialValue } from "@/lib/types";
+interface Props { value: TestimonialValue }
+const { value } = Astro.props;
+---
+<section class="section">
+  <figure class="container-x max-w-3xl text-center">
+    <blockquote class="text-xl font-medium leading-relaxed text-ink-900 sm:text-2xl">„{value.quote}“</blockquote>
+    <figcaption class="mt-6 text-sm text-ink-500"><span class="font-semibold text-ink-900">{value.name}</span>{value.company && <span> · {value.company}</span>}</figcaption>
+  </figure>
+</section>

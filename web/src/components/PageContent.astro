@@ -1,0 +1,88 @@
+---
+/** Renders any page type. Shared by [...slug].astro and the preview route. */
+import { isHomePage, isJobPage, isServicePage, isStandardPage, type PageData, type Settings } from "@/lib/types";
+import Hero from "@/components/blocks/Hero.astro";
+import BlockRenderer from "@/components/blocks/BlockRenderer.astro";
+import ServiceGrid from "@/components/blocks/ServiceGrid.astro";
+import Picture from "@/components/ui/Picture.astro";
+import ContactFormIsland from "@/components/islands/ContactForm";
+interface Props { page: PageData; settings: Settings; path: string }
+const { page, settings, path } = Astro.props;
+const home = isHomePage(page) ? page : null;
+const std = isStandardPage(page) ? page : null;
+const svc = isServicePage(page) ? page : null;
+const job = isJobPage(page) ? page : null;
+---
+{home && (
+  <>
+    <Hero value={home.hero[0].value} />
+    <BlockRenderer blocks={home.body} contact={settings.contact} sourcePath={path} />
+  </>
+)}
+
+{std && (
+  <>
+    <div class="border-b border-ink-100 bg-ink-50">
+      <div class="container-x py-12 sm:py-16">
+        <h1 class="h1">{page.title}</h1>
+        {std.intro && <p class="mt-4 max-w-2xl text-lg text-ink-700">{std.intro}</p>}
+      </div>
+    </div>
+    <BlockRenderer blocks={std.body} contact={settings.contact} sourcePath={path} />
+  </>
+)}
+
+{svc && (
+  <>
+    <div class="relative isolate bg-brand-900 text-white">
+      {svc.hero_image && <Picture image={svc.hero_image} variant="hero" loading="eager" sizes="100vw" class="absolute inset-0 -z-10 h-full w-full object-cover opacity-30" />}
+      <div class="container-x py-16 sm:py-24">
+        <p class="text-sm font-semibold uppercase tracking-wide text-brand-200">Leistung</p>
+        <h1 class="h1 mt-2">{page.title}</h1>
+        <p class="mt-4 max-w-2xl text-lg text-brand-100">{svc.teaser}</p>
+      </div>
+    </div>
+    <BlockRenderer blocks={svc.body} contact={settings.contact} sourcePath={path} />
+    {svc.related.length > 0 && <ServiceGrid value={{ heading: "Verwandte Leistungen", intro: "", services: svc.related }} />}
+  </>
+)}
+
+{job && (
+  <>
+    <div class="border-b border-ink-100 bg-ink-50">
+      <div class="container-x py-12 sm:py-16">
+        <p class="text-sm font-semibold uppercase tracking-wide text-brand-700">Stellenangebot</p>
+        <h1 class="h1 mt-2">{job.title}</h1>
+        <dl class="mt-6 flex flex-wrap gap-x-8 gap-y-2 text-sm text-ink-700">
+          <div><dt class="inline font-semibold">Ort: </dt><dd class="inline">{job.location}</dd></div>
+          <div><dt class="inline font-semibold">Art: </dt><dd class="inline">{job.employment_type_label}</dd></div>
+          <div><dt class="inline font-semibold">Beginn: </dt><dd class="inline">{job.start_date}</dd></div>
+          {job.salary_note && <div><dt class="inline font-semibold">Vergütung: </dt><dd class="inline">{job.salary_note}</dd></div>}
+        </dl>
+      </div>
+    </div>
+    <section class="section">
+      <div class="container-x grid gap-12 lg:grid-cols-3">
+        <div class="prose-site lg:col-span-2">
+          <p class="text-lg">{job.teaser}</p>
+          <h2>Ihre Aufgaben</h2><div set:html={job.tasks} />
+          <h2>Das bringen Sie mit</h2><div set:html={job.requirements} />
+          {job.benefits && <><h2>Wir bieten</h2><div set:html={job.benefits} /></>}
+        </div>
+        <aside class="rounded-lg bg-brand-50 p-6 text-sm">
+          <h2 class="h3">Fragen zur Stelle?</h2>
+          <p class="mt-2">Rufen Sie uns an: <a class="font-semibold text-brand-700" href={`tel:${settings.contact.phone.replace(/\s/g, "")}`}>{settings.contact.phone}</a></p>
+          {job.show_apply_form && <a href="#formular" class="btn-primary mt-4 w-full">Jetzt bewerben</a>}
+        </aside>
+      </div>
+    </section>
+    {job.show_apply_form && (
+      <section class="section bg-ink-50" id="formular">
+        <div class="container-x max-w-2xl">
+          <h2 class="h2 mb-8">Bewerbung: {job.title}</h2>
+          <ContactFormIsland client:visible variant="application" successMessage="Vielen Dank für Ihre Bewerbung! Wir melden uns zeitnah." sourcePath={path} job={{ id: job.id, title: job.title }} apiUrl={import.meta.env.PUBLIC_FORMS_API_URL} />
+        </div>
+      </section>
+    )}
+  </>
+)}

@@ -1,0 +1,16 @@
+[Unit]
+Description=Grabnar frontend rebuild webhook
+After=network.target
+
+[Service]
+User=felix
+Environment=HOOK_SECRET=change-me
+Environment=BUILD_SCRIPT=/srv/grabnar/repo/deploy/build-web.sh
+Environment=BUILD_LOG=/srv/grabnar/logs/build.log
+# fnm/node must be on PATH for build-web.sh:
+Environment=PATH=/home/felix/.local/share/fnm/aliases/default/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/usr/bin/python3 /srv/grabnar/repo/deploy/rebuild-hook.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

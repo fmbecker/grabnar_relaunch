@@ -1,0 +1,11 @@
+/// <reference types="astro/client" />
+
+interface ImportMetaEnv {
+  readonly WAGTAIL_API_URL: string;
+  readonly WAGTAIL_MEDIA_URL: string;
+  readonly PUBLIC_SITE_URL: string;
+  readonly PUBLIC_FORMS_API_URL: string;
+}
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}

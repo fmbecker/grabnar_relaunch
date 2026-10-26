@@ -1,0 +1,5 @@
+---
+interface Props { value: string }
+const { value } = Astro.props;
+---
+<section class="section"><div class="container-x"><div class="prose-site max-w-3xl" set:html={value} /></div></section>

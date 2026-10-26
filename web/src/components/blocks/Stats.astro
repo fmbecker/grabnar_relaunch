@@ -1,0 +1,12 @@
+---
+import type { StatsValue } from "@/lib/types";
+interface Props { value: StatsValue }
+const { value } = Astro.props;
+---
+<section class="bg-brand-700 py-12 text-white">
+  <dl class="container-x grid grid-cols-2 gap-8 text-center lg:grid-cols-4">
+    {value.stats.map((s) => (
+      <div><dd class="text-4xl font-bold">{s.value}</dd><dt class="mt-1 text-sm text-brand-100">{s.label}</dt></div>
+    ))}
+  </dl>
+</section>

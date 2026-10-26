@@ -1,0 +1,13 @@
+---
+import type { ContactFormValue, JobSummary } from "@/lib/types";
+import ContactFormIsland from "@/components/islands/ContactForm";
+interface Props { value: ContactFormValue; sourcePath: string; job?: Pick<JobSummary, "id" | "title"> }
+const { value, sourcePath, job } = Astro.props;
+---
+<section class="section" id="formular">
+  <div class="container-x max-w-2xl">
+    {value.heading && <h2 class="h2">{value.heading}</h2>}
+    {value.intro && <p class="mt-2 mb-8 text-ink-700">{value.intro}</p>}
+    <ContactFormIsland client:visible variant={value.variant} successMessage={value.success_message} sourcePath={sourcePath} job={job} apiUrl={import.meta.env.PUBLIC_FORMS_API_URL} />
+  </div>
+</section>

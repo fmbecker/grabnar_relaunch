@@ -1,0 +1,20 @@
+---
+import type { TextImageValue } from "@/lib/types";
+import Picture from "@/components/ui/Picture.astro";
+import LinkButton from "@/components/ui/LinkButton.astro";
+interface Props { value: TextImageValue }
+const { value } = Astro.props;
+const imgFirst = value.image_position === "left";
+---
+<section class="section">
+  <div class="container-x grid items-center gap-10 lg:grid-cols-2">
+    <div class={imgFirst ? "lg:order-1" : "lg:order-2"}>
+      <Picture image={value.image} variant="card" class="w-full rounded-lg object-cover shadow-sm" />
+    </div>
+    <div class={imgFirst ? "lg:order-2" : "lg:order-1"}>
+      {value.heading && <h2 class="h2 mb-4">{value.heading}</h2>}
+      <div class="prose-site" set:html={value.text} />
+      {value.link && <LinkButton link={value.link} class="mt-4" />}
+    </div>
+  </div>
+</section>

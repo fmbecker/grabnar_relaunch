@@ -1,0 +1,35 @@
+# Production: run from the repo checkout on the Linode, e.g.
+#   docker compose -f /srv/grabnar/repo/deploy/docker-compose.yml --env-file /srv/grabnar/cms.env up -d
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: grabnar
+      POSTGRES_USER: grabnar
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set in env file}
+    volumes:
+      - /srv/grabnar/pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U grabnar"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  cms:
+    build: ../cms
+    restart: unless-stopped
+    env_file: /srv/grabnar/cms.env
+    environment:
+      DATABASE_URL: postgres://grabnar:${POSTGRES_PASSWORD}@db:5432/grabnar
+      MEDIA_ROOT: /app/media
+    volumes:
+      - /srv/grabnar/media:/app/media
+      - /srv/grabnar/cms-static:/app/collected-static
+    ports:
+      - "127.0.0.1:8000:8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # reach rebuild hook on the host
+    depends_on:
+      db:
+        condition: service_healthy

@@ -12,32 +12,32 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 - [ ] 👤 Linode-Bestandsaufnahme: OS-Version, Nginx-Config der Altseite, certbot-Status, freier Speicher/RAM, ob Docker installiert ist → `docs/01-ist-analyse.md`
 - [ ] 👤 Logo, Farben, vorhandene Fotos sammeln → `docs/assets/`
 
-## Phase 1 – CMS-Grundgerüst (`cms/`)
+## Phase 1 – CMS-Grundgerüst (`cms/`) ✅ erledigt am 26.10.2026 (Wagtail 7.3 LTS, Django 5.2)
 
-- [ ] 🤖 Wagtail-Projekt mit `uv` aufsetzen, Settings-Split, Postgres via `docker-compose.yml`
-- [ ] 🤖 `BasePage` (abstract) mit SEO-Feldern
-- [ ] 🤖 Blocks in `cms/blocks/` gemäß `docs/02-konzept.md` (Block-Vertrag)
-- [ ] 🤖 Seitentypen `HomePage`, `StandardPage`, `ServiceIndexPage`, `ServicePage`, `JobIndexPage`, `JobPage`
-- [ ] 🤖 `site_settings` (Contact, Footer, Tracking)
-- [ ] 🤖 API v2 konfigurieren: Pages/Images/Documents + Settings- und Redirects-Endpunkt
-- [ ] 🤖 `wagtail-headless-preview` einbinden
-- [ ] 🤖 Fixture `cms/fixtures/dev.json` mit Beispielinhalten für alle Blocks
-- [ ] 🤖 `forms_api`: Contact + Application Endpunkte, Honeypot, Mailversand, Admin-Ansicht
-- [ ] 🤖 `signals.py`: Publish → Build-Hook mit Debounce
-- [ ] 🤖 Dockerfile, ruff-Konfiguration, GitHub-Workflow `cms.yml`
+- [x] 🤖 Wagtail-Projekt mit `uv` aufsetzen, Settings-Split, Postgres via `docker-compose.yml`
+- [x] 🤖 `BasePage` (abstract) mit SEO-Feldern
+- [x] 🤖 Blocks in `cms/blocks/` gemäß `docs/02-konzept.md` (Block-Vertrag)
+- [x] 🤖 Seitentypen `HomePage`, `StandardPage`, `ServiceIndexPage`, `ServicePage`, `JobIndexPage`, `JobPage`
+- [x] 🤖 `site_settings` (Contact, Footer, Tracking)
+- [x] 🤖 API v2 konfigurieren: Pages/Images/Documents + Settings- und Redirects-Endpunkt
+- [x] 🤖 `wagtail-headless-preview` einbinden
+- [x] 🤖 Beispielinhalte für alle Blocks: Management-Command `manage.py seed_dev` (statt JSON-Fixture, wegen Seitenbaum/Bildern)
+- [x] 🤖 `forms_api`: Contact + Application Endpunkte, Honeypot, Mailversand, Admin-Ansicht
+- [x] 🤖 `signals.py`: Publish → Build-Hook mit Debounce
+- [x] 🤖 Dockerfile, ruff-Konfiguration, GitHub-Workflow `cms.yml`
 
-## Phase 2 – Frontend-Grundgerüst (`web/`)
+## Phase 2 – Frontend-Grundgerüst (`web/`) ✅ bis auf Preview erledigt am 26.10.2026 (Astro 7, Tailwind 4, React 19)
 
-- [ ] 🤖 Astro + Tailwind + React-Integration initialisieren, `pnpm`
-- [ ] 🤖 `src/lib/types.ts` aus dem Block-Vertrag ableiten
-- [ ] 🤖 `src/lib/wagtail.ts` (Pages, Settings, Redirects, Renditions)
-- [ ] 🤖 Layouts + `[...slug].astro` mit `getStaticPaths()`
-- [ ] 🤖 Alle Block-Komponenten in `src/components/blocks/` (zunächst unstyled, dann Design)
-- [ ] 🤖 Islands: `ContactForm.tsx`, `ApplicationForm.tsx`, `JobFilter.tsx`
-- [ ] 🤖 `Seo.astro`, Sitemap, JSON-LD (`LocalBusiness`, `JobPosting`)
-- [ ] 🤖 `_redirects`-Generierung aus der Redirects-API
-- [ ] 🤖 Preview-Route für Headless-Preview
-- [ ] 🤖 GitHub-Workflow `web.yml`
+- [x] 🤖 Astro + Tailwind + React-Integration initialisieren, `pnpm`
+- [x] 🤖 `src/lib/types.ts` aus dem Block-Vertrag ableiten
+- [x] 🤖 `src/lib/wagtail.ts` (Pages, Settings, Redirects, Renditions)
+- [x] 🤖 Layouts + `[...slug].astro` mit `getStaticPaths()`
+- [x] 🤖 Alle Block-Komponenten in `src/components/blocks/` (zunächst unstyled, dann Design)
+- [x] 🤖 Islands: `ContactForm.tsx` (Kontakt + Bewerbung in einer Komponente, `variant`), `JobFilter.tsx`
+- [x] 🤖 `Seo.astro`, Sitemap, JSON-LD (`LocalBusiness`, `JobPosting`)
+- [x] 🤖 Nginx-`map`-Generierung aus der Redirects-API (`web/scripts/redirects.mjs`)
+- [ ] 🤖 Preview-Route für Headless-Preview fertigstellen: `web/src/pages/preview.astro` ist nur ein Platzhalter. Plan: kleine SSR-Route (Astro `output: 'static'` + `prerender = false` für `/preview/`, Node-Adapter oder separater `astro dev`-Prozess auf dem Server), die `?content_type=&token=` an `GET <CMS>/api/v2/page_preview/1/?content_type=…&token=…` weiterreicht und `PageContent.astro` rendert
+- [x] 🤖 GitHub-Workflow `web.yml`
 
 ## Phase 3 – Design & Inhalte
 
@@ -47,10 +47,12 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 - [ ] 👤 Bilder einpflegen (Wagtail-Admin)
 - [ ] 👤 Impressum / Datenschutz aktualisieren
 - [ ] 🤖 Lighthouse ≥ 95 auf Mobile, a11y-Check (axe)
+- [ ] 🤖 Karte in `Map.astro`: selbst gehostetes Leaflet mit OSM-Tiles (aktuell nur Adresse + OSM-Link)
+- [ ] 🤖 Schriften selbst hosten (`web/public/fonts/`, Inter Variable), aktuell System-Font-Stack
 
 ## Phase 4 – Go-Live
 
-- [ ] 🤖 `deploy/`: `docker-compose.yml`, `nginx/grabnar.conf`, `rebuild-hook.py` + systemd-Unit, `build-web.sh`, `deploy.sh`, Backup-Skript
+- [x] 🤖 `deploy/`: `docker-compose.yml`, `nginx/grabnar.conf`, `rebuild-hook.py` + systemd-Unit, `build-web.sh`, `deploy.sh`, Backup-Skript
 - [ ] 🤝 Docker, Node/pnpm (fnm) auf dem Linode installieren, CMS parallel zur Altseite hochfahren
 - [ ] 🤝 Staging-Server-Block (Port 8443, Basic-Auth) für Abnahme
 - [ ] 🤝 Backup nach `/srv/backup/` + Offsite-Ziel einrichten und Restore einmal testen

@@ -1,0 +1,40 @@
+---
+import { isHomePage, isJobPage, isServicePage, type PageData } from "@/lib/types";
+import { getAllPages, getNavigation, getSettings, normalizePage, pathFromHtmlUrl } from "@/lib/wagtail";
+import { jobPosting, localBusiness } from "@/lib/jsonld";
+import Base from "@/layouts/Base.astro";
+import PageContent from "@/components/PageContent.astro";
+
+export async function getStaticPaths() {
+  const pages = await getAllPages();
+  return pages.map((page) => {
+    const path = pathFromHtmlUrl(page.meta.html_url);
+    const slug = path === "/" ? undefined : path.replace(/^\/|\/$/g, "");
+    return { params: { slug }, props: { page: normalizePage(page), path } };
+  });
+}
+
+interface Props { page: PageData; path: string }
+const { page, path } = Astro.props;
+const [settings, nav] = await Promise.all([getSettings(), getNavigation()]);
+const site = import.meta.env.PUBLIC_SITE_URL;
+
+const jsonLd: object[] = [];
+if (isHomePage(page) || path === "/kontakt/") jsonLd.push(localBusiness(settings.contact, site));
+if (isJobPage(page)) jsonLd.push(jobPosting(page, settings.contact, site, path));
+
+const image =
+  page.og_image ?? (isServicePage(page) ? page.hero_image : null) ?? (isHomePage(page) ? page.hero[0].value.image : null);
+---
+<Base
+  settings={settings}
+  nav={nav}
+  title={page.meta.seo_title || page.title}
+  description={page.meta.search_description}
+  image={image}
+  path={path}
+  noindex={page.hide_from_sitemap}
+  jsonLd={jsonLd}
+>
+  <PageContent page={page} settings={settings} path={path} />
+</Base>

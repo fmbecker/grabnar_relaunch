@@ -1,0 +1,29 @@
+---
+import type { Navigation, SiteSettings } from "@/lib/types";
+import Icon from "@/components/ui/Icon.astro";
+interface Props { nav: Navigation; site: SiteSettings; phone: string; currentPath: string }
+const { nav, site, phone, currentPath } = Astro.props;
+const isActive = (href: string) => href !== "/" && currentPath.startsWith(href);
+---
+<header class="sticky top-0 z-40 border-b border-ink-100 bg-white/95 backdrop-blur">
+  <div class="container-x flex h-16 items-center justify-between gap-6">
+    <a href="/" class="flex items-center gap-2 font-bold text-brand-800" aria-label="Zur Startseite">
+      {site.logo ? <img src={site.logo.renditions.thumb.url} alt={site.logo.alt} class="h-9 w-auto" width={site.logo.renditions.thumb.width} height={site.logo.renditions.thumb.height} /> : <span class="text-lg">Grabnar</span>}
+    </a>
+    <nav aria-label="Hauptnavigation" class="hidden md:block">
+      <ul class="flex items-center gap-6 text-sm font-medium">
+        {nav.items.map((item) => (
+          <li><a href={item.href} class:list={["hover:text-brand-700", isActive(item.href) && "text-brand-700"]} aria-current={isActive(item.href) ? "page" : undefined}>{item.title}</a></li>
+        ))}
+      </ul>
+    </nav>
+    <a href={`tel:${phone.replace(/\s/g, "")}`} class="btn-primary hidden md:inline-flex"><Icon name="phone" class="h-4 w-4" />{phone}</a>
+    <details class="relative md:hidden">
+      <summary class="btn-secondary cursor-pointer list-none px-3 py-2" aria-label="Menü öffnen">Menü</summary>
+      <ul class="absolute right-0 mt-2 w-56 rounded-md border border-ink-100 bg-white p-2 shadow-lg">
+        {nav.items.map((item) => <li><a href={item.href} class="block rounded px-3 py-2 hover:bg-ink-50">{item.title}</a></li>)}
+        <li class="mt-2 border-t border-ink-100 pt-2"><a href={`tel:${phone.replace(/\s/g, "")}`} class="block px-3 py-2 font-semibold text-brand-700">{phone}</a></li>
+      </ul>
+    </details>
+  </div>
+</header>

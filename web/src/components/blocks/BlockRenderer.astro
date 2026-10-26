@@ -1,0 +1,36 @@
+---
+/** Maps StreamField blocks to components. Keep in sync with cms/blocks/blocks.py. */
+import type { Block, ContactSettings, JobSummary } from "@/lib/types";
+import RichText from "./RichText.astro";
+import TextImage from "./TextImage.astro";
+import ServiceGrid from "./ServiceGrid.astro";
+import FeatureList from "./FeatureList.astro";
+import Stats from "./Stats.astro";
+import Testimonial from "./Testimonial.astro";
+import Faq from "./Faq.astro";
+import Cta from "./Cta.astro";
+import ContactForm from "./ContactForm.astro";
+import JobList from "./JobList.astro";
+import Map from "./Map.astro";
+import Gallery from "./Gallery.astro";
+
+interface Props { blocks: Block[]; contact: ContactSettings; sourcePath: string; job?: Pick<JobSummary, "id" | "title"> }
+const { blocks, contact, sourcePath, job } = Astro.props;
+---
+{blocks.map((b) => {
+  switch (b.type) {
+    case "rich_text": return <RichText value={b.value} />;
+    case "text_image": return <TextImage value={b.value} />;
+    case "service_grid": return <ServiceGrid value={b.value} />;
+    case "feature_list": return <FeatureList value={b.value} />;
+    case "stats": return <Stats value={b.value} />;
+    case "testimonial": return <Testimonial value={b.value} />;
+    case "faq": return <Faq value={b.value} />;
+    case "cta": return <Cta value={b.value} />;
+    case "contact_form": return <ContactForm value={b.value} sourcePath={sourcePath} job={job} />;
+    case "job_list": return <JobList value={b.value} />;
+    case "map": return <Map value={b.value} contact={contact} />;
+    case "gallery": return <Gallery value={b.value} />;
+    default: return null;
+  }
+})}

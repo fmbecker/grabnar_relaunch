@@ -1,0 +1,6 @@
+[Unit]
+Description=Purge old application submissions (GDPR retention)
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/docker compose -f /srv/grabnar/repo/deploy/docker-compose.yml --env-file /srv/grabnar/cms.env exec -T cms python manage.py purge_applications

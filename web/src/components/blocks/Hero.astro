@@ -1,0 +1,23 @@
+---
+import type { HeroValue } from "@/lib/types";
+import Picture from "@/components/ui/Picture.astro";
+import LinkButton from "@/components/ui/LinkButton.astro";
+interface Props { value: HeroValue }
+const { value } = Astro.props;
+---
+<section class="relative isolate overflow-hidden bg-brand-900 text-white">
+  {value.image && (
+    <Picture image={value.image} variant="hero" loading="eager" sizes="100vw" class="absolute inset-0 -z-10 h-full w-full object-cover opacity-40" />
+  )}
+  <div class="container-x py-20 sm:py-28 lg:py-36">
+    <div class="max-w-2xl">
+      <h1 class="h1">{value.headline}</h1>
+      {value.subline && <p class="mt-5 text-lg text-brand-100 sm:text-xl">{value.subline}</p>}
+      {value.links.length > 0 && (
+        <div class="mt-8 flex flex-wrap gap-3">
+          {value.links.map((l) => <LinkButton link={{ ...l, style: l.style === "secondary" ? "secondary" : l.style }} class={l.style === "secondary" ? "border-white text-white hover:bg-white/10" : ""} />)}
+        </div>
+      )}
+    </div>
+  </div>
+</section>
