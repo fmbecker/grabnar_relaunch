@@ -9,9 +9,9 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 - [x] Inhalte der Altseite erfasst: DB-Export → `docs/01-ist-analyse.md`, Texte in `docs/content-export/`, Redirect-Mapping `docs/redirects.csv`
 - [x] Versionen der Altseite dokumentiert (Wagtail 2.14, Django 3.2, Python 3.8, MySQL)
 - [ ] 👤 Empfängeradresse des Kontaktformulars klären (aktuell `mail@aivii.de`)
-- [ ] 👤 Seitenbaum v2 freigeben (4 Kategorien auf oberster Ebene, `docs/02-konzept.md`)
-- [ ] 🤖 Nach Freigabe: `ServiceIndexPage` als Kategorie (max_count entfernen), `seed_dev` + Tests auf 4 Kategorien, Navigation mit Untermenü
-- [ ] 🤖 Import-Command `import_legacy`: Leistungstexte aus `docs/content-export/` als ServicePages anlegen, Redirects aus `docs/redirects.csv` importieren
+- [x] Seitenbaum v2 freigegeben (4 Kategorien auf oberster Ebene, `docs/02-konzept.md`)
+- [x] 🤖 `ServiceIndexPage` = Leistungskategorie (Icon, Kurzbeschreibung, Titelbild), `ServiceGridBlock` mit Quelle Kategorien/Kategorie/manuell, Navigation mit Dropdown (Desktop) bzw. aufklappbar (Mobil)
+- [x] 🤖 `manage.py import_legacy`: baut den kompletten Seitenbaum aus `docs/content-export/` (4 Kategorien, 22 Leistungen, Kontakt, Karriere, Impressum/Datenschutz/AGB), Kontaktdaten und 28 Redirects aus `docs/redirects.csv`. `seed_dev` = `import_legacy` + Platzhalterbilder + Beispiel-Stellen
 - [x] Entscheidung Hosting: alles auf dem bestehenden Linode-VPS, Nginx vor statischem Frontend + Wagtail-Docker, kein DNS-Wechsel (siehe `docs/03-technik.md`)
 - [ ] 👤 Linode-Bestandsaufnahme: OS-Version, Nginx-Config der Altseite, certbot-Status, freier Speicher/RAM, ob Docker installiert ist → `docs/01-ist-analyse.md`
 - [ ] 👤 Logo, Farben, vorhandene Fotos sammeln → `docs/assets/`
@@ -47,9 +47,11 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 
 - [ ] 🤝 Design-System in Tailwind (`tailwind.config` / CSS-Variablen): Farben aus Logo, Typo, Spacing
 - [ ] 🤖 Startseite, Leistungsseiten, Karriere, Kontakt ausgestalten
-- [ ] 👤 Texte der Altseite migrieren und überarbeiten (Claude kann Entwürfe liefern)
+- [x] 🤖 Texte der Altseite migriert (1:1 übernommen)
+- [ ] 🤝 Texte überarbeiten: Teaser im Hero wiederholt den ersten Satz des Fließtexts; Kategorie-Seiten haben kaum eigenen Text; SEO-Titel/Descriptions sind automatisch erzeugt; „IFSG“ → „IfSG“
+- [ ] 🤖 Seite „Unternehmen“ anlegen (Altseite hatte keine; Texte von der Startseite + Meisterbetrieb/QM)
 - [ ] 👤 Bilder einpflegen (Wagtail-Admin)
-- [ ] 👤 Impressum / Datenschutz aktualisieren
+- [ ] 👤 Impressum / Datenschutz / AGB rechtlich prüfen. Datenschutz muss neue Formulare (Bewerbung mit Upload, Speicherfrist 180 Tage) und ggf. Umami abdecken; Impressum: Feld „Vertretungsberechtigt“ ist in der Altseite leer
 - [ ] 🤖 Lighthouse ≥ 95 auf Mobile, a11y-Check (axe)
 - [ ] 🤖 Karte in `Map.astro`: selbst gehostetes Leaflet mit OSM-Tiles (aktuell nur Adresse + OSM-Link)
 - [ ] 🤖 Schriften selbst hosten (`web/public/fonts/`, Inter Variable), aktuell System-Font-Stack
@@ -60,7 +62,7 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 - [ ] 🤝 Docker, Node/pnpm (fnm) auf dem Linode installieren, CMS parallel zur Altseite hochfahren
 - [ ] 🤝 Staging-Server-Block (Port 8443, Basic-Auth) für Abnahme
 - [ ] 🤝 Backup nach `/srv/backup/` + Offsite-Ziel einrichten und Restore einmal testen
-- [ ] 👤 Redirect-Tabelle `docs/redirects.csv` befüllen → importieren
+- [x] Redirect-Tabelle `docs/redirects.csv` erstellt; Import erfolgt über `import_legacy`
 - [ ] 👤 Mailversand (SMTP-Zugang) für Formulare
 - [ ] 👤 Nginx auf neue Struktur umschalten, TLS prüfen (kein DNS-Wechsel nötig)
 - [ ] 🤖 Nach Go-Live: 404-Check, Search Console Sitemap

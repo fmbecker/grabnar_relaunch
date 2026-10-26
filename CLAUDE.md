@@ -55,6 +55,7 @@ grabnar_relaunch/
 
 ```
 cd cms && uv sync && uv run manage.py migrate && uv run manage.py seed_dev --superuser && uv run manage.py runserver
+# seed_dev = import_legacy (echte Inhalte der Altseite aus docs/) + Platzhalterbilder + Beispiel-Stellen
 cd web && pnpm install && cp .env.example .env && pnpm dev     # http://localhost:4321
 ```
 
@@ -68,6 +69,7 @@ Prüfen vor jedem Commit: `cd cms && uv run ruff check . && uv run pytest -q` ·
 - Keine coderedcms-Abhängigkeit, kein Bootstrap. Tailwind ausschließlich.
 - Formulare (Kontakt, Bewerbung) senden an einen eigenen Endpunkt im CMS (`cms/forms_api/`), nicht an Drittanbieter, wegen Datenschutz (Bewerbungsdaten!).
 - Bilder: ausschließlich über Wagtail-Renditions aus der API, nie Originaldateien im Frontend.
+- Inhalte der Altseite: `docs/content-export/*.md` + `docs/redirects.csv` sind die Quelle für `manage.py import_legacy`. Der Import ersetzt den kompletten Seitenbaum – in Produktion nur einmal vor dem Go-Live ausführen, danach pflegen Redakteure im CMS.
 - `grabnar/urls.py` registriert `wagtail_urls` immer (auch in Produktion): `page.url` braucht `reverse("wagtail_serve")`. Nicht entfernen.
 - Vor größeren Entscheidungen (Hosting, Domainumzug, Löschen alter Inhalte) Felix fragen.
 
@@ -83,4 +85,4 @@ Prüfen vor jedem Commit: `cd cms && uv run ruff check . && uv run pytest -q` ·
 - Inhalte der alten Seite noch nicht vollständig erfasst (robots.txt blockt automatisierten Zugriff).
 - Headless-Preview-Route im Frontend ist ein Platzhalter (siehe docs/04-aufgaben.md, Phase 2).
 - Zustand des Linode-VPS (OS, Nginx-Config, Docker, certbot) noch nicht erfasst.
-- Redirect-Konzept von alten URLs noch offen (Mapping in `docs/redirects.csv`).
+- Empfänger des alten Kontaktformulars ist `mail@aivii.de` – Klärung durch Felix offen.

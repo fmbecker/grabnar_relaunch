@@ -31,6 +31,8 @@ export interface ServiceSummary {
   teaser: string;
   icon: string;
   image: ApiImage | null;
+  /** Only for categories (ServiceIndexPage): the services below it. */
+  children?: { title: string; href: string }[];
 }
 
 export type EmploymentType = "FULL_TIME" | "PART_TIME" | "MINI_JOB" | "TEMPORARY" | "APPRENTICE";
@@ -67,6 +69,8 @@ export interface TextImageValue {
 export interface ServiceGridValue {
   heading: string;
   intro: string;
+  /** "categories" = tiles for ServiceIndexPages (with children), "services" = ServicePages */
+  kind: "categories" | "services";
   services: ServiceSummary[];
 }
 

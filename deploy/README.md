@@ -10,6 +10,8 @@ Einmalige Einrichtung (Details: `docs/03-technik.md`):
 4. Purge-Timer: beide `grabnar-purge-applications.*` nach `/etc/systemd/system/`, `systemctl enable --now grabnar-purge-applications.timer`.
 5. `nginx/grabnar.conf` einbauen (zunächst als Staging-Server-Block auf Port 8443 mit Basic-Auth), certbot-Zeilen aus der bestehenden Config übernehmen.
 6. `./deploy.sh` ausführen. Danach `docker compose … exec cms python manage.py createsuperuser`.
-7. Backup: `backup.sh` in die root-Crontab.
+7. **Einmalig** die Inhalte der Altseite importieren (ersetzt den Seitenbaum!):
+   `docker compose -f deploy/docker-compose.yml --env-file /srv/grabnar/cms.env run --rm -v /srv/grabnar/repo/docs:/docs:ro cms python manage.py import_legacy --source /docs`
+8. Backup: `backup.sh` in die root-Crontab.
 
 Jedes weitere Deployment: `./deploy.sh`. Inhaltsänderungen im CMS bauen das Frontend automatisch neu (Webhook, 60 s Debounce).

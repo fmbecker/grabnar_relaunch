@@ -7,6 +7,7 @@ Keep the three in sync when changing anything.
 
 from __future__ import annotations
 
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from wagtail import blocks
 from wagtail.images.blocks import ImageChooserBlock
@@ -95,36 +96,64 @@ class TextImageBlock(blocks.StructBlock):
 
 
 class ServiceGridBlock(blocks.StructBlock):
+    """Tiles for service categories or services.
+
+    source = "categories": all ServiceIndexPages (e.g. on the home page)
+    source = "category":   the ServicePages below one chosen category
+    source = "manual":     hand-picked ServicePages
+    """
+
     heading = blocks.CharBlock(label=_("Überschrift"), required=False, max_length=120)
     intro = blocks.TextBlock(label=_("Einleitung"), required=False, max_length=400)
+    source = blocks.ChoiceBlock(
+        label=_("Inhalt"),
+        choices=[
+            ("categories", _("Alle Leistungskategorien")),
+            ("category", _("Leistungen einer Kategorie")),
+            ("manual", _("Ausgewählte Leistungen")),
+        ],
+        default="categories",
+    )
+    category = blocks.PageChooserBlock(
+        label=_("Kategorie"),
+        page_type="services.ServiceIndexPage",
+        required=False,
+        help_text=_("Nur für „Leistungen einer Kategorie“."),
+    )
     services = blocks.ListBlock(
         blocks.PageChooserBlock(page_type="services.ServicePage"),
-        label=_("Leistungen (leer = alle)"),
+        label=_("Leistungen"),
         min_num=0,
+        help_text=_("Nur für „Ausgewählte Leistungen“."),
     )
 
     class Meta:
         icon = "grip"
         label = _("Leistungs-Kacheln")
 
-    def get_api_representation(self, value, context=None):
-        from services.models import ServicePage
+    def clean(self, value):
+        result = super().clean(value)
+        if result.get("source") == "category" and not result.get("category"):
+            raise blocks.StructBlockValidationError(
+                block_errors={"category": ValidationError(_("Bitte eine Kategorie wählen."))}
+            )
+        return result
 
-        chosen = [p for p in value.get("services", []) if p]
-        pages = chosen or list(ServicePage.objects.live().public().order_by("path"))
+    def get_api_representation(self, value, context=None):
+        from services.models import ServiceIndexPage, ServicePage
+
+        source = value.get("source") or "categories"
+        if source == "categories":
+            pages = ServiceIndexPage.objects.live().public().order_by("path").specific()
+        elif source == "category" and value.get("category"):
+            pages = ServicePage.objects.live().public().child_of(value["category"]).order_by("path")
+        else:
+            pages = [p.specific for p in value.get("services", []) if p and p.live]
         return {
             "heading": value.get("heading"),
             "intro": value.get("intro"),
-            "services": [
-                {
-                    "title": p.title,
-                    "href": p.url,
-                    "teaser": p.specific.teaser,
-                    "icon": p.specific.icon,
-                    "image": image_api_representation(p.specific.hero_image),
-                }
-                for p in pages
-            ],
+            "kind": "categories" if source == "categories" else "services",
+            "services": [p.specific.api_summary() for p in pages],
         }
 
 

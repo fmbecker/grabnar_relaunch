@@ -20,6 +20,9 @@ export const ICONS: Record<string, string> = {
   mail: "M4 4h16v16H4zM4 6l8 7 8-7",
   arrow: "M5 12h14M13 6l6 6-6 6",
   briefcase: "M3 7h18v13H3zM8 7V4h8v3M3 13h18",
+  leaf: "M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.5 19 2c1 2 2 4.2 2 8 0 5.5-4.8 10-10 10zM2 21c0-3 1.9-5.4 5.1-6",
+  brush: "M18.4 2.6a2 2 0 0 1 2.9 2.9L12 15l-3-3 9.4-9.4zM9 12c-2 0-4 1.5-4 4 0 1.5-1 3-3 3 1.5 1.5 3.5 2 5 2 3 0 5-2 5-5",
+  grid: "M3 3h18v18H3zM3 9h18M3 15h18M9 3v18M15 3v18",
 };
 
 export function iconPath(name: string | undefined): string {

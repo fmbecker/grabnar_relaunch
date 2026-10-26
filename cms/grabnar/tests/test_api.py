@@ -1,5 +1,5 @@
 # ruff: noqa: E501
-"""Smoke tests against the seeded site: the API shape the frontend depends on."""
+"""Smoke tests against the seeded site (real legacy content + demo extras)."""
 
 import pytest
 from django.core.cache import cache
@@ -15,30 +15,64 @@ def seeded(django_db_setup, django_db_blocker):
         cache.clear()  # site-root-path cache was primed before seeding
 
 
-def test_home_has_hero_and_blocks(client):
-    data = client.get("/api/v2/pages/", {"type": "home.HomePage", "fields": "*"}).json()
-    page = data["items"][0]
-    assert page["hero"][0]["value"]["headline"]
-    assert {b["type"] for b in page["body"]} >= {"service_grid", "cta"}
-    grid = next(b for b in page["body"] if b["type"] == "service_grid")
-    assert len(grid["value"]["services"]) == 8
-    assert "renditions" in grid["value"]["services"][0]["image"]
-
-
-def test_navigation_settings_redirects(client):
+def test_navigation_has_categories_with_children(client):
     nav = client.get("/api/v2/navigation/").json()
     assert [i["href"] for i in nav["items"]] == [
-        "/leistungen/",
-        "/unternehmen/",
-        "/kontakt/",
+        "/gebaeudereinigung/",
+        "/gebaeudedienste/",
+        "/handwerkerdienste/",
+        "/services/",
         "/karriere/",
+        "/kontakt/",
     ]
-    settings = client.get("/api/v2/settings/").json()
-    assert settings["contact"]["phone"]
-    assert client.get("/api/v2/redirects/").json() == {"items": []}
+    assert [len(i["children"]) for i in nav["items"][:4]] == [9, 3, 6, 4]
 
 
-def test_job_list_block_and_job_page(client):
+def test_home_shows_categories(client):
+    page = client.get("/api/v2/pages/", {"type": "home.HomePage", "fields": "*"}).json()["items"][0]
+    assert page["hero"][0]["value"]["headline"].startswith("Zusammenkommen")
+    grid = next(b for b in page["body"] if b["type"] == "service_grid")["value"]
+    assert grid["kind"] == "categories" and len(grid["services"]) == 4
+    assert grid["services"][0]["children"][0]["href"].startswith("/gebaeudereinigung/")
+
+
+def test_service_page_content_and_list(client):
+    data = client.get(
+        "/api/v2/pages/", {"type": "services.ServicePage", "slug": "wachdienste", "fields": "*"}
+    ).json()
+    page = data["items"][0]
+    assert page["meta"]["html_url"].endswith("/services/wachdienste/")
+    assert "<li>Citystreifen</li>" in page["body"][0]["value"]
+    assert page["teaser"] and len(page["related"]) == 2
+
+
+def test_category_grid_lists_its_services(client):
+    data = client.get(
+        "/api/v2/pages/",
+        {"type": "services.ServiceIndexPage", "slug": "gebaeudedienste", "fields": "body"},
+    ).json()
+    grid = data["items"][0]["body"][0]["value"]
+    assert grid["kind"] == "services"
+    assert [s["title"] for s in grid["services"]] == [
+        "Grau- und Grünanlagenpflege",
+        "Hausmeisterdienste",
+        "Winterdienst",
+    ]
+
+
+def test_settings_and_redirects(client):
+    contact = client.get("/api/v2/settings/").json()["contact"]
+    assert contact["street"] == "Julius-Hölder-Straße 4" and contact["postal_code"] == "70597"
+    items = client.get("/api/v2/redirects/").json()["items"]
+    assert len(items) == 28
+    assert {
+        "from": "/Gebäudereinigung/Baureinigung",
+        "to": "/gebaeudereinigung/baureinigung/",
+        "status": 301,
+    } in items
+
+
+def test_job_list_block(client):
     data = client.get("/api/v2/pages/", {"type": "jobs.JobIndexPage", "fields": "body"}).json()
     jobs = next(b for b in data["items"][0]["body"] if b["type"] == "job_list")["value"]["jobs"]
     assert len(jobs) == 3 and jobs[0]["employment_type_label"]
