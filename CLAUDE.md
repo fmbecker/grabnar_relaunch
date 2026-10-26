@@ -82,7 +82,6 @@ Prüfen vor jedem Commit: `cd cms && uv run ruff check . && uv run pytest -q` ·
 
 ## Offene Punkte (siehe docs/04-aufgaben.md)
 
-- Inhalte der alten Seite noch nicht vollständig erfasst (robots.txt blockt automatisierten Zugriff).
 - Headless-Preview-Route im Frontend ist ein Platzhalter (siehe docs/04-aufgaben.md, Phase 2).
 - Zustand des Linode-VPS (OS, Nginx-Config, Docker, certbot) noch nicht erfasst.
 - Empfänger des alten Kontaktformulars ist `mail@aivii.de` – Klärung durch Felix offen.
