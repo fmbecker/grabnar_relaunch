@@ -6,8 +6,12 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 
 - [x] Stack-Entscheidung: Headless Wagtail + Astro + Tailwind + React-Islands
 - [x] Repo `fmbecker/grabnar_relaunch` angelegt, `CLAUDE.md` und `docs/` erstellt
-- [ ] 👤 Inhalte der Altseite erfassen (Seitenbaum, Texte, Bilder, Formulare) → `docs/01-ist-analyse.md` vervollständigen
-- [ ] 👤 Versionen und Hosting der Altseite dokumentieren (`pip freeze`, Server, DB, Mailversand)
+- [x] Inhalte der Altseite erfasst: DB-Export → `docs/01-ist-analyse.md`, Texte in `docs/content-export/`, Redirect-Mapping `docs/redirects.csv`
+- [x] Versionen der Altseite dokumentiert (Wagtail 2.14, Django 3.2, Python 3.8, MySQL)
+- [ ] 👤 Empfängeradresse des Kontaktformulars klären (aktuell `mail@aivii.de`)
+- [ ] 👤 Seitenbaum v2 freigeben (4 Kategorien auf oberster Ebene, `docs/02-konzept.md`)
+- [ ] 🤖 Nach Freigabe: `ServiceIndexPage` als Kategorie (max_count entfernen), `seed_dev` + Tests auf 4 Kategorien, Navigation mit Untermenü
+- [ ] 🤖 Import-Command `import_legacy`: Leistungstexte aus `docs/content-export/` als ServicePages anlegen, Redirects aus `docs/redirects.csv` importieren
 - [x] Entscheidung Hosting: alles auf dem bestehenden Linode-VPS, Nginx vor statischem Frontend + Wagtail-Docker, kein DNS-Wechsel (siehe `docs/03-technik.md`)
 - [ ] 👤 Linode-Bestandsaufnahme: OS-Version, Nginx-Config der Altseite, certbot-Status, freier Speicher/RAM, ob Docker installiert ist → `docs/01-ist-analyse.md`
 - [ ] 👤 Logo, Farben, vorhandene Fotos sammeln → `docs/assets/`

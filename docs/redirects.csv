@@ -1,0 +1,36 @@
+alt,neu,status,titel
+/,/,-,Home
+/Gebäudereinigung/,/gebaeudereinigung/,301,Gebäudereinigung
+/Gebäudereinigung/Baureinigung/,/gebaeudereinigung/baureinigung/,301,Baureinigung
+/Gebäudereinigung/Containerreinigung/,/gebaeudereinigung/containerreinigung/,301,Containerreinigung
+/Gebäudereinigung/Desinfektion/,/gebaeudereinigung/desinfektion/,301,Desinfektion nach IFSG §17/3
+/Gebäudereinigung/Glasreinigung/,/gebaeudereinigung/glasreinigung/,301,Glas- und Fassadenreinigung
+/Gebäudereinigung/Grundreinigung/,/gebaeudereinigung/grundreinigung/,301,Grundreinigung
+/Gebäudereinigung/Industriereinigung/,/gebaeudereinigung/industriereinigung/,301,Hallen- und Industriereinigung
+/Gebäudereinigung/Sonderreinigung/,/gebaeudereinigung/sonderreinigung/,301,Sonderreinigung
+/Gebäudereinigung/Polsterreinigung/,/gebaeudereinigung/polsterreinigung/,301,Teppich- und Polsterreinigung
+/Gebäudereinigung/Unterhaltsreinigung/,/gebaeudereinigung/unterhaltsreinigung/,301,Unterhaltsreinigung
+/gebäudedienste/,/gebaeudedienste/,301,Gebäudedienste
+/gebäudedienste/Grünanlagenpflege/,/gebaeudedienste/gruenanlagenpflege/,301,Grau- und Grünanlagenpflege
+/gebäudedienste/Hausmeisterdienste/,/gebaeudedienste/hausmeisterdienste/,301,Hausmeisterdienste
+/gebäudedienste/Winterdienst/,/gebaeudedienste/winterdienst/,301,Winterdienst
+/handwerkerdienste/,/handwerkerdienste/,-,Handwerkerdienste
+/handwerkerdienste/Bauhilfsarbeiten/,/handwerkerdienste/bauhilfsarbeiten/,301,Bauhilfsarbeiten
+/handwerkerdienste/Bodenverlegerarbeiten/,/handwerkerdienste/bodenverlegerarbeiten/,301,Bodenverlegerarbeiten
+/handwerkerdienste/Fliesenlegerarbeiten/,/handwerkerdienste/fliesenlegerarbeiten/,301,Fliesenlegerarbeiten
+/handwerkerdienste/Malerarbeiten/,/handwerkerdienste/malerarbeiten/,301,Maler- und Maurerarbeiten
+/handwerkerdienste/Trockenbau/,/handwerkerdienste/trockenbau/,301,Trockenbau
+/handwerkerdienste/Bodenversiegelung/,/handwerkerdienste/bodenversiegelung/,301,Bodenversiegelung
+/services/,/services/,-,Services
+/services/Entrümpelung/,/services/entruempelung/,301,Entrümpelung
+/services/arbeitnehmerüberlassung/,/services/arbeitnehmerueberlassung/,301,Arbeitnehmerüberlassung
+/services/Transportarbeiten/,/services/transportarbeiten/,301,Transportarbeiten
+/services/Wachdienste/,/services/wachdienste/,301,Wach- und Schließdienste
+/kontaktformular/,/kontakt/,301,Kontaktformular
+/kontaktformular/form/,/kontakt/,301,Form
+/impressum/,/impressum/,-,Impressum
+/kontakt/,/kontakt/,-,Kontakt
+/datenschutz/,/datenschutz/,-,Datenschutz
+/danke/,/kontakt/,301,Danke
+/stellenangebote/,/karriere/,301,Stellenangebote
+/agb/,/agb/,-,AGB

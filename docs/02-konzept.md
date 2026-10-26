@@ -17,28 +17,32 @@
 
 ## Seitenbaum (Soll)
 
+**Vorschlag v2 (nach Export der Altseite, ⬜ Freigabe durch Felix):** Die Altseite hat 4 Leistungskategorien mit 22 Leistungen (siehe `docs/01-ist-analyse.md`). Diese Struktur bleibt erhalten, die Kategorien bleiben auf oberster Ebene. Dadurch ändern sich die URLs nur in Schreibweise (klein, ohne Umlaute), was für Rankings am verträglichsten ist.
+
 ```
-/                                   HomePage
-/leistungen/                        ServiceIndexPage
-/leistungen/unterhaltsreinigung/    ServicePage
-/leistungen/glasreinigung/          ServicePage
-/leistungen/fassadenreinigung/      ServicePage
-/leistungen/teppichreinigung/       ServicePage
-/leistungen/hausmeisterservice/     ServicePage
-/leistungen/winterdienst/           ServicePage
-/leistungen/handwerkerservice/      ServicePage
-/leistungen/entruempelung/          ServicePage
-/leistungen/sonderreinigung/        ServicePage (Desinfektion, Osmose, Transporte …)
-/unternehmen/                       StandardPage (Über uns, Team, Historie, Zertifikate)
-/referenzen/                        StandardPage oder ReferenceIndexPage (optional, Phase 2)
-/karriere/                          JobIndexPage (Arbeitgeber-Infos + Stellenliste)
-/karriere/<slug>/                   JobPage
-/kontakt/                           StandardPage mit ContactFormBlock + Karte
-/impressum/                         StandardPage
-/datenschutz/                       StandardPage
+/                                              HomePage
+/gebaeudereinigung/                            ServiceIndexPage (Kategorie)
+  baureinigung/  containerreinigung/  desinfektion/  glasreinigung/  grundreinigung/
+  industriereinigung/  sonderreinigung/  polsterreinigung/  unterhaltsreinigung/   ServicePage
+/gebaeudedienste/                              ServiceIndexPage (Kategorie)
+  gruenanlagenpflege/  hausmeisterdienste/  winterdienst/                           ServicePage
+/handwerkerdienste/                            ServiceIndexPage (Kategorie)
+  bauhilfsarbeiten/  bodenverlegerarbeiten/  fliesenlegerarbeiten/  malerarbeiten/
+  trockenbau/  bodenversiegelung/                                                  ServicePage
+/services/                                     ServiceIndexPage (Kategorie)
+  entruempelung/  arbeitnehmerueberlassung/  transportarbeiten/  wachdienste/       ServicePage
+/unternehmen/                                  StandardPage (neu: Über uns, Meisterbetrieb, QM)
+/karriere/                                     JobIndexPage (ersetzt die leere /stellenangebote/)
+/karriere/<slug>/                              JobPage
+/kontakt/                                      StandardPage mit ContactFormBlock + Karte
+/impressum/  /datenschutz/  /agb/              StandardPage
 ```
 
-Alte URLs → neue URLs: Mapping in `docs/03-technik.md` → Redirect-Konzept, gepflegt über `wagtail.contrib.redirects`.
+Entfällt: `/kontaktformular/` und `/kontaktformular/form/` (Duplikat), `/danke/` (Erfolgsmeldung erscheint direkt im Formular). Alle drei werden auf `/kontakt/` umgeleitet.
+
+Code-Anpassung dafür (klein): `ServiceIndexPage.max_count = 1` entfernen und `verbose_name` auf „Leistungskategorie“ ändern; `seed_dev` und `grabnar/tests/test_api.py` auf die vier Kategorien umstellen; Hauptnavigation zeigt die vier Kategorien mit ihren Leistungen als Untermenü (der Navigations-Endpunkt liefert bereits zwei Ebenen).
+
+Alte URLs → neue URLs: `docs/redirects.csv` (28 Weiterleitungen, automatisch aus dem Export erzeugt). Import beim Go-Live über `wagtail.contrib.redirects`.
 
 ## Inhaltsmodell (Wagtail-Seitentypen)
 
