@@ -18,9 +18,8 @@ Betreut von Felix (Administrator der Seite, Full-Stack-Entwickler, GitHub `fmbec
 |---|---|---|
 | CMS / Backend | Wagtail (aktuelle LTS), Django, Postgres, `wagtail.api.v2`, ohne coderedcms | `cms/` |
 | Frontend | Astro (statisch, SSG), Tailwind CSS, React-Islands nur für Interaktion (Formulare, Filter, Slider) | `web/` |
-| Hosting Frontend | statisch (Cloudflare Pages / Netlify / eigener Nginx) | – |
-| Hosting CMS | Docker Compose, nur intern bzw. hinter Auth erreichbar | `cms/`, `docker-compose.yml` |
-| Build-Trigger | Wagtail `page_published`-Signal → Webhook → Frontend-Rebuild | `cms/<app>/signals.py` |
+| Hosting | bestehender Linode-VPS: Nginx liefert `web/dist/` statisch aus und proxyt `/admin/`, `/api/` an Wagtail (Docker Compose); `/admin/` per IP-Allowlist/Basic-Auth | `deploy/` |
+| Build-Trigger | Wagtail `page_published`-Signal → lokaler Webhook (:9000) → `pnpm build` auf dem Server | `cms/grabnar/signals.py`, `deploy/rebuild-hook.py` |
 
 Begründung und Alternativen: `docs/03-technik.md`.
 
@@ -45,7 +44,8 @@ grabnar_relaunch/
 │   ├── src/components/islands/ ← React-Islands (ContactForm.tsx, JobFilter.tsx …)
 │   ├── src/layouts/
 │   └── src/pages/[...slug].astro
-└── docker-compose.yml
+├── deploy/                   ← docker-compose.yml, nginx/, rebuild-hook.py, build-web.sh, deploy.sh
+└── README.md
 ```
 
 ## Arbeitsweise
@@ -68,5 +68,5 @@ grabnar_relaunch/
 ## Offene Punkte (siehe docs/04-aufgaben.md)
 
 - Inhalte der alten Seite noch nicht vollständig erfasst (robots.txt blockt automatisierten Zugriff).
-- Hosting-Ziel für CMS und Frontend noch nicht entschieden.
-- Domainumzug / Redirect-Konzept von alten URLs noch offen.
+- Zustand des Linode-VPS (OS, Nginx-Config, Docker, certbot) noch nicht erfasst.
+- Redirect-Konzept von alten URLs noch offen (Mapping in `docs/redirects.csv`).

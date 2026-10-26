@@ -37,7 +37,39 @@ Geprüfte Alternativen:
 - Bilder: Wagtail-Renditions, `<picture>` mit `srcset`, `loading="lazy"`.
 - SEO: `src/components/Seo.astro` (Title, Description, OG, Canonical), `@astrojs/sitemap`, JSON-LD `LocalBusiness` auf Home/Kontakt, `JobPosting` auf JobPage.
 - Fonts selbst gehostet (`public/fonts/`), kein externes CDN.
-- Hosting: Cloudflare Pages (Deploy-Hook, `_redirects`, kostenlos) als Vorschlag; alternativ Netlify oder eigener Nginx mit `rsync` aus CI.
+- Hosting: siehe Abschnitt „Hosting auf dem Linode-VPS“ – statisches Build-Verzeichnis `web/dist/` wird von Nginx ausgeliefert.
+
+## Hosting auf dem Linode-VPS (entschieden)
+
+Die bestehende Linode-Instanz bleibt. `www.grabnar.de` zeigt extern verwaltet auf deren IP – deshalb **keine neue Subdomain**, CMS und Frontend laufen unter derselben Domain, getrennt nach Pfad. So ist kein DNS-Eingriff nötig.
+
+```
+Internet → Nginx (:443, www.grabnar.de)
+            ├── /                → /srv/grabnar/web/dist/        (statische Astro-Dateien)
+            ├── /admin/, /api/   → proxy_pass http://127.0.0.1:8000  (Wagtail, Docker)
+            ├── /media/          → /srv/grabnar/media/            (Wagtail-Uploads, Renditions)
+            ├── /django-static/  → /srv/grabnar/cms-static/       (Admin-Assets)
+            └── /_hooks/rebuild  → proxy_pass http://127.0.0.1:9000  (Build-Webhook)
+```
+
+- `/admin/` zusätzlich mit `allow <Firmen-IP>; allow <Felix-IP>; deny all;` oder Basic-Auth absichern (`auth_basic`). Die `/api/` bleibt offen, liefert aber nur veröffentlichte Inhalte.
+- Verzeichnisse auf dem Server: `/srv/grabnar/repo/` (Git-Checkout), `/srv/grabnar/web/dist/` (Build-Ausgabe, atomar per `mv` getauscht), `/srv/grabnar/media/`, `/srv/grabnar/pg/` (Postgres-Volume).
+- CMS: `docker compose -f /srv/grabnar/repo/docker-compose.yml up -d` mit Services `cms` (gunicorn, Port 8000 nur auf 127.0.0.1) und `db` (Postgres). Media als Bind-Mount.
+- Frontend-Build **auf dem Server**: kleiner Webhook-Dienst (`deploy/rebuild-hook.py`, Python stdlib `http.server`, systemd-Unit `grabnar-rebuild.service`), der bei `POST /_hooks/rebuild` mit gültigem `X-Hook-Secret` das Skript `deploy/build-web.sh` ausführt: `git pull`, `pnpm install --frozen-lockfile`, `pnpm build` nach `dist.new/`, dann atomar `mv dist dist.old && mv dist.new dist`. Debounce 60 s, Lock-Datei gegen Parallelbuilds. Node/pnpm auf dem Host nötig (z. B. via `fnm`).
+- Der Wagtail-Signal-Handler ruft `FRONTEND_BUILD_HOOK_URL=http://127.0.0.1:9000/rebuild` auf (intern, nicht über Nginx).
+- Redirects: `web` erzeugt beim Build aus `/api/v2/redirects/` eine Nginx-`map`-Datei `/srv/grabnar/web/redirects.map`; Nginx lädt sie per `include` und wird nach dem Build mit `nginx -s reload` neu geladen (sudoers-Regel nur für diesen Befehl).
+- TLS: bestehendes Let's-Encrypt-Setup (certbot) weiternutzen. ⬜ prüfen, ob certbot aktuell und automatisch erneuert.
+- Alte Wagtail/CodeRed-Installation: parallel laufen lassen, bis Nginx umgeschaltet ist, dann stoppen und nach 4 Wochen entfernen.
+
+### Deploy-Workflow
+
+1. `git push` nach `main` → GitHub Actions (`cms.yml`, `web.yml`) prüft Lint/Tests/Build.
+2. Deployment per `deploy/deploy.sh` (SSH auf den Linode): `git pull`, `docker compose build cms`, `docker compose up -d`, `manage.py migrate`, `collectstatic`, danach `build-web.sh`.
+3. Inhaltsänderungen im CMS lösen nur den Frontend-Rebuild aus, kein Deployment.
+
+### Backup
+
+- Nächtlich `pg_dump` + `tar` von `/srv/grabnar/media/` nach `/srv/backup/` und per `rclone`/Linode Object Storage offsite (⬜ Ziel klären). Linode-Backup-Service als zweite Ebene, falls gebucht.
 
 ### CI (`.github/workflows/`)
 
@@ -58,7 +90,7 @@ Seed: `cms/fixtures/dev.json` mit Beispielseiten für alle Blocks, damit das Fro
 
 1. Inhalte exportieren (siehe `docs/01-ist-analyse.md`): Texte als Markdown nach `docs/content-export/`, Bilder nach `cms/fixtures/media/`.
 2. Alte URL-Liste → Mapping-Tabelle `docs/redirects.csv` (`alt,neu,status`) → beim Go-Live als `wagtail.contrib.redirects` importieren (Management-Command `import_redirects`).
-3. Go-Live-Reihenfolge: CMS produktiv (interne Domain, z. B. `cms.grabnar.de` hinter Auth) → Frontend auf Staging-Domain abnehmen → DNS für `www.grabnar.de` umstellen → Altserver 4 Wochen als Fallback behalten.
+3. Go-Live-Reihenfolge (alles auf demselben Linode, kein DNS-Wechsel): neues CMS auf Port 8000 parallel zur Altinstallation starten → Inhalte einpflegen, Admin über `/admin-neu/` (temporärer Nginx-Pfad) → Frontend-Build unter `/srv/grabnar/web/dist/` erzeugen und über einen Staging-Server-Block (z. B. Port 8443 mit Basic-Auth) abnehmen → Nginx-Konfiguration für `www.grabnar.de` auf die neue Struktur umschalten (`nginx -t && nginx -s reload`) → Altinstallation stoppen, 4 Wochen aufbewahren.
 4. Google Search Console: Sitemap neu einreichen, 404-Report nach Go-Live wöchentlich prüfen.
 
 ## Datenschutz
