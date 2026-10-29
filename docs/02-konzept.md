@@ -31,7 +31,7 @@
   trockenbau/  bodenversiegelung/                                                  ServicePage
 /services/                                     ServiceIndexPage (Kategorie)
   entruempelung/  arbeitnehmerueberlassung/  transportarbeiten/  wachdienste/       ServicePage
-/unternehmen/                                  StandardPage (neu: Über uns, Meisterbetrieb, QM)
+/unternehmen/                                  StandardPage (neu: Leitgedanke, Firmentext, Merkmale, Leistungsbereiche)
 /karriere/                                     JobIndexPage (ersetzt die leere /stellenangebote/)
 /karriere/<slug>/                              JobPage
 /kontakt/                                      StandardPage mit ContactFormBlock + Karte

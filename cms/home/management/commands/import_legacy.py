@@ -74,8 +74,60 @@ ICONS = {
     "wachdienste": "shield",
 }
 
+# Company facts for "Unternehmen" and the home page. Every item restates something the
+# old site says; the source file in docs/content-export/ is noted. Do not add claims here
+# that are not backed by the company.
+FEATURES = [
+    (
+        "check",
+        "Meisterbetrieb",
+        "Fachliche Leitung durch einen Meister des Gebäudereinigerhandwerks.",
+        "home.md",
+    ),
+    (
+        "shield",
+        "Zertifiziertes Qualitätsmanagement",
+        "Vertragsgemäße und hygienische Reinigung nach einem zertifizierten Qualitätsmanagement.",
+        "gebäudereinigung__unterhaltsreinigung.md",
+    ),
+    (
+        "leaf",
+        "Strenge Umweltleitlinien",
+        "Freiwillig strenge Umweltleitlinien, umweltgerechte Entsorgung über zertifizierte Entsorgungsunternehmen.",
+        "gebäudereinigung__unterhaltsreinigung.md, services__entrümpelung.md",
+    ),
+    (
+        "users",
+        "Geschultes Fachpersonal",
+        "Fachgeschulte Mitarbeiter mit leistungsstarken, hocheffizienten Geräten.",
+        "gebäudereinigung__desinfektion.md, gebäudedienste__winterdienst.md",
+    ),
+    (
+        "clock",
+        "Langjährige Erfahrung",
+        "Jahrelanges Know-how, um auf die verschiedensten Kundenbedürfnisse einzugehen.",
+        "gebäudereinigung__*.md",
+    ),
+    (
+        "map-pin",
+        "Firmensitz in Stuttgart",
+        "Logistisches und technisches Zentrum mit Personal und Ausstattung am Firmensitz in Stuttgart.",
+        "home.md",
+    ),
+]
+
 LEGAL = ["impressum", "datenschutz", "agb"]
 SKIP = {"/kontaktformular/", "/kontaktformular/form/", "/danke/", "/stellenangebote/", "/kontakt/"}
+
+
+def fix_spelling(text: str) -> str:
+    """Small corrections of the old texts (keep this list short and obvious)."""
+    return re.sub(r"\bIFSG\b", "IfSG", text)
+
+
+def join_de(items: list[str]) -> str:
+    """'a, b und c' – German enumeration."""
+    return items[0] if len(items) == 1 else ", ".join(items[:-1]) + " und " + items[-1]
 
 
 @dataclass
@@ -126,12 +178,12 @@ class Command(BaseCommand):
             seo = re.search(r"^- SEO-Titel: (.+)$", head, re.M)
             desc = re.search(r"^- Meta-Description: (.+)$", head, re.M)
             pages[old_path] = LegacyPage(
-                title=title.group(1).strip(),
+                title=fix_spelling(title.group(1).strip()),
                 old_path=old_path,
                 new_path=mapping.get(old_path, old_path),
                 seo_title=seo.group(1).strip() if seo else "",
                 description=desc.group(1).strip() if desc else "",
-                body_md=body.strip(),
+                body_md=fix_spelling(body.strip()),
             )
         return pages, mapping
 
@@ -185,6 +237,27 @@ class Command(BaseCommand):
                 break
             result = f"{result} {s}".strip()
         return result or text[: limit - 1].rsplit(" ", 1)[0] + "…"
+
+    @classmethod
+    def split_lead(cls, html: str, limit: int = 190) -> tuple[str, str]:
+        """Take the first sentence(s) of the first paragraph as teaser and remove them
+        from the body, so the hero teaser is not repeated at the start of the text."""
+        m = re.search(r"<p>(.*?)</p>", html, re.S)
+        if not m:
+            return cls.teaser(html, limit), html
+        paragraph = m.group(1)
+        plain = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", paragraph)).strip()
+        sentences = re.split(r"(?<=[.!?])\s+", plain)
+        lead = sentences[0]
+        for sentence in sentences[1:]:
+            if len(lead) + len(sentence) + 1 > limit:
+                break
+            lead = f"{lead} {sentence}"
+        if len(lead) > limit or "<" in paragraph:  # long first sentence or inline markup
+            return cls.teaser(html, limit), html
+        rest = plain[len(lead) :].strip()
+        new_p = f"<p>{rest}</p>" if rest else ""
+        return lead, html[: m.start()] + new_p + html[m.end() :]
 
     @staticmethod
     def import_logo(source: Path) -> Image | None:
@@ -335,20 +408,26 @@ class Command(BaseCommand):
             services: list[ServicePage] = []
             for svc in cat.children:
                 html = self.to_html(svc.body_md, svc.title, mapping)
+                lead, html = self.split_lead(html)
                 page = ServicePage(
                     title=svc.title,
                     slug=svc.slug,
                     show_in_menus=True,
                     icon=ICONS.get(svc.slug, ""),
-                    teaser=self.teaser(html),
+                    teaser=lead,
                     seo_title=svc.seo_title or f"{svc.title} in Stuttgart – M. B. Grabnar GmbH",
-                    search_description=svc.description or self.teaser(html, 155),
+                    search_description=svc.description or self.teaser(lead, 155),
                     body=[("rich_text", html), cta(f"{svc.title} anfragen")] if html else [],
                 )
                 cat_page.add_child(instance=page)
                 services.append(page)
             created_services.append(services)
 
+            if not cat_page.intro:
+                cat_page.intro = (
+                    f"Im Bereich {cat.title} bieten wir Ihnen: "
+                    f"{join_de([s.title for s in services])}."
+                )
             cat_page.body = [
                 (
                     "service_grid",
@@ -375,6 +454,46 @@ class Command(BaseCommand):
                     if other.pk != page.pk:
                         RelatedService.objects.create(page=page, service=other)
                 page.save_revision().publish()
+
+        # --- Unternehmen (new; the old site had none) ---------------------------
+        about = StandardPage(
+            title="Unternehmen",
+            slug="unternehmen",
+            show_in_menus=True,
+            seo_title="Über uns – M. B. Grabnar GmbH, Meisterbetrieb aus Stuttgart",
+            search_description=(
+                "Etablierter Stuttgarter Dienstleister und Meisterbetrieb: Gebäudereinigung, "
+                "Gebäudedienste und Handwerkerleistungen aus einer Hand."
+            ),
+            intro=(
+                "Etablierter Stuttgarter Dienstleister und Meisterbetrieb des "
+                "Gebäudereinigerhandwerks."
+            ),
+            body=[
+                ("rich_text", f"<h2>{motto}</h2>" + home_html),
+                (
+                    "feature_list",
+                    {
+                        "heading": "Was uns auszeichnet",
+                        "features": [
+                            {"icon": i, "title": t, "text": x} for i, t, x, _src in FEATURES
+                        ],
+                    },
+                ),
+                (
+                    "service_grid",
+                    {
+                        "heading": "Unsere Leistungsbereiche",
+                        "intro": "",
+                        "source": "categories",
+                        "category": None,
+                        "services": [],
+                    },
+                ),
+                cta("Lernen Sie uns kennen"),
+            ],
+        )
+        home.add_child(instance=about)
 
         # --- Karriere -----------------------------------------------------------
         jobs = JobIndexPage(
@@ -459,10 +578,23 @@ class Command(BaseCommand):
                     "services": [],
                 },
             ),
-            ("rich_text", home_html),
+            (
+                "rich_text",
+                (re.search(r"<p>.*?</p>", home_html, re.S) or re.search(r".*", home_html)).group(0)
+                + '<p><a href="/unternehmen/">Mehr über uns</a></p>',
+            ),
+            (
+                "feature_list",
+                {
+                    "heading": "Warum M. B. Grabnar",
+                    "features": [
+                        {"icon": i, "title": t, "text": x} for i, t, x, _src in FEATURES[:3]
+                    ],
+                },
+            ),
             cta("Maßgeschneidertes Gebäudemanagement für Ihr Objekt"),
         ]
-        for page in [home, *category_pages, jobs, contact, *legal_pages]:
+        for page in [home, *category_pages, about, jobs, contact, *legal_pages]:
             page.save_revision().publish()
 
         # --- Settings ---------------------------------------------------------------

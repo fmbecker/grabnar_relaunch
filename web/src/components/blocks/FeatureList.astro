@@ -10,7 +10,7 @@ const { value } = Astro.props;
     <ul class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
       {value.features.map((f) => (
         <li class="flex gap-4">
-          <span class="shrink-0 rounded-md bg-brand-600 p-2.5 text-white"><Icon name={f.icon} class="h-6 w-6" /></span>
+          <span class="shrink-0 self-start rounded-md bg-brand-500 p-2.5 text-white"><Icon name={f.icon} class="h-6 w-6" /></span>
           <div><h3 class="h3">{f.title}</h3><p class="mt-1 text-ink-700">{f.text}</p></div>
         </li>
       ))}

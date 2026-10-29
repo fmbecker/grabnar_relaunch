@@ -51,8 +51,10 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 - [ ] 🤝 Design-System weiter ausbauen: Typo-Skala, Abstände, Bildsprache, Hero mit Foto
 - [ ] 🤖 Startseite, Leistungsseiten, Karriere, Kontakt ausgestalten
 - [x] 🤖 Texte der Altseite migriert (1:1 übernommen)
-- [ ] 🤝 Texte überarbeiten: Teaser im Hero wiederholt den ersten Satz des Fließtexts; Kategorie-Seiten haben kaum eigenen Text; SEO-Titel/Descriptions sind automatisch erzeugt; „IFSG“ → „IfSG“
-- [ ] 🤖 Seite „Unternehmen“ anlegen (Altseite hatte keine; Texte von der Startseite + Meisterbetrieb/QM)
+- [x] 🤖 Seiten aus den Alttexten aufgebaut: Kurztext im Kopf der Leistungsseiten wird nicht mehr im Fließtext wiederholt; Kategorieseiten mit Einleitung aus ihren Leistungen; „IFSG“ → „IfSG“; Leistungslisten als zweispaltige Häkchenlisten
+- [ ] 🤝 Texte redaktionell überarbeiten: Kategorie-Einleitungen sind automatisch formuliert; SEO-Titel/Descriptions der Leistungen automatisch erzeugt; Startseiten-Text („Unter unserem Leitgedanken …“) sprachlich glätten; doppelter Eintrag „Unterhaltsreinigung von Verkehrsmitteln“ in der Altseite
+- [x] 🤖 Seite „Unternehmen“ (`/unternehmen/`): Leitgedanke + Firmentext, 6 Merkmale („Was uns auszeichnet“) ausschließlich aus Aussagen der Altseite (Quellen in `import_legacy.FEATURES`), Leistungsbereiche, CTA
+- [ ] 👤 Merkmale auf „Unternehmen“ von der Firma bestätigen lassen (z. B. ob die QM-Zertifizierung noch gültig ist, Name des Zertifikats), ggf. ergänzen: Gründungsjahr, Mitarbeiterzahl, Team-Fotos
 - [ ] 👤 Bilder einpflegen (Wagtail-Admin)
 - [ ] 👤 Impressum / Datenschutz / AGB rechtlich prüfen. Datenschutz muss neue Formulare (Bewerbung mit Upload, Speicherfrist 180 Tage) und ggf. Umami abdecken; Impressum: Feld „Vertretungsberechtigt“ ist in der Altseite leer
 - [ ] 🤖 Lighthouse ≥ 95 auf Mobile, a11y-Check (axe)

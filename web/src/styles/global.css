@@ -53,9 +53,19 @@
   .prose-site h2 { @apply mt-8 mb-3 text-2xl font-bold tracking-tight text-ink-900 sm:text-3xl; }
   .prose-site h3 { @apply mt-6 mb-2 text-lg font-semibold text-ink-900; }
   .prose-site p { @apply mb-4; }
-  .prose-site ul { @apply mb-4 list-disc pl-6; }
+  .prose-site ul { @apply mb-4; }
   .prose-site ol { @apply mb-4 list-decimal pl-6; }
-  .prose-site a { @apply text-brand-700 underline underline-offset-2; }
+  .prose-site a { @apply text-brand-600 underline underline-offset-2; }
+  /* Service lists ("Unsere Dienstleistungen im Einzelnen"): checkmarks, two columns when long */
+  .prose-site ul { @apply list-none pl-0; }
+  .prose-site ul > li { @apply relative mb-1.5 break-inside-avoid pl-7; }
+  .prose-site ul > li::before {
+    content: "";
+    @apply absolute left-0 top-[0.35em] h-4 w-4 rounded-full bg-brand-100;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 8.5l2.2 2.2 4.8-5' fill='none' stroke='%232d78bc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-size: 100% 100%;
+  }
+  .prose-site ul:has(> li:nth-child(6)) { @apply sm:columns-2 sm:gap-10; }
   .field { @apply block w-full rounded-md border border-ink-300 px-3 py-2 text-sm focus:border-brand-500 focus:ring-1 focus:ring-brand-500; }
   .label { @apply mb-1 block text-sm font-medium text-ink-700; }
 }

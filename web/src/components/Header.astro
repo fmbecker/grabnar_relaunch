@@ -8,7 +8,7 @@ const tel = `tel:${phone.replace(/[^\d+]/g, "")}`;
 ---
 <header class="sticky top-0 z-40 border-b border-ink-100 bg-white/95 backdrop-blur">
   <div class="container-x flex h-20 items-center justify-between gap-6">
-    <a href="/" class="flex items-center gap-2 font-bold text-brand-700">
+    <a href="/" class="flex shrink-0 items-center gap-2 font-bold text-brand-700">
       {site.logo ? (
         <img src={site.logo.url} srcset={`${site.logo.url} 1x, ${site.logo.url2x} 2x`} alt="M. B. Grabnar GmbH – Startseite" class="h-14 w-auto" width={site.logo.width} height={site.logo.height} />
       ) : (
@@ -18,10 +18,10 @@ const tel = `tel:${phone.replace(/[^\d+]/g, "")}`;
 
     <!-- Desktop: hover/focus dropdowns, no JS -->
     <nav aria-label="Hauptnavigation" class="hidden lg:block">
-      <ul class="flex items-center gap-1 text-sm font-medium">
+      <ul class="flex items-center gap-0.5 text-sm font-medium xl:gap-1">
         {nav.items.map((item) => (
           <li class="group relative">
-            <a href={item.href} class:list={["flex items-center gap-1 rounded-md px-3 py-2 hover:bg-ink-50 hover:text-brand-700", isActive(item.href) && "text-brand-700"]} aria-current={currentPath === item.href ? "page" : undefined}>
+            <a href={item.href} class:list={["flex items-center gap-1 whitespace-nowrap rounded-md px-2.5 py-2 hover:bg-ink-50 hover:text-brand-700", isActive(item.href) && "text-brand-700"]} aria-current={currentPath === item.href ? "page" : undefined}>
               {item.title}
               {item.children && item.children.length > 0 && <svg class="h-3 w-3" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5" /></svg>}
             </a>
@@ -36,7 +36,9 @@ const tel = `tel:${phone.replace(/[^\d+]/g, "")}`;
         ))}
       </ul>
     </nav>
-    <a href={tel} class="btn-primary hidden whitespace-nowrap xl:inline-flex"><Icon name="phone" class="h-4 w-4" />{phone}</a>
+    <!-- Phone: icon only while the menu needs the space, full number on very wide screens -->
+    <a href={tel} class="btn-primary hidden px-3 xl:inline-flex 2xl:hidden" aria-label={`Anrufen: ${phone}`} title={phone}><Icon name="phone" class="h-4 w-4" /></a>
+    <a href={tel} class="btn-primary hidden whitespace-nowrap 2xl:inline-flex"><Icon name="phone" class="h-4 w-4" />{phone}</a>
 
     <!-- Mobile: details/summary, categories expandable -->
     <details class="relative lg:hidden">

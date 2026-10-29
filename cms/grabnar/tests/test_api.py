@@ -22,6 +22,7 @@ def test_navigation_has_categories_with_children(client):
         "/gebaeudedienste/",
         "/handwerkerdienste/",
         "/services/",
+        "/unternehmen/",
         "/karriere/",
         "/kontakt/",
     ]
@@ -157,3 +158,41 @@ def test_all_pages_pass_admin_validation():
                 except Exception as exc:  # noqa: BLE001
                     failures.append(f"{page.url_path} {field.name}: {exc}")
     assert not failures, "\n".join(failures)
+
+
+def test_service_teaser_not_repeated_in_body(client):
+    data = client.get(
+        "/api/v2/pages/", {"type": "services.ServicePage", "fields": "teaser,body", "limit": 50}
+    ).json()
+    assert len(data["items"]) == 22
+    for page in data["items"]:
+        body = page["body"][0]["value"] if page["body"] else ""
+        assert page["teaser"], page["title"]
+        assert page["teaser"] not in body, f"teaser repeated in body: {page['title']}"
+
+
+def test_spelling_fix_and_category_intro(client):
+    titles = [
+        p["title"]
+        for p in client.get("/api/v2/pages/", {"type": "services.ServicePage", "limit": 50}).json()[
+            "items"
+        ]
+    ]
+    assert "Desinfektion nach IfSG §17/3" in titles and not any("IFSG" in t for t in titles)
+    cat = client.get(
+        "/api/v2/pages/",
+        {"type": "services.ServiceIndexPage", "slug": "gebaeudedienste", "fields": "intro"},
+    ).json()["items"][0]
+    assert (
+        cat["intro"]
+        == "Im Bereich Gebäudedienste bieten wir Ihnen: Grau- und Grünanlagenpflege, Hausmeisterdienste und Winterdienst."
+    )
+
+
+def test_unternehmen_page(client):
+    page = client.get(
+        "/api/v2/pages/", {"type": "home.StandardPage", "slug": "unternehmen", "fields": "body"}
+    ).json()["items"][0]
+    types = [b["type"] for b in page["body"]]
+    assert types == ["rich_text", "feature_list", "service_grid", "cta"]
+    assert "Meisterbetrieb" in [f["title"] for f in page["body"][1]["value"]["features"]]
