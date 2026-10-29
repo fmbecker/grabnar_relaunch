@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Runs the checks from CLAUDE.md before every push, only for the parts that changed.
+# Enable once per clone:  git config core.hooksPath .githooks
+# Skip in an emergency:   git push --no-verify
+set -euo pipefail
+ROOT=$(git rev-parse --show-toplevel)
+ZERO=0000000000000000000000000000000000000000
+
+changed=""
+while read -r _local_ref local_sha _remote_ref remote_sha; do
+  [ "$local_sha" = "$ZERO" ] && continue                      # branch deletion
+  if [ "$remote_sha" = "$ZERO" ]; then base=$(git merge-base "$local_sha" origin/main 2>/dev/null || echo "")
+  else base=$remote_sha; fi
+  if [ -n "$base" ]; then changed+=$(git diff --name-only "$base" "$local_sha"); changed+=$'\n'
+  else changed+=$(git ls-files); fi
+done
+[ -z "$changed" ] && exit 0
+
+run() { echo "▶ $*"; "$@"; }
+if grep -qE '^(cms|docs)/' <<<"$changed"; then
+  echo "── cms: ruff + pytest"
+  (cd "$ROOT/cms" && run uv run ruff check . && run uv run ruff format --check . && run uv run pytest -q)
+fi
+if grep -qE '^web/' <<<"$changed"; then
+  echo "── web: lint + check"
+  (cd "$ROOT/web" && run pnpm lint && run pnpm check)
+fi
+echo "✔ pre-push checks passed"

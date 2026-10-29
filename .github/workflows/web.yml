@@ -1,17 +1,23 @@
 name: web
 on:
-  push: { paths: ["web/**", "cms/**", ".github/workflows/web.yml"] }
-  pull_request: { paths: ["web/**", "cms/**"] }
+  # docs/ is the content source for import_legacy/seed_dev, so it affects the build too.
+  push: { paths: ["web/**", "cms/**", "docs/**", ".github/workflows/web.yml"] }
+  pull_request: { paths: ["web/**", "cms/**", "docs/**"] }
 jobs:
   build:
     # Builds against a freshly seeded CMS so the block contract is verified end to end.
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      ASTRO_TELEMETRY_DISABLED: "1"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+      # Cache disabled: the post-step "uv cache prune" failed sporadically and turned green runs red.
       - uses: astral-sh/setup-uv@v5
+        with: { enable-cache: false }
       - uses: pnpm/action-setup@v4
         with: { version: 10 }
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with: { node-version: 22, cache: pnpm, cache-dependency-path: web/pnpm-lock.yaml }
       - name: Start seeded CMS
         working-directory: cms
@@ -20,15 +26,25 @@ jobs:
           uv run manage.py migrate -v 0
           uv run manage.py seed_dev
           nohup uv run manage.py runserver 127.0.0.1:8000 > /tmp/cms.log 2>&1 &
-          for i in $(seq 1 30); do curl -sf http://127.0.0.1:8000/api/v2/settings/ && break; sleep 1; done
-      - working-directory: web
+          for i in $(seq 1 30); do curl -sf -o /dev/null http://127.0.0.1:8000/api/v2/settings/ && exit 0; sleep 1; done
+          echo "::error::CMS did not start"; cat /tmp/cms.log; exit 1
+      - name: Install
+        working-directory: web
         run: pnpm install --frozen-lockfile
-      - working-directory: web
-        run: pnpm lint && pnpm check
-      - working-directory: web
+      - name: Lint (ESLint)
+        working-directory: web
+        run: pnpm lint
+      - name: Type check (astro check + tsc)
+        working-directory: web
+        run: pnpm check
+      - name: Build against seeded CMS
+        working-directory: web
         env:
           WAGTAIL_API_URL: http://127.0.0.1:8000/api/v2
           WAGTAIL_MEDIA_URL: http://127.0.0.1:8000
           PUBLIC_SITE_URL: https://www.grabnar.de
           PUBLIC_FORMS_API_URL: https://www.grabnar.de/api/forms
-        run: pnpm build && node scripts/redirects.mjs
+        run: pnpm build && node scripts/redirects.mjs > /dev/null
+      - name: CMS log (on failure)
+        if: failure()
+        run: tail -n 100 /tmp/cms.log || true

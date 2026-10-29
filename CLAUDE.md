@@ -62,6 +62,8 @@ cd web && pnpm install && cp .env.example .env && pnpm dev     # http://localhos
 
 Prüfen vor jedem Commit: `cd cms && uv run ruff check . && uv run pytest -q` · `cd web && pnpm lint && pnpm check && pnpm build`.
 
+Pre-Push-Hook (einmal pro Klon aktivieren): `git config core.hooksPath .githooks` – führt die Prüfungen für geänderte Bereiche aus und verhindert rote Pushes. **Nie mit roten Prüfungen pushen**, auch nicht als Zwischenstand; dann lieber nicht committen oder auf einem Feature-Branch arbeiten.
+
 ## Arbeitsweise
 
 - Reihenfolge: `docs/01-ist-analyse.md` → `docs/02-konzept.md` → `docs/03-technik.md` → `docs/04-aufgaben.md`. Die Aufgabenliste ist die Quelle der Wahrheit für den Fortschritt; erledigte Punkte dort abhaken.
