@@ -48,3 +48,55 @@ jobs:
       - name: CMS log (on failure)
         if: failure()
         run: tail -n 100 /tmp/cms.log || true
+
+  audit:
+    # Lighthouse (mobile) + axe-core (WCAG 2.1/2.2 AA) against a production-like setup:
+    # same-origin build, served with compression by scripts/serve-prod.mjs.
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      ASTRO_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v5
+        with: { enable-cache: false }
+      - uses: pnpm/action-setup@v4
+        with: { version: 10 }
+      - uses: actions/setup-node@v5
+        with: { node-version: 22, cache: pnpm, cache-dependency-path: web/pnpm-lock.yaml }
+      - name: Start seeded CMS
+        working-directory: cms
+        run: |
+          uv sync --frozen
+          uv run manage.py migrate -v 0
+          uv run manage.py seed_dev
+          FRONTEND_URL=http://127.0.0.1:8080 nohup uv run manage.py runserver 127.0.0.1:8000 > /tmp/cms.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf -o /dev/null http://127.0.0.1:8000/api/v2/settings/ && exit 0; sleep 1; done
+          echo "::error::CMS did not start"; cat /tmp/cms.log; exit 1
+      - name: Install (incl. Playwright Chromium for axe)
+        working-directory: web
+        run: |
+          pnpm install --frozen-lockfile
+          npm install -g playwright
+          npx playwright install --with-deps chromium
+      - name: Same-origin build and production-like server
+        working-directory: web
+        env:
+          WAGTAIL_API_URL: http://127.0.0.1:8000/api/v2
+          WAGTAIL_MEDIA_URL: ""
+          PUBLIC_SITE_URL: https://www.grabnar.de
+          PUBLIC_FORMS_API_URL: /api/forms
+        run: |
+          pnpm build
+          HOST=127.0.0.1 PORT=4322 nohup node dist/server/entry.mjs > /tmp/ssr.log 2>&1 &
+          nohup node scripts/serve-prod.mjs --port 8080 > /tmp/serve.log 2>&1 &
+          sleep 2
+      - name: Audit (Lighthouse + axe)
+        working-directory: web
+        # Performance on shared runners is noisy: gate at 80 there, 90 locally.
+        run: node scripts/audit.mjs --base http://127.0.0.1:8080 --min-perf 80 --json audit-report.json
+      - name: Upload audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with: { name: audit-report, path: web/audit-report.json, if-no-files-found: ignore }

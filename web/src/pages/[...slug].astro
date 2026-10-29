@@ -23,6 +23,11 @@ const jsonLd: object[] = [];
 if (isHomePage(page) || path === "/kontakt/") jsonLd.push(localBusiness(settings.contact, site));
 if (isJobPage(page)) jsonLd.push(jobPosting(page, settings.contact, site, path));
 
+// Never ship an empty meta description: fall back to teaser, intro or the site text.
+const fallbackText = (p: PageData): string =>
+  ("teaser" in p && p.teaser) || ("intro" in p && p.intro) || settings.site.footer_text || "";
+const description = page.meta.search_description || fallbackText(page);
+
 const image =
   page.og_image ?? (isServicePage(page) ? page.hero_image : null) ?? (isHomePage(page) ? page.hero[0].value.image : null);
 ---
@@ -30,7 +35,7 @@ const image =
   settings={settings}
   nav={nav}
   title={page.meta.seo_title || page.title}
-  description={page.meta.search_description}
+  description={description}
   image={image}
   path={path}
   noindex={page.hide_from_sitemap}

@@ -59,7 +59,7 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 - [ ] 👤 Merkmale auf „Unternehmen“ von der Firma bestätigen lassen (z. B. ob die QM-Zertifizierung noch gültig ist, Name des Zertifikats), ggf. ergänzen: Gründungsjahr, Mitarbeiterzahl, Team-Fotos
 - [ ] 👤 Bilder einpflegen (Wagtail-Admin)
 - [ ] 👤 Impressum / Datenschutz / AGB rechtlich prüfen. Datenschutz muss neue Formulare (Bewerbung mit Upload, Speicherfrist 180 Tage) und ggf. Umami abdecken; Impressum: Feld „Vertretungsberechtigt“ ist in der Altseite leer
-- [ ] 🤖 Lighthouse ≥ 95 auf Mobile, a11y-Check (axe)
+- [x] 🤖 Lighthouse (mobil) + axe-core (WCAG 2.1/2.2 AA) für 8 Seitentypen: überall 100/100/100/100, 0 axe-Verstöße (29.10.2026). Behoben: Touch-Ziele in Kategorie-Kacheln, Kontrast Kartenplatzhalter, Überschriften-Reihenfolge der Alttexte, fehlende Meta-Beschreibungen. Läuft als Job `audit` in `web.yml`, lokal: `web/scripts/audit.mjs` + `web/scripts/serve-prod.mjs`
 - [ ] 🤖 Karte in `Map.astro`: selbst gehostetes Leaflet mit OSM-Tiles (aktuell nur Adresse + OSM-Link)
 - [ ] 🤖 Schriften selbst hosten (`web/public/fonts/`, Inter Variable), aktuell System-Font-Stack
 

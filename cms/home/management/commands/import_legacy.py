@@ -236,7 +236,27 @@ class Command(BaseCommand):
             return f"[{m.group(1)}]({mapping.get(path, path)})"
 
         md = re.sub(r"\[([^\]]+)\]\((https?://(?:www\.)?grabnar\.de[^)]*)\)", relink, md)
-        return markdown.markdown(md, output_format="html")
+        return self.normalize_headings(markdown.markdown(md, output_format="html"))
+
+    @staticmethod
+    def normalize_headings(html: str) -> str:
+        """Shift headings so the body starts at <h2> (the page title is the <h1>).
+
+        Old service texts jump from the title straight to <h3> ("Unsere Dienstleistungen
+        im Einzelnen"), which breaks the heading order for screen readers (WCAG 1.3.1).
+        """
+        levels = [int(n) for n in re.findall(r"<h([1-6])\b", html)]
+        if not levels:
+            return html
+        shift = 2 - min(levels)
+        if shift == 0:
+            return html
+
+        def repl(m: re.Match) -> str:
+            level = min(6, max(2, int(m.group(2)) + shift))
+            return f"<{m.group(1)}h{level}"
+
+        return re.sub(r"<(/?)h([1-6])", repl, html)
 
     @staticmethod
     def teaser(html: str, limit: int = 190) -> str:

@@ -15,3 +15,6 @@ cms/db.sqlite3
 cms/media/
 cms/collected-static/
 cms/grabnar/settings/local.py
+
+# audit output
+web/audit-report.json

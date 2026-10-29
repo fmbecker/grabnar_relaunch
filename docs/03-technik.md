@@ -117,3 +117,11 @@ Seed: `cms/fixtures/dev.json` mit Beispielseiten für alle Blocks, damit das Fro
 - Karte als statisches Bild oder selbst gehostetes Leaflet mit OSM-Tiles von eigenem Proxy, sonst Consent-Overlay.
 - Bewerbungsdaten: Löschfrist (z. B. 6 Monate) als Management-Command `purge_applications`, im Admin dokumentiert.
 - Analytics falls gewünscht: selbst gehostetes Plausible/Umami, cookielos.
+
+## Qualitätsprüfung (Lighthouse + Barrierefreiheit)
+
+- `web/scripts/audit.mjs`: Lighthouse im Mobil-Profil und axe-core (WCAG 2.1/2.2 AA, bei 390 und 1280 px) für 8 repräsentative Seiten. Ziele: Barrierefreiheit, Best Practices, SEO ≥ 95, Performance ≥ 90 (CI: ≥ 80, geteilte Runner schwanken), 0 axe-Verstöße. Exit-Code 1 bei Verfehlung.
+- `web/scripts/serve-prod.mjs` bildet `deploy/nginx/grabnar.conf` nach (gzip/Brotli, Cache-Header, Proxy für `/media/`, `/api/`, `/preview/`), damit lokal und in CI produktionsnah gemessen wird. Build dafür mit `WAGTAIL_MEDIA_URL=` und `PUBLIC_FORMS_API_URL=/api/forms` (alles unter einer Domain).
+- CI: Job `audit` in `.github/workflows/web.yml`, Bericht als Artefakt `audit-report`.
+- Stand 29.10.2026: alle 8 Seiten 100/100/100/100, LCP 0,8–1,0 s, CLS 0.
+- Regeln, die daraus folgen: Links in dichten Listen mindestens 24 px hoch (`py-1`), Fließtext beginnt mit `<h2>` (Import normalisiert, Test `test_rich_text_heading_order`), jede Seite hat eine Meta-Beschreibung (Rückfall: Kurztext → Einleitung → Website-Text).

@@ -216,3 +216,28 @@ def test_unternehmen_page(client):
     types = [b["type"] for b in page["body"]]
     assert types == ["rich_text", "feature_list", "service_grid", "cta"]
     assert "Meisterbetrieb" in [f["title"] for f in page["body"][1]["value"]["features"]]
+
+
+def test_rich_text_heading_order():
+    """Body rich text starts at <h2> and never skips a level (WCAG 1.3.1, axe heading-order)."""
+    import re
+
+    from wagtail.fields import StreamField
+    from wagtail.models import Page
+
+    problems = []
+    for page in Page.objects.live().filter(depth__gt=1).specific():
+        for field in page._meta.get_fields():
+            if not isinstance(field, StreamField):
+                continue
+            for block in getattr(page, field.name):
+                if block.block_type != "rich_text":
+                    continue
+                levels = [int(n) for n in re.findall(r"<h([1-6])\b", str(block.value.source))]
+                previous = 1  # the page title
+                for level in levels:
+                    if level > previous + 1:
+                        problems.append(f"{page.url_path}: h{previous} -> h{level}")
+                        break
+                    previous = level
+    assert not problems, "\n".join(problems)
