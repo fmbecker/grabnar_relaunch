@@ -1,0 +1,281 @@
+<title>Grabnar Textfreigabe</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: review desk — page index on the left (wide screens), each page as old/new columns with a sign-off row. */
+:root {
+  --bg: #f3f6fa;
+  --surface: #ffffff;
+  --alt-bg: #eef0f3;
+  --fg: #16202c;
+  --muted: #5a6879;
+  --line: #d6dee8;
+  --accent: #2d78bc;
+  --accent-ink: #1d5f9b;
+  --accent-soft: #e3eef8;
+  --ok: #26754a;
+  --ok-soft: #e1f2e8;
+  --warn: #9a5a00;
+  --warn-soft: #fbefdc;
+  --hint-bg: #fff8e6;
+  --hint-line: #e9cf86;
+  --font-ui: "Public Sans", "Segoe UI", system-ui, sans-serif;
+  --font-text: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10161e; --surface: #18212c; --alt-bg: #141b24; --fg: #e6ecf3; --muted: #9aa9ba;
+    --line: #2b3746; --accent: #6aa9e0; --accent-ink: #8cc0ee; --accent-soft: #1d2f43;
+    --ok: #6cc897; --ok-soft: #173326; --warn: #f0b45c; --warn-soft: #3a2a12;
+    --hint-bg: #2a2414; --hint-line: #6b5726; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10161e; --surface: #18212c; --alt-bg: #141b24; --fg: #e6ecf3; --muted: #9aa9ba;
+  --line: #2b3746; --accent: #6aa9e0; --accent-ink: #8cc0ee; --accent-soft: #1d2f43;
+  --ok: #6cc897; --ok-soft: #173326; --warn: #f0b45c; --warn-soft: #3a2a12;
+  --hint-bg: #2a2414; --hint-line: #6b5726; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--font-ui); font-size: 15px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 48px;
+}
+.shell { max-width: 1320px; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 32px; }
+@media (min-width: 1100px) { .shell { grid-template-columns: 240px minmax(0, 1fr); } }
+
+/* Top */
+.top { padding-block: 32px 8px; display: grid; gap: 12px; max-width: 72ch; }
+.top .kicker { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent-ink); }
+.top h1 { margin: 0; font-family: var(--font-text); font-weight: 600; font-size: clamp(28px, 4vw, 38px); line-height: 1.15; text-wrap: balance; }
+.top p { margin: 0; color: var(--muted); }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.chip {
+  font: inherit; font-size: 13px; font-weight: 600; border: 1px solid var(--line); background: var(--surface); color: var(--fg);
+  border-radius: 999px; padding: 6px 12px; cursor: pointer; display: inline-flex; gap: 8px; align-items: center;
+  font-variant-numeric: tabular-nums;
+}
+.chip[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.chip .n { opacity: .7; }
+.chip:focus-visible, button:focus-visible, a:focus-visible, textarea:focus-visible, .seg input:focus-visible + * { outline: 2px solid var(--accent); outline-offset: 2px; }
+.status-note { font-size: 13px; color: var(--muted); }
+
+/* Index */
+.index { display: none; }
+@media (min-width: 1100px) {
+  .index { display: block; position: sticky; top: env(safe-area-inset-top, 0px); align-self: start; max-height: 100vh; overflow-y: auto; padding-block: 32px; }
+}
+.index ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.index .nav-group { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 14px 8px 4px; }
+.index .nav-group:first-child { padding-top: 0; }
+.index a { display: flex; gap: 8px; align-items: center; padding: 5px 8px; border-radius: 6px; color: var(--fg); text-decoration: none; font-size: 14px; }
+.index a:hover { background: var(--accent-soft); }
+.dot { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--muted); flex: none; }
+[data-status="freigegeben"] .dot, .dot[data-s="freigegeben"] { background: var(--ok); border-color: var(--ok); }
+.dot[data-s="aenderung"] { background: var(--warn); border-color: var(--warn); }
+
+/* Page blocks */
+main { display: grid; gap: 28px; min-width: 0; }
+.page { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 24px; display: grid; gap: 18px; min-width: 0; scroll-margin-top: 16px; }
+.page[hidden] { display: none; }
+.page-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+.page-title { display: grid; gap: 4px; min-width: 0; }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.page h2 { margin: 0; font-family: var(--font-text); font-weight: 600; font-size: 24px; line-height: 1.2; text-wrap: balance; }
+.path { font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); overflow-wrap: anywhere; }
+.pill { font-size: 12.5px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: var(--alt-bg); color: var(--muted); white-space: nowrap; }
+.pill[data-s="freigegeben"] { background: var(--ok-soft); color: var(--ok); }
+.pill[data-s="aenderung"] { background: var(--warn-soft); color: var(--warn); }
+
+.hint { background: var(--hint-bg); border: 1px solid var(--hint-line); border-radius: 8px; padding: 12px 14px; display: grid; gap: 4px; }
+.hint-label, .lead-label { font-size: 11.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.hint-label { color: var(--warn); }
+.hint p { margin: 0; }
+.lead { margin: 0; display: grid; gap: 4px; max-width: 80ch; font-family: var(--font-text); font-size: 16px; }
+.lead-label { color: var(--muted); font-family: var(--font-ui); }
+
+.compare { display: grid; grid-template-columns: 1fr; gap: 16px; }
+@media (min-width: 760px) { .compare { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.col { border-radius: 8px; padding: 16px 18px; min-width: 0; display: grid; gap: 10px; align-content: start; }
+.col-alt { background: var(--alt-bg); color: var(--muted); }
+.col-neu { border: 1px solid var(--line); }
+.col-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.tag { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; }
+.tag-alt { background: var(--line); color: var(--fg); }
+.tag-neu { background: var(--accent); color: var(--surface); }
+.count { font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.prose { font-family: var(--font-text); font-size: 16px; line-height: 1.6; overflow-wrap: anywhere; }
+.col-alt .prose { color: var(--fg); opacity: .82; }
+.prose h3 { font-family: var(--font-ui); font-size: 15px; font-weight: 700; margin: 18px 0 6px; color: var(--fg); }
+.prose h3:first-child { margin-top: 0; }
+.prose p { margin: 0 0 10px; }
+.prose ul { margin: 0 0 10px; padding-left: 20px; }
+.prose li { margin: 2px 0; }
+.prose blockquote { margin: 0 0 10px; padding-left: 12px; border-left: 2px solid var(--line); font-style: italic; }
+.lnk { color: var(--accent-ink); text-decoration: underline dotted; text-underline-offset: 3px; cursor: help; }
+
+/* Review row */
+.review { border-top: 1px solid var(--line); padding-top: 16px; display: grid; gap: 10px; }
+.seg { border: 0; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.seg legend { font-size: 13px; font-weight: 600; margin-bottom: 8px; padding: 0; }
+.seg label { position: relative; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 6px; padding: 7px 12px; font-size: 14px; font-weight: 500; cursor: pointer; background: var(--surface); }
+.seg input { accent-color: var(--accent); margin: 0; }
+.seg label:has(input[value="freigegeben"]:checked) { border-color: var(--ok); background: var(--ok-soft); color: var(--ok); }
+.seg label:has(input[value="aenderung"]:checked) { border-color: var(--warn); background: var(--warn-soft); color: var(--warn); }
+.seg label:has(input[value="offen"]:checked) { border-color: var(--muted); }
+.note-label { font-size: 13px; font-weight: 600; }
+textarea { font: inherit; font-size: 14.5px; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; width: 100%; resize: vertical; }
+.review-foot { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+button[type="submit"] { font: inherit; font-weight: 600; font-size: 14px; background: var(--accent); color: #fff; border: 0; border-radius: 6px; padding: 8px 16px; cursor: pointer; }
+button[type="submit"]:disabled { opacity: .5; cursor: not-allowed; }
+.saved { font-size: 13px; color: var(--muted); }
+.empty { color: var(--muted); padding: 24px; text-align: center; border: 1px dashed var(--line); border-radius: 10px; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+
+<div class="shell">
+  <nav class="index" aria-label="Seiten">
+    <ul>
+{{NAV}}
+    </ul>
+  </nav>
+  <div>
+    <header class="top">
+      <span class="kicker">Relaunch grabnar.de</span>
+      <h1>Neue Seitentexte zur Freigabe</h1>
+      <p>{{COUNT}} Seiten, jeweils der Text der bisherigen Website und der Vorschlag für die neue nebeneinander. Inhaltlich ist nichts dazugekommen. Gelbe Hinweise nennen, was geändert wurde oder was die Firma bestätigen muss. Bitte je Seite eine Bewertung wählen und bei Bedarf eine Anmerkung schreiben.</p>
+      <div class="filters" role="group" aria-label="Nach Status filtern">
+        <button class="chip" type="button" data-filter="alle" aria-pressed="true">Alle <span class="n" data-n="alle"></span></button>
+        <button class="chip" type="button" data-filter="offen" aria-pressed="false">Offen <span class="n" data-n="offen"></span></button>
+        <button class="chip" type="button" data-filter="freigegeben" aria-pressed="false">Freigegeben <span class="n" data-n="freigegeben"></span></button>
+        <button class="chip" type="button" data-filter="aenderung" aria-pressed="false">Änderung gewünscht <span class="n" data-n="aenderung"></span></button>
+      </div>
+      <p class="status-note" data-store-note>Bewertungen werden geladen …</p>
+    </header>
+    <main>
+{{SECTIONS}}
+      <p class="empty" data-empty hidden>Keine Seite mit diesem Status.</p>
+    </main>
+  </div>
+</div>
+
+<script>
+(() => {
+  const KEYS = {{KEYS}};
+  const LABEL = { offen: "Offen", freigegeben: "Freigegeben", aenderung: "Änderung gewünscht" };
+  const sections = new Map([...document.querySelectorAll(".page")].map((s) => [s.dataset.key, s]));
+  const reviews = {};
+  let filter = "alle";
+  let db = null, user = null, myId = null, readOnly = false;
+  const note = document.querySelector("[data-store-note]");
+
+  const fmt = (iso) => {
+    try { return new Date(iso).toLocaleString("de-DE", { dateStyle: "medium", timeStyle: "short" }); }
+    catch { return ""; }
+  };
+
+  async function renderSaved() {
+    const ids = [...new Set(Object.values(reviews).map((r) => r.by).filter(Boolean))];
+    const people = user && ids.length ? await user.profiles(ids) : {};
+    for (const [key, s] of sections) {
+      const r = reviews[key];
+      const el = s.querySelector("[data-saved]");
+      if (!r || !r.at) { el.textContent = ""; continue; }
+      const who = (r.by && people[r.by] && people[r.by].name) || "jemandem";
+      el.textContent = `Zuletzt gespeichert von ${who}, ${fmt(r.at)}`;
+    }
+  }
+
+  function apply() {
+    const counts = { alle: 0, offen: 0, freigegeben: 0, aenderung: 0 };
+    let visible = 0;
+    for (const [key, s] of sections) {
+      const st = (reviews[key] && reviews[key].status) || "offen";
+      counts.alle++; counts[st] = (counts[st] || 0) + 1;
+      s.dataset.status = st;
+      const pill = s.querySelector("[data-pill]");
+      pill.dataset.s = st; pill.textContent = LABEL[st];
+      const dot = document.querySelector(`.index a[data-key="${key}"] .dot`);
+      if (dot) dot.dataset.s = st;
+      const show = filter === "alle" || filter === st;
+      s.hidden = !show; if (show) visible++;
+    }
+    for (const [k, n] of Object.entries(counts)) {
+      const el = document.querySelector(`[data-n="${k}"]`); if (el) el.textContent = n;
+    }
+    document.querySelector("[data-empty]").hidden = visible > 0;
+  }
+
+  function fillForm(key) {
+    const s = sections.get(key), r = reviews[key];
+    const form = s.querySelector("[data-review]");
+    if (form.dataset.dirty === "1") return; // keep what the viewer is typing
+    const st = (r && r.status) || "offen";
+    const radio = form.querySelector(`input[value="${st}"]`); if (radio) radio.checked = true;
+    form.querySelector("textarea").value = (r && r.kommentar) || "";
+  }
+
+  document.querySelectorAll(".chip").forEach((chip) => chip.addEventListener("click", () => {
+    filter = chip.dataset.filter;
+    document.querySelectorAll(".chip").forEach((c) => c.setAttribute("aria-pressed", String(c === chip)));
+    apply();
+  }));
+
+  for (const [key, s] of sections) {
+    const form = s.querySelector("[data-review]");
+    const btn = form.querySelector("button");
+    const saved = form.querySelector("[data-saved]");
+    form.addEventListener("input", () => { form.dataset.dirty = "1"; });
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!db || readOnly) return;
+      const status = form.querySelector("input:checked").value;
+      const kommentar = form.querySelector("textarea").value.trim();
+      btn.disabled = true; saved.textContent = "Wird gespeichert …";
+      try {
+        await db.collection("reviews").doc(key).set({ status, kommentar, by: myId, at: new Date().toISOString() });
+        form.dataset.dirty = "0";
+        reviews[key] = { status, kommentar, by: myId, at: new Date().toISOString() };
+        apply(); renderSaved();
+      } catch (err) {
+        if (err && err.code === "invalid_argument") {
+          readOnly = true; lockForms("Du kannst diese Seite ansehen, aber keine Bewertungen speichern. Bitte Felix um Bearbeitungsrechte.");
+        } else {
+          saved.textContent = "Nicht gespeichert. Bitte in ein paar Sekunden erneut versuchen.";
+        }
+      } finally { btn.disabled = readOnly; }
+    });
+  }
+
+  function lockForms(msg) {
+    note.textContent = msg;
+    document.querySelectorAll("[data-review] input, [data-review] textarea, [data-review] button").forEach((el) => { el.disabled = true; });
+  }
+
+  apply();
+
+  (async () => {
+    if (!window.claude || !window.claude.use) { lockForms("Bewertungen lassen sich nur in der veröffentlichten Ansicht auf claude.ai speichern."); return; }
+    [db, user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+    if (!db) { lockForms("Zum Speichern von Bewertungen bitte bei claude.ai anmelden. Die Texte lassen sich auch so lesen."); return; }
+    myId = user ? await user.id() : null;
+    const canWrite = user ? await user.can("data.write") : null;
+    if (canWrite === false) { readOnly = true; lockForms("Du kannst diese Seite ansehen, aber keine Bewertungen speichern. Bitte Felix um Bearbeitungsrechte."); }
+    else note.textContent = "Bewertungen und Anmerkungen werden für alle gespeichert, die diese Seite öffnen.";
+    db.collection("reviews").onSnapshot((snap) => {
+      for (const d of snap.docs) {
+        if (!KEYS.includes(d.id)) continue;
+        reviews[d.id] = d.data();
+      }
+      for (const ch of snap.docChanges()) if (ch.type === "removed") delete reviews[ch.doc.id];
+      for (const key of sections.keys()) fillForm(key);
+      apply(); renderSaved();
+    }, () => { note.textContent = "Die Verbindung zu den gespeicherten Bewertungen ist abgebrochen. Bitte die Seite neu laden."; });
+  })();
+})();
+</script>

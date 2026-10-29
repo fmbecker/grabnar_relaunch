@@ -49,3 +49,12 @@ Lokal vergleichen: `uv run manage.py seed_dev` zeigt die Neutexte,
 | [services__entruempelung.md](services__entruempelung.md) | Entrümpelung (`/services/entruempelung/`) |
 | [services__transportarbeiten.md](services__transportarbeiten.md) | Transportarbeiten (`/services/transportarbeiten/`) |
 | [services__wachdienste.md](services__wachdienste.md) | Wach- und Schließdienste (`/services/wachdienste/`) |
+
+## Vergleichsseite für die Abstimmung
+
+`vergleich.py` baut aus diesen Dateien eine Seite mit Alt- und Neutext nebeneinander
+(Vorlage: `vergleich.template.html`). Sie ist als claude.ai-Artefakt „Grabnar Textfreigabe“
+veröffentlicht; Bewertung und Anmerkung je Seite werden dort gespeichert (Sammlung `reviews`,
+ein Dokument pro Dateiname) und können von Claude ausgelesen und hier eingearbeitet werden.
+
+    cd cms && uv run python ../docs/content-neu/vergleich.py /tmp/vergleich.html
