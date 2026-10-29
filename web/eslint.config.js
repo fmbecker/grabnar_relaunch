@@ -9,4 +9,6 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
   ...astro.configs.recommended,
   { files: ["scripts/**/*.mjs"], languageOptions: { globals: globals.node } },
+  // audit.mjs passes callbacks to page.evaluate(), which run in the browser
+  { files: ["scripts/audit.mjs"], languageOptions: { globals: { ...globals.node, ...globals.browser } } },
 );
