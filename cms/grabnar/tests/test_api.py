@@ -241,3 +241,49 @@ def test_rich_text_heading_order():
                         break
                     previous = level
     assert not problems, "\n".join(problems)
+
+
+def _rewrites() -> dict[str, tuple[str, str]]:
+    """docs/content-neu/*.md -> {new path: (file name, body markdown)}."""
+    import re
+    from pathlib import Path
+
+    from django.conf import settings
+
+    folder = Path(settings.BASE_DIR).parent / "docs" / "content-neu"
+    result = {}
+    for f in sorted(folder.glob("*.md")):
+        if f.name == "README.md":
+            continue
+        head, _, body = f.read_text(encoding="utf-8").partition("\n---\n")
+        result[re.search(r"^- Pfad: `([^`]+)`", head, re.M).group(1)] = (f.name, body)
+    return result
+
+
+def test_rewrites_replace_legacy_bodies():
+    """Every file in docs/content-neu/ ends up as the body of its page."""
+    import re
+
+    from wagtail.models import Page
+
+    rewrites = _rewrites()
+    assert len(rewrites) == 24
+    by_url = {p.url: p.specific for p in Page.objects.live() if p.url}
+    for path, (name, body) in rewrites.items():
+        page = by_url[path]
+        html = "".join(str(b.value) for b in page.body if b.block_type == "rich_text")
+        first_heading = re.search(r"^## (.+)$", body, re.M).group(1)
+        assert f">{first_heading}</h2>" in html, name
+    unterhalt = by_url["/gebaeudereinigung/unterhaltsreinigung/"]
+    assert str(unterhalt.body[0].value).count("Verkehrsmittel") == 1  # legacy duplicate gone
+
+
+def test_rewrite_links_point_to_live_pages():
+    import re
+
+    from wagtail.models import Page
+
+    live = {p.url for p in Page.objects.live() if p.url}
+    for _path, (name, body) in _rewrites().items():
+        for target in re.findall(r"\]\((/[^)]*)\)", body):
+            assert target in live, f"{name}: {target}"

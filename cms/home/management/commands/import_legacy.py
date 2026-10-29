@@ -6,6 +6,8 @@ Sources (both in the repo, produced from the DB export of the old site):
   docs/redirects.csv         old URL -> new URL mapping
   docs/content-overrides.csv editorial texts per new URL (Kurztext, Einleitung, SEO),
                              semicolon-separated, UTF-8 with BOM (opens in Excel)
+  docs/content-neu/*.md      rewritten body texts per new URL (services, home, Unternehmen);
+                             they replace the legacy body unless --originaltexte is given
 
 Builds:
   /                                   HomePage
@@ -20,6 +22,7 @@ Destructive: replaces the whole page tree below the default site root.
 Usage:
   uv run manage.py import_legacy
   uv run manage.py import_legacy --source /path/to/docs     # e.g. inside Docker
+  uv run manage.py import_legacy --originaltexte            # legacy bodies, ignore content-neu/
 """
 
 from __future__ import annotations
@@ -152,6 +155,11 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--source", type=Path, default=DEFAULT_SOURCE, help="docs/ directory")
+        parser.add_argument(
+            "--originaltexte",
+            action="store_true",
+            help="Fließtexte der Altseite verwenden und docs/content-neu/ ignorieren",
+        )
 
     # ------------------------------------------------------------------ parsing
 
@@ -166,6 +174,21 @@ class Command(BaseCommand):
                 row["pfad"]: {k: v.strip() for k, v in row.items() if v and v.strip()}
                 for row in csv.DictReader(f, delimiter=";")
             }
+
+    @staticmethod
+    def load_rewrites(source: Path) -> dict[str, str]:
+        """docs/content-neu/*.md -> {new path: body markdown below the '---' line}."""
+        folder = source / "content-neu"
+        rewrites: dict[str, str] = {}
+        for md_file in sorted(folder.glob("*.md")) if folder.is_dir() else []:
+            if md_file.name == "README.md":
+                continue
+            head, sep, body = md_file.read_text(encoding="utf-8").partition("\n---\n")
+            path = re.search(r"^- Pfad: `([^`]+)`", head, re.M)
+            if not (sep and path):
+                raise CommandError(f"{md_file}: Kopf mit '- Pfad:' und Trennlinie '---' fehlt.")
+            rewrites[path.group(1)] = body.strip()
+        return rewrites
 
     def load(self, source: Path) -> tuple[dict[str, LegacyPage], dict[str, str]]:
         export = source / "content-export"
@@ -313,9 +336,19 @@ class Command(BaseCommand):
     # ------------------------------------------------------------------ building
 
     @transaction.atomic
-    def handle(self, *args, source: Path, **options):
+    def handle(self, *args, source: Path, originaltexte: bool = False, **options):
         pages, mapping = self.load(source)
         overrides = self.load_overrides(source)
+        rewrites = {} if originaltexte else self.load_rewrites(source)
+        used_rewrites: set[str] = set()
+
+        def rewritten(path: str, title: str) -> str | None:
+            """HTML of the rewritten body for a new path, if there is one."""
+            if path not in rewrites:
+                return None
+            used_rewrites.add(path)
+            return self.to_html(rewrites[path], title, mapping)
+
         if "/" not in pages:
             raise CommandError("home.md (alte URL '/') fehlt im Export.")
         legacy_home = pages["/"]
@@ -442,7 +475,9 @@ class Command(BaseCommand):
 
             services: list[ServicePage] = []
             for svc in cat.children:
-                html = self.to_html(svc.body_md, svc.title, mapping)
+                html = rewritten(svc.new_path, svc.title) or self.to_html(
+                    svc.body_md, svc.title, mapping
+                )
                 if overrides.get(svc.new_path, {}).get("kurztext"):
                     # Editorial summary: keep the full original text in the body.
                     lead = overrides[svc.new_path]["kurztext"]
@@ -509,7 +544,10 @@ class Command(BaseCommand):
                 "Gebäudereinigerhandwerks."
             ),
             body=[
-                ("rich_text", f"<h2>{motto}</h2>" + home_html),
+                (
+                    "rich_text",
+                    rewritten("/unternehmen/", "Unternehmen") or f"<h2>{motto}</h2>" + home_html,
+                ),
                 (
                     "feature_list",
                     {
@@ -584,6 +622,12 @@ class Command(BaseCommand):
             legal_pages.append(page)
 
         # --- Home body -------------------------------------------------------------
+        home_intro = rewritten("/", "Startseite")
+        if not home_intro:
+            first_paragraph = re.search(r"<p>.*?</p>", home_html, re.S)
+            home_intro = (first_paragraph.group(0) if first_paragraph else home_html) + (
+                '<p><a href="/unternehmen/">Mehr über uns</a></p>'
+            )
         home.hero = [
             (
                 "hero",
@@ -617,11 +661,7 @@ class Command(BaseCommand):
                     "services": [],
                 },
             ),
-            (
-                "rich_text",
-                (re.search(r"<p>.*?</p>", home_html, re.S) or re.search(r".*", home_html)).group(0)
-                + '<p><a href="/unternehmen/">Mehr über uns</a></p>',
-            ),
+            ("rich_text", home_intro),
             (
                 "feature_list",
                 {
@@ -700,11 +740,16 @@ class Command(BaseCommand):
                 target.save_revision().publish()
                 applied += 1
 
+        for path in sorted(set(rewrites) - used_rewrites):
+            self.stderr.write(f"content-neu: keine Seite für {path}")
+
         n_services = sum(len(s) for s in created_services)
         self.stdout.write(
             self.style.SUCCESS(
                 f"Importiert: {len(category_pages)} Kategorien, {n_services} Leistungen, "
                 f"{len(legal_pages)} Rechtstexte, {created} Redirects, "
-                f"{applied} Seiten mit redaktionellen Texten."
+                f"{applied} Seiten mit redaktionellen Texten, "
+                f"{len(used_rewrites)} Neutexte"
+                f"{' (ignoriert: --originaltexte)' if originaltexte else ''}."
             )
         )
