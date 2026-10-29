@@ -16,7 +16,7 @@ jobs:
       - uses: astral-sh/setup-uv@v5
         with: { enable-cache: false }
       - uses: pnpm/action-setup@v4
-        with: { version: 10 }
+        with: { package_json_file: web/package.json }
       - uses: actions/setup-node@v5
         with: { node-version: 22, cache: pnpm, cache-dependency-path: web/pnpm-lock.yaml }
       - name: Start seeded CMS
@@ -62,7 +62,7 @@ jobs:
       - uses: astral-sh/setup-uv@v5
         with: { enable-cache: false }
       - uses: pnpm/action-setup@v4
-        with: { version: 10 }
+        with: { package_json_file: web/package.json }
       - uses: actions/setup-node@v5
         with: { node-version: 22, cache: pnpm, cache-dependency-path: web/pnpm-lock.yaml }
       - name: Start seeded CMS
