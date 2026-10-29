@@ -74,6 +74,7 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 - [ ] 👤 Mailversand (SMTP-Zugang) für Formulare
 - [ ] 👤 Nginx auf neue Struktur umschalten, TLS prüfen (kein DNS-Wechsel nötig)
 - [ ] 🤖 Nach Go-Live: 404-Check, Search Console Sitemap
+- [ ] 👤 Vor dem Abschalten: Mediathek der Altseite (`/home/mbgsite/media/`, 135 Bilder) und einen MySQL-Dump offline sichern
 - [ ] 👤 Altserver nach 4 Wochen abschalten
 
 ## Später / Ideen
