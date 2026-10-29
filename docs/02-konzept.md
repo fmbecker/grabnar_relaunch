@@ -79,9 +79,24 @@ Site-weite Einstellungen (`wagtail.contrib.settings`): `ContactSettings` (Adress
 
 ## Design-Richtung
 
-- Seriös, sauber, regional: viel Weißraum, eine kräftige Akzentfarbe (⬜ aus Logo ableiten), neutrale Grautöne.
-- Typografie: eine gut lesbare Sans (z. B. Inter oder Source Sans 3, selbst gehostet – keine Google-Fonts-CDN wegen DSGVO).
-- Bildsprache: echte Fotos von Team und Objekten statt Stock, soweit vorhanden.
+**Markenfarben (aus Logo und `custom.css` der Altseite, per Pixelanalyse bestätigt):**
+
+| Token | Hex | Verwendung |
+|---|---|---|
+| `brand-500` | `#2D78BC` | Logo-Blau „M B GRABNAR“: Buttons, Links, Icons. Weiß darauf = 4,64:1 (WCAG AA) |
+| `brand-300` / `accent-400` | `#8BC1E5` | Logo-Hellblau (Türme, Unterzeile): Akzente, Flächen, Vorschau-Banner |
+| `brand-600`…`950` | `#2768A3` … `#102C48` | Abdunklungen: Hover, Hero- und Footer-Flächen |
+| `ink-900` / `ink-700` | `#1F2328` / `#39424C` | Text (Anthrazit aus der Altseite) |
+| `ink-300` | `#D4D4D5` | Linien, Rahmen (Altseite) |
+
+Die Skala steht in `web/src/styles/global.css` (`@theme`). Das Bootstrap-Blau `#007BFF` der Altseite war nur der Framework-Standard, nicht die Markenfarbe.
+
+**Logo:** `docs/assets/logo-mbgrabnar.png` (917 × 539, transparent, Original vom Server). `import_legacy` übernimmt es in die Mediathek und setzt es in den Website-Einstellungen; das Frontend nutzt unbeschnittene Renditions (`height-80`/`height-160`, 1x/2x). Favicon und Touch-Icon (`web/public/`) zeigen die drei Gebäude-Türme aus dem Logo. ⬜ Vektorversion (SVG) bei der Firma anfragen bzw. nachbauen und abnehmen lassen.
+
+**Typografie:** Die Altseite nutzt nur Arial, es gibt keine Hausschrift. Vorschlag: Inter (selbst gehostet), weil sie der Logo-Schrift (Grotesk) nahekommt und am Bildschirm besser lesbar ist.
+
+**Weiteres:**
+- Bildsprache: echte Fotos von Team und Objekten statt Stock (die Altseite nutzt fast nur Unsplash).
 - Mobile first – Bewerber kommen überwiegend vom Smartphone.
 - Barrierefreiheit: WCAG 2.1 AA als Mindestziel (Kontraste, Fokus-Stile, Formular-Labels).
 

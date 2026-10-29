@@ -23,7 +23,10 @@ const fullTitle = title.includes("Grabnar") ? title : `${title} â€“ Grabnar GebÃ
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <Seo title={fullTitle} description={description} image={image ?? settings.site.default_og_image} path={path} noindex={noindex} jsonLd={jsonLd} />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#2d78bc" />
     {settings.site.analytics && <script defer data-domain={settings.site.analytics.site_id} src={settings.site.analytics.script_url}></script>}
   </head>
   <body class="flex min-h-full flex-col">

@@ -46,7 +46,7 @@ if (page?.meta.html_url) {
 }
 ---
 <Base settings={settings} nav={nav} title={page ? `Vorschau: ${page.title}` : "Vorschau"} path={path} noindex>
-  <div class="sticky top-16 z-30 bg-accent-400 text-ink-900" role="status">
+  <div class="sticky top-20 z-30 bg-accent-400 text-ink-900" role="status">
     <div class="container-x flex flex-wrap items-center justify-between gap-2 py-2 text-sm font-medium">
       <span>Vorschau – diese Version ist noch nicht veröffentlicht.</span>
       {page && <span class="text-ink-700">{page.meta.type.split(".")[1]} · {path}</span>}

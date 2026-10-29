@@ -7,9 +7,13 @@ const isActive = (href: string) => href !== "/" && currentPath.startsWith(href);
 const tel = `tel:${phone.replace(/[^\d+]/g, "")}`;
 ---
 <header class="sticky top-0 z-40 border-b border-ink-100 bg-white/95 backdrop-blur">
-  <div class="container-x flex h-16 items-center justify-between gap-6">
-    <a href="/" class="flex items-center gap-2 font-bold text-brand-800" aria-label="Zur Startseite">
-      {site.logo ? <img src={site.logo.renditions.thumb.url} alt={site.logo.alt} class="h-9 w-auto" width={site.logo.renditions.thumb.width} height={site.logo.renditions.thumb.height} /> : <span class="text-lg">Grabnar</span>}
+  <div class="container-x flex h-20 items-center justify-between gap-6">
+    <a href="/" class="flex items-center gap-2 font-bold text-brand-700">
+      {site.logo ? (
+        <img src={site.logo.url} srcset={`${site.logo.url} 1x, ${site.logo.url2x} 2x`} alt="M. B. Grabnar GmbH – Startseite" class="h-14 w-auto" width={site.logo.width} height={site.logo.height} />
+      ) : (
+        <span class="text-lg">M. B. Grabnar</span>
+      )}
     </a>
 
     <!-- Desktop: hover/focus dropdowns, no JS -->

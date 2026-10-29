@@ -14,7 +14,9 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 - [x] 🤖 `manage.py import_legacy`: baut den kompletten Seitenbaum aus `docs/content-export/` (4 Kategorien, 22 Leistungen, Kontakt, Karriere, Impressum/Datenschutz/AGB), Kontaktdaten und 28 Redirects aus `docs/redirects.csv`. `seed_dev` = `import_legacy` + Platzhalterbilder + Beispiel-Stellen
 - [x] Entscheidung Hosting: alles auf dem bestehenden Linode-VPS, Nginx vor statischem Frontend + Wagtail-Docker, kein DNS-Wechsel (siehe `docs/03-technik.md`)
 - [ ] 👤 Linode-Bestandsaufnahme: OS-Version, Nginx-Config der Altseite, certbot-Status, freier Speicher/RAM, ob Docker installiert ist → `docs/01-ist-analyse.md`
-- [ ] 👤 Logo, Farben, vorhandene Fotos sammeln → `docs/assets/`
+- [x] Logo (`docs/assets/logo-mbgrabnar.png`) und Markenfarben (`#2D78BC`, `#8BC1E5`) von der Altseite übernommen
+- [ ] 👤 Eigene Fotos (Team, Objekte, Fahrzeuge) sammeln → Wagtail-Mediathek
+- [ ] 👤 Logo als Vektor (SVG/PDF/EPS) bei der Firma oder Agentur anfragen
 
 ## Phase 1 – CMS-Grundgerüst (`cms/`) ✅ erledigt am 26.10.2026 (Wagtail 7.3 LTS, Django 5.2)
 
@@ -45,7 +47,8 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 
 ## Phase 3 – Design & Inhalte
 
-- [ ] 🤝 Design-System in Tailwind (`tailwind.config` / CSS-Variablen): Farben aus Logo, Typo, Spacing
+- [x] 🤖 Farb-Tokens aus dem Logo in `web/src/styles/global.css` (Kontraste geprüft), Logo im Header, Favicon/Touch-Icon aus den Logo-Türmen
+- [ ] 🤝 Design-System weiter ausbauen: Typo-Skala, Abstände, Bildsprache, Hero mit Foto
 - [ ] 🤖 Startseite, Leistungsseiten, Karriere, Kontakt ausgestalten
 - [x] 🤖 Texte der Altseite migriert (1:1 übernommen)
 - [ ] 🤝 Texte überarbeiten: Teaser im Hero wiederholt den ersten Satz des Fließtexts; Kategorie-Seiten haben kaum eigenen Text; SEO-Titel/Descriptions sind automatisch erzeugt; „IFSG“ → „IfSG“

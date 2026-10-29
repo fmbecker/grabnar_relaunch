@@ -112,7 +112,9 @@ export async function getSettings(opts: FetchOptions = {}): Promise<Settings> {
     ...s,
     site: {
       ...s.site,
-      logo: withMedia(s.site.logo),
+      logo: s.site.logo
+        ? { ...s.site.logo, url: mediaUrl(s.site.logo.url), url2x: mediaUrl(s.site.logo.url2x) }
+        : null,
       default_og_image: withMedia(s.site.default_og_image),
     },
   };

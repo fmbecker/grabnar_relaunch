@@ -30,9 +30,11 @@ from pathlib import Path
 
 import markdown
 from django.conf import settings
+from django.core.files.images import ImageFile
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from wagtail.contrib.redirects.models import Redirect
+from wagtail.images.models import Image
 from wagtail.models import Page, Site
 
 from home.models import HomePage, StandardPage
@@ -183,6 +185,23 @@ class Command(BaseCommand):
                 break
             result = f"{result} {s}".strip()
         return result or text[: limit - 1].rsplit(" ", 1)[0] + "…"
+
+    @staticmethod
+    def import_logo(source: Path) -> Image | None:
+        """docs/assets/logo-mbgrabnar.png -> Wagtail image (reused if already imported)."""
+        path = source / "assets" / "logo-mbgrabnar.png"
+        if not path.is_file():
+            return None
+        title = "Logo M. B. Grabnar GmbH"
+        existing = Image.objects.filter(title=title).first()
+        if existing:
+            return existing
+        with path.open("rb") as f:
+            image = Image(title=title)
+            image.file.save(path.name, ImageFile(f, name=path.name), save=False)
+            image._set_image_file_metadata()
+            image.save()
+        return image
 
     # ------------------------------------------------------------------ building
 
@@ -463,6 +482,7 @@ class Command(BaseCommand):
             "Meisterbetrieb für Gebäudereinigung, Gebäudedienste und Handwerkerleistungen "
             "in Stuttgart."
         )
+        ss.logo = self.import_logo(source)
         ss.save()
         ss.footer_links.all().delete()
         for page in legal_pages:

@@ -226,8 +226,16 @@ export interface ContactSettings {
   service_area: string;
 }
 
+export interface LogoImage {
+  url: string;
+  url2x: string;
+  width: number;
+  height: number;
+  alt: string;
+}
+
 export interface SiteSettings {
-  logo: ApiImage | null;
+  logo: LogoImage | null;
   tagline: string;
   footer_text: string;
   default_og_image: ApiImage | null;

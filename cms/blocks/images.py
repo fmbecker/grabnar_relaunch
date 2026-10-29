@@ -33,3 +33,21 @@ def image_api_representation(image) -> dict[str, Any] | None:
         "height": image.height,
         "renditions": renditions,
     }
+
+
+def logo_api_representation(image) -> dict[str, Any] | None:
+    """Logo: uncropped, fixed height, original format (keeps PNG transparency).
+
+    Two renditions for <img srcset> (1x/2x). Never uses the cropping renditions above.
+    """
+    if image is None:
+        return None
+    r1 = image.get_rendition("height-80")
+    r2 = image.get_rendition("height-160")
+    return {
+        "url": r1.url,
+        "url2x": r2.url,
+        "width": r1.width,
+        "height": r1.height,
+        "alt": getattr(image, "alt_text", "") or image.title,
+    }

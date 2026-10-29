@@ -8,7 +8,7 @@ from wagtail.admin.panels import FieldPanel, InlinePanel, MultiFieldPanel
 from wagtail.contrib.settings.models import BaseSiteSetting, register_setting
 from wagtail.models import Orderable
 
-from blocks.images import image_api_representation
+from blocks.images import image_api_representation, logo_api_representation
 
 
 @register_setting(icon="mail")
@@ -118,7 +118,7 @@ class SiteSettings(BaseSiteSetting, ClusterableModel):
 
     def to_api(self) -> dict:
         return {
-            "logo": image_api_representation(self.logo),
+            "logo": logo_api_representation(self.logo),
             "tagline": self.tagline,
             "footer_text": self.footer_text,
             "default_og_image": image_api_representation(self.default_og_image),
