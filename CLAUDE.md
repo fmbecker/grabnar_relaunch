@@ -70,7 +70,7 @@ Prüfen vor jedem Commit: `cd cms && uv run ruff check . && uv run pytest -q` ·
 - Keine coderedcms-Abhängigkeit, kein Bootstrap. Tailwind ausschließlich.
 - Formulare (Kontakt, Bewerbung) senden an einen eigenen Endpunkt im CMS (`cms/forms_api/`), nicht an Drittanbieter, wegen Datenschutz (Bewerbungsdaten!).
 - Bilder: ausschließlich über Wagtail-Renditions aus der API, nie Originaldateien im Frontend.
-- Inhalte der Altseite: `docs/content-export/*.md` + `docs/redirects.csv` sind die Quelle für `manage.py import_legacy`. Der Import ersetzt den kompletten Seitenbaum – in Produktion nur einmal vor dem Go-Live ausführen, danach pflegen Redakteure im CMS.
+- Inhalte der Altseite: `docs/content-export/*.md` + `docs/redirects.csv` sind die Quelle für `manage.py import_legacy`; redaktionelle Texte (Kurztext, Einleitung, SEO) kommen aus `docs/content-overrides.csv` (Semikolon, UTF-8 mit BOM für Excel). Neue Aussagen über die Firma nur, wenn Felix/die Firma sie bestätigt hat. Der Import ersetzt den kompletten Seitenbaum – in Produktion nur einmal vor dem Go-Live ausführen, danach pflegen Redakteure im CMS.
 - Preview-Setting heißt `WAGTAIL_HEADLESS_PREVIEW` (nicht `HEADLESS_PREVIEW` – wird sonst still ignoriert). `wagtail.ts` cached nur im statischen Build; SSR-Code muss `{ fresh: true }` übergeben.
 - Beim Anlegen von Seiten per Code: Seiten, auf die Links zeigen (PageChooser), müssen vorher gespeichert sein, sonst landet `null` im StreamField. `test_all_pages_pass_admin_validation` prüft das.
 - `grabnar/urls.py` registriert `wagtail_urls` immer (auch in Produktion): `page.url` braucht `reverse("wagtail_serve")`. Nicht entfernen.

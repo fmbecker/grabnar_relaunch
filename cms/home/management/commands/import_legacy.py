@@ -4,6 +4,8 @@
 Sources (both in the repo, produced from the DB export of the old site):
   docs/content-export/*.md   one Markdown file per old page
   docs/redirects.csv         old URL -> new URL mapping
+  docs/content-overrides.csv editorial texts per new URL (Kurztext, Einleitung, SEO),
+                             semicolon-separated, UTF-8 with BOM (opens in Excel)
 
 Builds:
   /                                   HomePage
@@ -153,6 +155,18 @@ class Command(BaseCommand):
 
     # ------------------------------------------------------------------ parsing
 
+    @staticmethod
+    def load_overrides(source: Path) -> dict[str, dict[str, str]]:
+        """docs/content-overrides.csv -> {new path: {column: value}} (empty values dropped)."""
+        path = source / "content-overrides.csv"
+        if not path.is_file():
+            return {}
+        with path.open(newline="", encoding="utf-8-sig") as f:
+            return {
+                row["pfad"]: {k: v.strip() for k, v in row.items() if v and v.strip()}
+                for row in csv.DictReader(f, delimiter=";")
+            }
+
     def load(self, source: Path) -> tuple[dict[str, LegacyPage], dict[str, str]]:
         export = source / "content-export"
         csv_path = source / "redirects.csv"
@@ -281,6 +295,7 @@ class Command(BaseCommand):
     @transaction.atomic
     def handle(self, *args, source: Path, **options):
         pages, mapping = self.load(source)
+        overrides = self.load_overrides(source)
         if "/" not in pages:
             raise CommandError("home.md (alte URL '/') fehlt im Export.")
         legacy_home = pages["/"]
@@ -408,7 +423,11 @@ class Command(BaseCommand):
             services: list[ServicePage] = []
             for svc in cat.children:
                 html = self.to_html(svc.body_md, svc.title, mapping)
-                lead, html = self.split_lead(html)
+                if overrides.get(svc.new_path, {}).get("kurztext"):
+                    # Editorial summary: keep the full original text in the body.
+                    lead = overrides[svc.new_path]["kurztext"]
+                else:
+                    lead, html = self.split_lead(html)
                 page = ServicePage(
                     title=svc.title,
                     slug=svc.slug,
@@ -639,10 +658,33 @@ class Command(BaseCommand):
             )
             created += 1
 
+        # --- Editorial overrides (docs/content-overrides.csv) ---------------------------
+        applied = 0
+        for path, row in overrides.items():
+            target = by_url.get(path)
+            if target is None:
+                self.stderr.write(f"content-overrides.csv: keine Seite für {path}")
+                continue
+            target = target.specific
+            changed = False
+            for column, attr in (
+                ("seo_titel", "seo_title"),
+                ("meta_beschreibung", "search_description"),
+                ("einleitung", "intro"),
+                ("kurztext", "teaser"),
+            ):
+                if column in row and hasattr(target, attr):
+                    setattr(target, attr, row[column])
+                    changed = True
+            if changed:
+                target.save_revision().publish()
+                applied += 1
+
         n_services = sum(len(s) for s in created_services)
         self.stdout.write(
             self.style.SUCCESS(
                 f"Importiert: {len(category_pages)} Kategorien, {n_services} Leistungen, "
-                f"{len(legal_pages)} Rechtstexte, {created} Redirects."
+                f"{len(legal_pages)} Rechtstexte, {created} Redirects, "
+                f"{applied} Seiten mit redaktionellen Texten."
             )
         )

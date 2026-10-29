@@ -183,10 +183,30 @@ def test_spelling_fix_and_category_intro(client):
         "/api/v2/pages/",
         {"type": "services.ServiceIndexPage", "slug": "gebaeudedienste", "fields": "intro"},
     ).json()["items"][0]
-    assert (
-        cat["intro"]
-        == "Im Bereich Gebäudedienste bieten wir Ihnen: Grau- und Grünanlagenpflege, Hausmeisterdienste und Winterdienst."
-    )
+    # Editorial intro from docs/content-overrides.csv replaces the generated one.
+    assert cat["intro"].startswith("Damit Ihr Objekt das ganze Jahr")
+
+
+def test_content_overrides_applied(client):
+    """Every row of docs/content-overrides.csv ends up on its page; SEO lengths stay sane."""
+    import csv
+    from pathlib import Path
+
+    from django.conf import settings
+    from wagtail.models import Page
+
+    path = Path(settings.BASE_DIR).parent / "docs" / "content-overrides.csv"
+    with path.open(encoding="utf-8-sig") as f:
+        rows = list(csv.DictReader(f, delimiter=";"))
+    assert len(rows) >= 30
+    by_url = {p.url: p.specific for p in Page.objects.live() if p.url}
+    for row in rows:
+        page = by_url[row["pfad"]]
+        assert page.seo_title == row["seo_titel"] and len(page.seo_title) <= 60, row["pfad"]
+        assert page.search_description == row["meta_beschreibung"], row["pfad"]
+        assert len(page.search_description) <= 160, row["pfad"]
+        if row["kurztext"]:
+            assert page.teaser == row["kurztext"], row["pfad"]
 
 
 def test_unternehmen_page(client):

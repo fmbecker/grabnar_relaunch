@@ -52,7 +52,9 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 - [ ] 🤖 Startseite, Leistungsseiten, Karriere, Kontakt ausgestalten
 - [x] 🤖 Texte der Altseite migriert (1:1 übernommen)
 - [x] 🤖 Seiten aus den Alttexten aufgebaut: Kurztext im Kopf der Leistungsseiten wird nicht mehr im Fließtext wiederholt; Kategorieseiten mit Einleitung aus ihren Leistungen; „IFSG“ → „IfSG“; Leistungslisten als zweispaltige Häkchenlisten
-- [ ] 🤝 Texte redaktionell überarbeiten: Kategorie-Einleitungen sind automatisch formuliert; SEO-Titel/Descriptions der Leistungen automatisch erzeugt; Startseiten-Text („Unter unserem Leitgedanken …“) sprachlich glätten; doppelter Eintrag „Unterhaltsreinigung von Verkehrsmitteln“ in der Altseite
+- [x] 🤖 Redaktionelle Texte für 30 Seiten in `docs/content-overrides.csv`: Kurztexte der 22 Leistungen, Einleitungen der 4 Kategorien, SEO-Titel (≤ 60 Zeichen) und Meta-Beschreibungen (≤ 158 Zeichen); nur Aussagen aus den Alttexten, Quelle je Zeile in Spalte `quelle_hinweis`
+- [ ] 👤 `docs/content-overrides.csv` mit der Firma durchgehen (Excel öffnet sie direkt), Spalte `status` von „Vorschlag“ auf „freigegeben“ setzen; Änderungen dort eintragen, `import_legacy` übernimmt sie
+- [ ] 👤 Doppelter Eintrag „Unterhaltsreinigung von Verkehrsmitteln“ (aus der Altseite) nach Go-Live im CMS entfernen
 - [x] 🤖 Seite „Unternehmen“ (`/unternehmen/`): Leitgedanke + Firmentext, 6 Merkmale („Was uns auszeichnet“) ausschließlich aus Aussagen der Altseite (Quellen in `import_legacy.FEATURES`), Leistungsbereiche, CTA
 - [ ] 👤 Merkmale auf „Unternehmen“ von der Firma bestätigen lassen (z. B. ob die QM-Zertifizierung noch gültig ist, Name des Zertifikats), ggf. ergänzen: Gründungsjahr, Mitarbeiterzahl, Team-Fotos
 - [ ] 👤 Bilder einpflegen (Wagtail-Admin)
