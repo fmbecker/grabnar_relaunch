@@ -92,13 +92,33 @@ class SiteSettings(BaseSiteSetting, ClusterableModel):
         on_delete=models.SET_NULL,
         related_name="+",
     )
+    # Umami (self-hosted, cookieless). Tracking stays off until script URL and website ID are set.
     analytics_script_url = models.URLField(
-        _("Analytics-Script-URL"),
+        _("Umami-Script-URL"),
         blank=True,
-        help_text=_("Nur cookielose, selbst gehostete Lösungen (Plausible/Umami)."),
+        help_text=_("z. B. https://statistik.grabnar.de/script.js – leer lassen = kein Tracking."),
     )
-    analytics_site_id = models.CharField(
-        _("Analytics-Site-ID / Domain"), max_length=120, blank=True
+    analytics_website_id = models.CharField(
+        _("Umami-Website-ID"),
+        max_length=64,
+        blank=True,
+        help_text=_("UUID aus Umami → Einstellungen → Websites."),
+    )
+    analytics_host_url = models.URLField(
+        _("Umami-Host-URL (optional)"),
+        blank=True,
+        help_text=_("Nur nötig, wenn Daten an eine andere Adresse gehen als das Script."),
+    )
+    analytics_domains = models.CharField(
+        _("Nur auf diesen Domains zählen"),
+        max_length=255,
+        blank=True,
+        default="www.grabnar.de,grabnar.de",
+        help_text=_("Kommagetrennt. Verhindert Zählungen von Staging und lokalen Builds."),
+    )
+    analytics_performance = models.BooleanField(_("Ladezeiten (Web Vitals) erfassen"), default=True)
+    analytics_do_not_track = models.BooleanField(
+        _("„Do Not Track“ der Besucher respektieren"), default=True
     )
 
     panels = [
@@ -109,7 +129,15 @@ class SiteSettings(BaseSiteSetting, ClusterableModel):
         InlinePanel("footer_links", label=_("Footer-Links")),
         InlinePanel("social_links", label=_("Social-Media-Links")),
         MultiFieldPanel(
-            [FieldPanel("analytics_script_url"), FieldPanel("analytics_site_id")], _("Analytics")
+            [
+                FieldPanel("analytics_script_url"),
+                FieldPanel("analytics_website_id"),
+                FieldPanel("analytics_host_url"),
+                FieldPanel("analytics_domains"),
+                FieldPanel("analytics_performance"),
+                FieldPanel("analytics_do_not_track"),
+            ],
+            _("Statistik (Umami)"),
         ),
     ]
 
@@ -134,12 +162,22 @@ class SiteSettings(BaseSiteSetting, ClusterableModel):
             "social_links": [
                 {"platform": s.platform, "url": s.url} for s in self.social_links.all()
             ],
-            "analytics": {
-                "script_url": self.analytics_script_url,
-                "site_id": self.analytics_site_id,
-            }
-            if self.analytics_script_url
-            else None,
+            "analytics": self.analytics_api(),
+        }
+
+    def analytics_api(self) -> dict | None:
+        """Umami tracker config for the frontend, or None while tracking is not set up."""
+        if not (self.analytics_script_url and self.analytics_website_id.strip()):
+            return None
+        domains = [d.strip() for d in self.analytics_domains.split(",") if d.strip()]
+        return {
+            "provider": "umami",
+            "script_url": self.analytics_script_url,
+            "website_id": self.analytics_website_id.strip(),
+            "host_url": self.analytics_host_url,
+            "domains": ",".join(domains),
+            "performance": self.analytics_performance,
+            "do_not_track": self.analytics_do_not_track,
         }
 
 

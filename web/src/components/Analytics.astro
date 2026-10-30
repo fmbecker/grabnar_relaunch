@@ -1,0 +1,66 @@
+---
+/**
+ * Umami tracker + site-wide automatic events. Rendered by Base.astro only when
+ * the CMS has a script URL and website ID, and never in the editor preview.
+ *
+ * Explicit events sit on the components (see lib/analytics.ts). This script adds
+ * what applies to every link on every page, including links inside rich text
+ * that editors write: tel:, mailto:, outbound links, downloads, plus opening
+ * <details> elements marked with data-track-toggle.
+ */
+import type { AnalyticsSettings } from "@/lib/types";
+interface Props { config: AnalyticsSettings }
+const { config } = Astro.props;
+---
+<script
+  is:inline
+  defer
+  src={config.script_url}
+  data-website-id={config.website_id}
+  data-host-url={config.host_url || undefined}
+  data-domains={config.domains || undefined}
+  data-performance={config.performance ? "true" : undefined}
+  data-do-not-track={config.do_not_track ? "true" : undefined}
+  data-exclude-hash="true"
+></script>
+
+<script>
+  import { EVENT, track } from "@/lib/analytics";
+
+  const DOWNLOAD = /\.(pdf|docx?|xlsx?|pptx?|zip)$/i;
+
+  /** Where on the page a click happened: nearest data-track-area, else "content". */
+  const area = (el: Element) => (el.closest("[data-track-area]") as HTMLElement | null)?.dataset.trackArea ?? "content";
+
+  document.addEventListener(
+    "click",
+    (e) => {
+      const link = (e.target as Element | null)?.closest?.("a[href]") as HTMLAnchorElement | null;
+      if (!link || link.closest("[data-umami-event]")) return; // explicit events win
+      const href = link.getAttribute("href") ?? "";
+      if (href.startsWith("tel:")) return track(EVENT.phone, { placement: area(link) });
+      if (href.startsWith("mailto:")) return track(EVENT.email, { placement: area(link) });
+      let url: URL;
+      try { url = new URL(link.href); } catch { return; }
+      if (DOWNLOAD.test(url.pathname) || url.pathname.startsWith("/documents/")) {
+        return track(EVENT.download, { file: decodeURIComponent(url.pathname.split("/").pop() ?? ""), placement: area(link) });
+      }
+      if (/^https?:$/.test(url.protocol) && url.hostname !== location.hostname) {
+        track(EVENT.outbound, { url: `${url.hostname}${url.pathname}`, placement: area(link) });
+      }
+    },
+    { capture: true },
+  );
+
+  // <details data-track-toggle="faq-open" data-track-label="…">: count openings only.
+  document.addEventListener(
+    "toggle",
+    (e) => {
+      const el = e.target as HTMLDetailsElement;
+      if (!(el instanceof HTMLDetailsElement) || !el.open || !el.dataset.trackToggle) return;
+      const name = el.dataset.trackToggle as (typeof EVENT)[keyof typeof EVENT];
+      track(name, el.dataset.trackLabel ? { question: el.dataset.trackLabel } : {});
+    },
+    { capture: true },
+  );
+</script>

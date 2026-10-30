@@ -1,10 +1,17 @@
 ---
 import type { ApiLink } from "@/lib/types";
 import Icon from "./Icon.astro";
-interface Props { link: ApiLink; class?: string }
-const { link, class: cls = "" } = Astro.props;
+import { EVENT, target, umami } from "@/lib/analytics";
+interface Props {
+  link: ApiLink;
+  class?: string;
+  /** Where the button sits, for the cta-click event (hero, cta, text-image …). */
+  block?: string;
+}
+const { link, class: cls = "", block = "content" } = Astro.props;
+const events = umami(EVENT.cta, { block, label: link.label, target: target(link.href) });
 const styles = { primary: "btn-primary", secondary: "btn-secondary", link: "btn-link" };
 ---
-<a href={link.href} class={`${styles[link.style] ?? "btn-primary"} ${cls}`} rel={link.external ? "noopener" : undefined}>
+<a href={link.href} class={`${styles[link.style] ?? "btn-primary"} ${cls}`} rel={link.external ? "noopener" : undefined} {...events}>
   {link.label}{link.style === "link" && <Icon name="arrow" class="h-4 w-4" />}
 </a>

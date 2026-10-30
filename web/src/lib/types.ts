@@ -234,6 +234,17 @@ export interface LogoImage {
   alt: string;
 }
 
+export interface AnalyticsSettings {
+  provider: "umami";
+  script_url: string;
+  website_id: string;
+  host_url: string;
+  /** Comma-separated hostnames; empty = count everywhere. */
+  domains: string;
+  performance: boolean;
+  do_not_track: boolean;
+}
+
 export interface SiteSettings {
   logo: LogoImage | null;
   tagline: string;
@@ -241,7 +252,8 @@ export interface SiteSettings {
   default_og_image: ApiImage | null;
   footer_links: { label: string; href: string; external: boolean }[];
   social_links: { platform: string; url: string }[];
-  analytics: { script_url: string; site_id: string } | null;
+  /** Umami config from cms/site_settings (null = tracking not set up). */
+  analytics: AnalyticsSettings | null;
 }
 
 export interface Settings {

@@ -23,7 +23,7 @@ Stand: 2026-10-26. Quelle: Datenbank-Export der Live-Instanz (`manage.py shell`,
 | Virtualenv | `/home/env/` (weitere: `/home/env25/`, `/home/envcrx/`) |
 | App-Server | gunicorn, 3 Worker, als **root**, Unix-Socket `/home/mbgsite/app.sock` |
 | Webserver | Nginx (`/etc/nginx/sites-available/`), liefert `robots.txt` nicht selbst aus (kommt aus Django) |
-| Weitere Dienste in `/home` | `umami/` (⬜ läuft dort Umami-Analytics?), `csite/`, `bak.coderedcms.conf` |
+| Weitere Dienste in `/home` | `umami/` (Umami-Analytics, bleibt), `csite/`, `bak.coderedcms.conf` |
 | Kanonische Domain | **`grabnar.de` ohne www** (Wagtail-Site-Hostname, alle Seiten-URLs) |
 | robots.txt | erlaubt alles außer `/admin/` und `/django-admin/`; drei doppelte `User-agent: *`-Gruppen ohne Leerzeilen, relative Sitemap-URL (`/sitemap.xml`). Funktioniert für Google, ist aber formal unsauber. |
 
@@ -84,7 +84,7 @@ Auffällig: URLs mischen Groß-/Kleinschreibung und Umlaute (`/Gebäudereinigung
 ## Noch offen (👤 Felix)
 
 - ⬜ Empfängeradresse `mail@aivii.de` klären
-- ⬜ Läuft Umami unter `/home/umami`? Wenn ja: Script-URL und Site-ID für die Website-Einstellungen im neuen CMS
+- ✅ Umami unter `/home/umami` bleibt (Felix, 30.10.2026) und wird auf v3 aktualisiert → `docs/05-tracking.md`
 - ⬜ Linode: OS-Version, RAM/Disk, Docker installiert?, certbot-Status (`cat /etc/os-release; free -h; df -h /; docker --version; certbot certificates`)
 - ⬜ Mailversand: Welcher SMTP-Weg wird heute genutzt (`django-sendmail-backend` → lokales sendmail/Postfix?)
 - ⬜ Logo-Datei und Firmenfarben

@@ -2,8 +2,13 @@
 import type { ServiceGridValue } from "@/lib/types";
 import Icon from "@/components/ui/Icon.astro";
 import Picture from "@/components/ui/Picture.astro";
-interface Props { value: ServiceGridValue }
-const { value } = Astro.props;
+import { EVENT, umami } from "@/lib/analytics";
+interface Props {
+  value: ServiceGridValue;
+  /** Which list the cards belong to, for the service-click event. */
+  list?: "category" | "related" | "manual";
+}
+const { value, list = "category" } = Astro.props;
 const isCategories = value.kind === "categories";
 ---
 <section class="section bg-ink-50">
@@ -15,20 +20,20 @@ const isCategories = value.kind === "categories";
       <ul class="mt-10 grid gap-6 md:grid-cols-2">
         {value.services.map((c) => (
           <li class="flex flex-col overflow-hidden rounded-lg border border-ink-100 bg-white shadow-sm">
-            {c.image && <a href={c.href} tabindex="-1" aria-hidden="true"><Picture image={c.image} variant="wide" sizes="(min-width: 768px) 50vw, 100vw" class="aspect-[16/7] w-full object-cover" /></a>}
+            {c.image && <a href={c.href} tabindex="-1" aria-hidden="true" {...umami(EVENT.category, { category: c.title, target: "overview" })}><Picture image={c.image} variant="wide" sizes="(min-width: 768px) 50vw, 100vw" class="aspect-[16/7] w-full object-cover" /></a>}
             <div class="flex flex-1 flex-col p-6">
               <div class="flex items-center gap-3">
                 <span class="rounded-md bg-brand-600 p-2 text-white"><Icon name={c.icon} class="h-6 w-6" /></span>
-                <h3 class="text-xl font-bold"><a href={c.href} class="hover:text-brand-700">{c.title}</a></h3>
+                <h3 class="text-xl font-bold"><a href={c.href} class="hover:text-brand-700" {...umami(EVENT.category, { category: c.title, target: "overview" })}>{c.title}</a></h3>
               </div>
               {c.children && c.children.length > 0 && (
                 <ul class="mt-3 grid gap-x-6 text-sm sm:grid-cols-2">
                   {c.children.map((s) => (
-                    <li><a href={s.href} class="inline-block py-1 text-ink-700 hover:text-brand-700 hover:underline">{s.title}</a></li>
+                    <li><a href={s.href} class="inline-block py-1 text-ink-700 hover:text-brand-700 hover:underline" {...umami(EVENT.category, { category: c.title, target: "service", service: s.title })}>{s.title}</a></li>
                   ))}
                 </ul>
               )}
-              <a href={c.href} class="btn-link mt-auto pt-5 text-sm">Alle Leistungen <Icon name="arrow" class="h-4 w-4" /></a>
+              <a href={c.href} class="btn-link mt-auto pt-5 text-sm" {...umami(EVENT.category, { category: c.title, target: "overview" })}>Alle Leistungen <Icon name="arrow" class="h-4 w-4" /></a>
             </div>
           </li>
         ))}
@@ -37,7 +42,7 @@ const isCategories = value.kind === "categories";
       <ul class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {value.services.map((s) => (
           <li>
-            <a href={s.href} class="group flex h-full flex-col overflow-hidden rounded-lg border border-ink-100 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+            <a href={s.href} {...umami(EVENT.service, { service: s.title, list })} class="group flex h-full flex-col overflow-hidden rounded-lg border border-ink-100 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
               {s.image && <Picture image={s.image} variant="card" sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" class="aspect-[4/3] w-full object-cover" />}
               <div class="flex flex-1 flex-col p-5">
                 <div class="flex items-center gap-3">

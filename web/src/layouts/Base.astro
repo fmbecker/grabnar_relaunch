@@ -4,6 +4,7 @@ import type { ApiImage, Navigation, Settings } from "@/lib/types";
 import Seo from "@/components/Seo.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
+import Analytics from "@/components/Analytics.astro";
 interface Props {
   settings: Settings;
   nav: Navigation;
@@ -13,8 +14,11 @@ interface Props {
   path: string;
   noindex?: boolean;
   jsonLd?: object | object[];
+  /** Editor preview: never load tracking. */
+  preview?: boolean;
 }
-const { settings, nav, title, description, image, path, noindex, jsonLd } = Astro.props;
+const { settings, nav, title, description, image, path, noindex, jsonLd, preview = false } = Astro.props;
+const analytics = preview ? null : settings.site.analytics;
 const fullTitle = title.includes("Grabnar") ? title : `${title} – Grabnar Gebäudereinigung`;
 ---
 <!doctype html>
@@ -27,12 +31,12 @@ const fullTitle = title.includes("Grabnar") ? title : `${title} – Grabnar Geb�
     <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="theme-color" content="#2d78bc" />
-    {settings.site.analytics && <script defer data-domain={settings.site.analytics.site_id} src={settings.site.analytics.script_url}></script>}
+    {analytics && <Analytics config={analytics} />}
   </head>
   <body class="flex min-h-full flex-col">
     <a href="#inhalt" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-white focus:p-3">Zum Inhalt springen</a>
     <Header nav={nav} site={settings.site} phone={settings.contact.phone} currentPath={path} />
-    <main id="inhalt"><slot /></main>
+    <main id="inhalt" data-track-area="content"><slot /></main>
     <Footer nav={nav} settings={settings} />
   </body>
 </html>

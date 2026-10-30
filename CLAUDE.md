@@ -76,6 +76,7 @@ Pre-Push-Hook (einmal pro Klon aktivieren): `git config core.hooksPath .githooks
 - Preview-Setting heißt `WAGTAIL_HEADLESS_PREVIEW` (nicht `HEADLESS_PREVIEW` – wird sonst still ignoriert). `wagtail.ts` cached nur im statischen Build; SSR-Code muss `{ fresh: true }` übergeben.
 - Beim Anlegen von Seiten per Code: Seiten, auf die Links zeigen (PageChooser), müssen vorher gespeichert sein, sonst landet `null` im StreamField. `test_all_pages_pass_admin_validation` prüft das.
 - `grabnar/urls.py` registriert `wagtail_urls` immer (auch in Produktion): `page.url` braucht `reverse("wagtail_serve")`. Nicht entfernen.
+- Tracking: Umami, Konzept in `docs/05-tracking.md`. Neue Links/Buttons/Formulare bekommen ein Ereignis aus `web/src/lib/analytics.ts` (`EVENT`, `umami()`, `track()`); nie personenbezogene Daten oder Formularinhalte senden.
 - Vor größeren Entscheidungen (Hosting, Domainumzug, Löschen alter Inhalte) Felix fragen.
 
 ## Konventionen

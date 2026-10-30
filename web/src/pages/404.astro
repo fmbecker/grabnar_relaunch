@@ -9,4 +9,12 @@ const [settings, nav] = await Promise.all([getSettings(), getNavigation()]);
     <p class="mt-4 text-ink-700">Die Adresse existiert nicht mehr oder wurde verschoben.</p>
     <a href="/" class="btn-primary mt-8">Zur Startseite</a>
   </div></section>
+  <script>
+    import { EVENT, track } from "@/lib/analytics";
+    // Which old or mistyped addresses still get visits (no query string, only the referring host).
+    const send = () =>
+      track(EVENT.notFound, { path: location.pathname, referrer: document.referrer ? new URL(document.referrer).hostname : "direkt" });
+    if ("umami" in window) send();
+    else window.addEventListener("load", send, { once: true });
+  </script>
 </Base>

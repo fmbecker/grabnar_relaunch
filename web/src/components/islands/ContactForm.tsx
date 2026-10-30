@@ -1,4 +1,5 @@
 import { useId, useRef, useState, type FormEvent } from "react";
+import { EVENT, track } from "@/lib/analytics";
 
 interface Props {
   variant: "contact" | "application";
@@ -14,8 +15,17 @@ export default function ContactForm({ variant, successMessage, sourcePath, apiUr
   const [status, setStatus] = useState<Status>("idle");
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const startedAt = useRef(Date.now());
+  const started = useRef(false);
   const uid = useId();
   const isApplication = variant === "application";
+  // Tracking: form type and job title only, never what visitors type.
+  const trackData = { form: variant, job: job?.title };
+  function onFirstInput() {
+    if (started.current) return;
+    started.current = true;
+    track(EVENT.formStart, trackData);
+  }
+
   const endpoint = `${apiUrl.replace(/\/$/, "")}/${isApplication ? "application" : "contact"}/`;
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
@@ -37,12 +47,15 @@ export default function ContactForm({ variant, successMessage, sourcePath, apiUr
       if (res.ok && json.ok) {
         setStatus("success");
         form.reset();
+        track(EVENT.formSubmit, { ...trackData, result: "success" });
       } else {
         setErrors(json.errors ?? {});
         setStatus("error");
+        track(EVENT.formSubmit, { ...trackData, result: json.errors ? "invalid" : "error", fields: Object.keys(json.errors ?? {}).join(",") });
       }
     } catch {
       setStatus("error");
+      track(EVENT.formSubmit, { ...trackData, result: "error" });
     }
   }
 
@@ -67,7 +80,7 @@ export default function ContactForm({ variant, successMessage, sourcePath, apiUr
   );
 
   return (
-    <form onSubmit={onSubmit} className="grid gap-5" noValidate={false}>
+    <form onSubmit={onSubmit} onInput={onFirstInput} className="grid gap-5" noValidate={false}>
       {/* honeypot */}
       <div className="hidden" aria-hidden="true">
         <label htmlFor={`${uid}-website`}>Website</label>

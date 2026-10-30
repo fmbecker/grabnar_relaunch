@@ -8,7 +8,7 @@ const { value } = Astro.props;
     {value.heading && <h2 class="h2 mb-6">{value.heading}</h2>}
     <div class="divide-y divide-ink-100 rounded-lg border border-ink-100">
       {value.items.map((item) => (
-        <details class="group p-5">
+        <details class="group p-5" data-track-toggle="faq-open" data-track-label={item.question}>
           <summary class="flex cursor-pointer list-none items-center justify-between font-semibold">
             {item.question}
             <span class="ml-4 text-brand-600 transition group-open:rotate-45" aria-hidden="true">+</span>

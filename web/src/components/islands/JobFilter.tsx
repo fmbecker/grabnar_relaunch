@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import type { JobSummary } from "@/lib/types";
+import { EVENT, track, umami } from "@/lib/analytics";
 
 interface Props {
   jobs: JobSummary[];
@@ -21,7 +22,10 @@ export default function JobFilter({ jobs }: Props) {
   return (
     <div>
       <div className="mb-6 flex flex-wrap gap-3">
-        <select className="field w-auto" value={location} onChange={(e) => setLocation(e.target.value)} aria-label="Arbeitsort">
+        <select className="field w-auto" value={location} onChange={(e) => {
+            setLocation(e.target.value);
+            track(EVENT.jobFilter, { field: "location", value: e.target.value || "alle" });
+          }} aria-label="Arbeitsort">
           <option value="">Alle Orte</option>
           {locations.map((l) => (
             <option key={l} value={l}>
@@ -29,7 +33,10 @@ export default function JobFilter({ jobs }: Props) {
             </option>
           ))}
         </select>
-        <select className="field w-auto" value={type} onChange={(e) => setType(e.target.value)} aria-label="Beschäftigungsart">
+        <select className="field w-auto" value={type} onChange={(e) => {
+            setType(e.target.value);
+            track(EVENT.jobFilter, { field: "employment_type", value: e.target.value || "alle" });
+          }} aria-label="Beschäftigungsart">
           <option value="">Alle Beschäftigungsarten</option>
           {types.map(([k, label]) => (
             <option key={k} value={k}>
@@ -44,7 +51,7 @@ export default function JobFilter({ jobs }: Props) {
         <ul className="grid gap-4">
           {visible.map((j) => (
             <li key={j.id}>
-              <a href={j.href} className="flex items-center justify-between rounded-lg border border-ink-100 bg-white p-5 hover:border-brand-300">
+              <a href={j.href} {...umami(EVENT.jobOpen, { job: j.title })} className="flex items-center justify-between rounded-lg border border-ink-100 bg-white p-5 hover:border-brand-300">
                 <div>
                   <h3 className="h3">{j.title}</h3>
                   <p className="mt-1 text-sm text-ink-500">

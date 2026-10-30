@@ -15,7 +15,7 @@ const { value } = Astro.props;
       {value.subline && <p class="mt-5 text-lg text-brand-100 sm:text-xl">{value.subline}</p>}
       {value.links.length > 0 && (
         <div class="mt-8 flex flex-wrap gap-3">
-          {value.links.map((l) => <LinkButton link={{ ...l, style: l.style === "secondary" ? "secondary" : l.style }} class={l.style === "secondary" ? "border-white text-white hover:bg-white/10" : ""} />)}
+          {value.links.map((l) => <LinkButton block="hero" link={{ ...l, style: l.style === "secondary" ? "secondary" : l.style }} class={l.style === "secondary" ? "border-white text-white hover:bg-white/10" : ""} />)}
         </div>
       )}
     </div>

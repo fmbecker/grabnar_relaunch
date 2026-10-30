@@ -287,3 +287,31 @@ def test_rewrite_links_point_to_live_pages():
     for _path, (name, body) in _rewrites().items():
         for target in re.findall(r"\]\((/[^)]*)\)", body):
             assert target in live, f"{name}: {target}"
+
+
+def test_analytics_settings(client):
+    """Tracking is off until script URL and website ID are set; then the Umami config is served."""
+    from wagtail.models import Site
+
+    from site_settings.models import SiteSettings
+
+    assert client.get("/api/v2/settings/").json()["site"]["analytics"] is None
+    ss = SiteSettings.for_site(Site.objects.get(is_default_site=True))
+    ss.analytics_script_url = "https://statistik.grabnar.de/script.js"
+    ss.analytics_website_id = " 94db1cb1-74f4-4a40-ad6c-962362670409 "
+    ss.analytics_domains = "www.grabnar.de, grabnar.de,"
+    ss.save()
+    try:
+        analytics = client.get("/api/v2/settings/").json()["site"]["analytics"]
+        assert analytics == {
+            "provider": "umami",
+            "script_url": "https://statistik.grabnar.de/script.js",
+            "website_id": "94db1cb1-74f4-4a40-ad6c-962362670409",
+            "host_url": "",
+            "domains": "www.grabnar.de,grabnar.de",
+            "performance": True,
+            "do_not_track": True,
+        }
+    finally:
+        ss.analytics_script_url = ""
+        ss.save()

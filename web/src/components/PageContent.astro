@@ -6,6 +6,7 @@ import BlockRenderer from "@/components/blocks/BlockRenderer.astro";
 import ServiceGrid from "@/components/blocks/ServiceGrid.astro";
 import Picture from "@/components/ui/Picture.astro";
 import ContactFormIsland from "@/components/islands/ContactForm";
+import { EVENT, umami } from "@/lib/analytics";
 interface Props { page: PageData; settings: Settings; path: string }
 const { page, settings, path } = Astro.props;
 const home = isHomePage(page) ? page : null;
@@ -43,7 +44,7 @@ const job = isJobPage(page) ? page : null;
       </div>
     </div>
     <BlockRenderer blocks={svc.body} contact={settings.contact} sourcePath={path} />
-    {svc.related.length > 0 && <ServiceGrid value={{ heading: "Verwandte Leistungen", intro: "", kind: "services", services: svc.related }} />}
+    {svc.related.length > 0 && <ServiceGrid list="related" value={{ heading: "Verwandte Leistungen", intro: "", kind: "services", services: svc.related }} />}
   </>
 )}
 
@@ -69,10 +70,10 @@ const job = isJobPage(page) ? page : null;
           <h2>Das bringen Sie mit</h2><div set:html={job.requirements} />
           {job.benefits && <><h2>Wir bieten</h2><div set:html={job.benefits} /></>}
         </div>
-        <aside class="rounded-lg bg-brand-50 p-6 text-sm">
+        <aside class="rounded-lg bg-brand-50 p-6 text-sm" data-track-area="job-sidebar">
           <h2 class="h3">Fragen zur Stelle?</h2>
           <p class="mt-2">Rufen Sie uns an: <a class="font-semibold text-brand-700" href={`tel:${settings.contact.phone.replace(/\s/g, "")}`}>{settings.contact.phone}</a></p>
-          {job.show_apply_form && <a href="#formular" class="btn-primary mt-4 w-full">Jetzt bewerben</a>}
+          {job.show_apply_form && <a href="#formular" class="btn-primary mt-4 w-full" {...umami(EVENT.jobApply, { job: job.title })}>Jetzt bewerben</a>}
         </aside>
       </div>
     </section>

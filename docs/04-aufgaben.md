@@ -64,6 +64,10 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 - [ ] 🤖 Karte in `Map.astro`: selbst gehostetes Leaflet mit OSM-Tiles (aktuell nur Adresse + OSM-Link)
 - [x] Schrift: Arial (Entscheidung Felix 30.10.2026), keine Webfonts nötig
 
+- [x] 🤖 Tracking mit Umami vorbereitet: Einstellungen im CMS (Script-URL, Website-ID, Domains, Web Vitals, Do Not Track), 17 Ereignisse auf allen Seiten und Komponenten, Konzept in `docs/05-tracking.md`
+- [ ] 👤 Umami auf v3 aktualisieren (nur noch PostgreSQL – ggf. MySQL-Migration), Website anlegen, Website-ID im CMS eintragen
+- [ ] 👤 Ziele und Trichter in Umami anlegen (Vorschlag in `docs/05-tracking.md`)
+
 ## Phase 4 – Go-Live
 
 - [x] 🤖 `deploy/`: `docker-compose.yml`, `nginx/grabnar.conf`, `rebuild-hook.py` + systemd-Unit, `build-web.sh`, `deploy.sh`, Backup-Skript
@@ -83,4 +87,3 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 - Referenzen-Seite mit Logos
 - News/Blog (`ArticlePage`)
 - Stellenanzeigen automatisch an Google for Jobs via JSON-LD (bereits in Phase 2 angelegt) – Indexierung prüfen
-- Selbst gehostete Analytics (Plausible/Umami)
