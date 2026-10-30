@@ -22,7 +22,7 @@
 Diese Aussagen dürfen auf der Website stehen:
 
 - **Zertifiziert nach ISO 9001** (Qualitätsmanagement) und **ISO 14001** (Umweltmanagement). Ein
-  kombiniertes Siegel wird nachgereicht und kommt dann auf „Unternehmen“ und in den Footer.
+  kombiniertes Siegel wird nachgereicht und im Admin unter Einstellungen → Website-Einstellungen → Zertifizierung hochgeladen; es erscheint dann automatisch im Footer und im Block „Zertifikat“ auf „Unternehmen“.
 - **Erlaubnis zur Arbeitnehmerüberlassung (AÜG)** liegt vor – wird auf der Leistungsseite genannt.
 - **Bewachungserlaubnis (§ 34a GewO)** liegt vor, soll aber **nicht** erwähnt oder aufgeführt werden.
 - **Maurerarbeiten** gehören zum Angebot (Seite „Maler- und Maurerarbeiten“; Leistungsliste als Vorschlag
@@ -91,6 +91,7 @@ Site-weite Einstellungen (`wagtail.contrib.settings`): `ContactSettings` (Adress
 | `JobListBlock` | `JobList.astro` + optional `islands/JobFilter.tsx` | Liste aller gültigen JobPages |
 | `MapBlock` | `Map.astro` | statische Karte/Leaflet ohne Google-Tracking |
 | `GalleryBlock` | `Gallery.astro` | Bildergalerie, Lightbox optional als Island |
+| `CertificateBlock` | `Certificate.astro` | ISO-Siegel aus den Website-Einstellungen (Zertifizierung); unsichtbar, solange kein Siegel hochgeladen ist |
 
 ## Design-Richtung
 

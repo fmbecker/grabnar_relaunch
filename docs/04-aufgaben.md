@@ -58,7 +58,8 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 - [x] 👤 Neutexte in `docs/content-neu/` von der Firma freigegeben (30.10.2026), Status in allen Dateien auf „freigegeben“
 - [x] 🤖 Seite „Unternehmen“ (`/unternehmen/`): Leitgedanke + Firmentext, 6 Merkmale („Was uns auszeichnet“) ausschließlich aus Aussagen der Altseite (Quellen in `import_legacy.FEATURES`), Leistungsbereiche, CTA
 - [x] 👤 Rückfragen der Firma beantwortet (30.10.2026): ISO 9001 + ISO 14001, AÜG-Erlaubnis, Bewachungserlaubnis (nicht nennen), Maurerarbeiten ergänzen, Versiegelung ohne Einschränkung, IfSG-Paragraf korrekt, keine Privatkunden – eingearbeitet, siehe `docs/02-konzept.md`
-- [ ] 👤 Kombiniertes Siegel ISO 9001/14001 nachreichen (SVG oder PNG) → auf „Unternehmen“ und im Footer einbauen
+- [x] 🤖 Platz für das ISO-Siegel vorbereitet: Website-Einstellungen → „Zertifizierung“ (Siegel, Text, optional PDF), erscheint automatisch im Footer und im Block „Zertifikat“ auf „Unternehmen“
+- [ ] 👤 Kombiniertes Siegel ISO 9001/14001 (SVG oder PNG, transparent) im Admin hochladen: Einstellungen → Website-Einstellungen → Zertifizierung; optional das Zertifikat als PDF
 - [x] 👤 Alle 24 Neutexte inkl. Maurerarbeiten und geänderter Baureinigung von der Firma freigegeben (Vergleichsseite, 30.10.2026)
 - [ ] 👤 Optional: Gründungsjahr, Mitarbeiterzahl, Team-Fotos für „Unternehmen“
 - [ ] 👤 Bilder einpflegen (Wagtail-Admin)

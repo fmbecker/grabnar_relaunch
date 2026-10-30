@@ -10,6 +10,25 @@ const { contact, site } = settings;
     <div class="lg:col-span-2">
       <p class="text-lg font-bold text-white">{contact.company_name}</p>
       {site.footer_text && <p class="mt-3 max-w-md text-sm">{site.footer_text}</p>}
+      {site.certificate && (
+        <a
+          href={site.certificate.document_url || "/unternehmen/"}
+          target={site.certificate.document_url ? "_blank" : undefined}
+          rel={site.certificate.document_url ? "noopener" : undefined}
+          class="mt-5 inline-flex items-center gap-3 rounded-md bg-white p-2 pr-4 text-sm font-medium text-ink-900 hover:bg-ink-50"
+        >
+          <img
+            src={site.certificate.seal.url}
+            srcset={`${site.certificate.seal.url} 1x, ${site.certificate.seal.url2x} 2x`}
+            width={site.certificate.seal.width}
+            height={site.certificate.seal.height}
+            alt=""
+            loading="lazy"
+            class="h-12 w-auto"
+          />
+          {site.certificate.label}
+        </a>
+      )}
     </div>
     <div>
       <h2 class="text-sm font-semibold uppercase tracking-wide text-white">Kontakt</h2>

@@ -297,6 +297,41 @@ class GalleryBlock(blocks.StructBlock):
         label = _("Galerie")
 
 
+class CertificateBlock(blocks.StructBlock):
+    """Shows the certification seal from the site settings (Einstellungen → Website-Einstellungen
+    → Zertifizierung). Renders nothing on the website while no seal is uploaded."""
+
+    heading = blocks.CharBlock(
+        label=_("Überschrift"), required=False, default="Zertifiziert nach ISO 9001 und ISO 14001"
+    )
+    text = blocks.TextBlock(
+        label=_("Text"),
+        required=False,
+        default=(
+            "Unser Qualitätsmanagement ist nach ISO 9001, unser Umweltmanagement nach "
+            "ISO 14001 zertifiziert."
+        ),
+    )
+
+    class Meta:
+        icon = "success"
+        label = _("Zertifikat")
+
+    def get_api_representation(self, value, context=None):
+        from wagtail.models import Site
+
+        from site_settings.models import SiteSettings
+
+        site = Site.objects.filter(is_default_site=True).first()
+        certificate = SiteSettings.for_site(site).certificate_api(height=160) if site else None
+        return {
+            "heading": value.get("heading", ""),
+            "text": value.get("text", ""),
+            "seal": certificate["seal"] if certificate else None,
+            "document_url": certificate["document_url"] if certificate else "",
+        }
+
+
 class BodyStreamBlock(blocks.StreamBlock):
     """The body of every page type. HeroBlock is a separate field on HomePage."""
 
@@ -312,6 +347,7 @@ class BodyStreamBlock(blocks.StreamBlock):
     job_list = JobListBlock()
     map = MapBlock()
     gallery = GalleryBlock()
+    certificate = CertificateBlock()
 
     class Meta:
         block_counts = {"contact_form": {"max_num": 1}, "job_list": {"max_num": 1}}

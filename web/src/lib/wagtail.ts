@@ -116,6 +116,13 @@ export async function getSettings(opts: FetchOptions = {}): Promise<Settings> {
         ? { ...s.site.logo, url: mediaUrl(s.site.logo.url), url2x: mediaUrl(s.site.logo.url2x) }
         : null,
       default_og_image: withMedia(s.site.default_og_image),
+      certificate: s.site.certificate
+        ? {
+            ...s.site.certificate,
+            seal: { ...s.site.certificate.seal, url: mediaUrl(s.site.certificate.seal.url), url2x: mediaUrl(s.site.certificate.seal.url2x) },
+            document_url: s.site.certificate.document_url ? mediaUrl(s.site.certificate.document_url) : "",
+          }
+        : null,
     },
   };
 }
@@ -136,6 +143,13 @@ export function normalizePage<T extends PageData>(page: T): T {
     if (v && typeof v === "object") {
       const o = v as Record<string, unknown>;
       if ("renditions" in o && "alt" in o) return withMedia(o as unknown as ApiImage);
+      // Fixed-height images (logo, seal) and document links inside blocks.
+      if ("url2x" in o && typeof o.url === "string" && typeof o.url2x === "string")
+        return { ...o, url: mediaUrl(o.url), url2x: mediaUrl(o.url2x) };
+      if (typeof o.document_url === "string" && o.document_url)
+        return Object.fromEntries(
+          Object.entries(o).map(([k, val]) => [k, k === "document_url" ? mediaUrl(val as string) : walk(val)]),
+        );
       return Object.fromEntries(Object.entries(o).map(([k, val]) => [k, walk(val)]));
     }
     return v;

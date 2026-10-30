@@ -214,7 +214,7 @@ def test_unternehmen_page(client):
         "/api/v2/pages/", {"type": "home.StandardPage", "slug": "unternehmen", "fields": "body"}
     ).json()["items"][0]
     types = [b["type"] for b in page["body"]]
-    assert types == ["rich_text", "feature_list", "service_grid", "cta"]
+    assert types == ["rich_text", "feature_list", "certificate", "service_grid", "cta"]
     assert "Meisterbetrieb" in [f["title"] for f in page["body"][1]["value"]["features"]]
 
 
@@ -371,3 +371,41 @@ def test_company_wording_rules():
     about = Page.objects.get(slug="unternehmen").specific
     body = str(about.body.get_prep_value())
     assert "ISO 9001" in body and "ISO 14001" in body
+
+
+def test_certificate_seal(client):
+    """No seal uploaded → nothing on the site; after upload → footer setting + block carry it."""
+    from django.core.files.uploadedfile import SimpleUploadedFile
+    from wagtail.images.models import Image
+    from wagtail.models import Site
+
+    from site_settings.models import SiteSettings
+
+    def unternehmen_block():
+        page = client.get(
+            "/api/v2/pages/", {"type": "home.StandardPage", "slug": "unternehmen", "fields": "body"}
+        ).json()["items"][0]
+        return next(b for b in page["body"] if b["type"] == "certificate")["value"]
+
+    assert client.get("/api/v2/settings/").json()["site"]["certificate"] is None
+    assert unternehmen_block()["seal"] is None
+
+    svg = b'<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><circle cx="100" cy="100" r="90"/></svg>'
+    image = Image(title="Siegel ISO 9001/14001")
+    image.file.save("siegel.svg", SimpleUploadedFile("siegel.svg", svg), save=False)
+    image._set_image_file_metadata()
+    image.save()
+    ss = SiteSettings.for_site(Site.objects.get(is_default_site=True))
+    ss.certificate_seal = image
+    ss.save()
+    try:
+        cert = client.get("/api/v2/settings/").json()["site"]["certificate"]
+        assert cert["label"] == "Zertifiziert nach ISO 9001 und ISO 14001"
+        assert cert["seal"]["height"] == 64 and cert["seal"]["url2x"]
+        assert cert["seal"]["alt"] == cert["label"] and cert["document_url"] == ""
+        block = unternehmen_block()
+        assert block["seal"]["height"] == 160 and block["heading"].startswith("Zertifiziert")
+    finally:
+        ss.certificate_seal = None
+        ss.save()
+        image.delete()

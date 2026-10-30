@@ -92,6 +92,35 @@ class SiteSettings(BaseSiteSetting, ClusterableModel):
         on_delete=models.SET_NULL,
         related_name="+",
     )
+    # Combined ISO 9001/14001 seal: shown in the footer and by the "Zertifikat" block once uploaded.
+    certificate_seal = models.ForeignKey(
+        "wagtailimages.Image",
+        verbose_name=_("Zertifikats-Siegel"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        help_text=_(
+            "SVG oder PNG mit transparentem Hintergrund. Leer = kein Siegel auf der Website."
+        ),
+    )
+    certificate_label = models.CharField(
+        _("Text zum Siegel"),
+        max_length=120,
+        blank=True,
+        default="Zertifiziert nach ISO 9001 und ISO 14001",
+        help_text=_("Steht neben dem Siegel und dient als Alternativtext."),
+    )
+    certificate_document = models.ForeignKey(
+        "wagtaildocs.Document",
+        verbose_name=_("Zertifikat als PDF (optional)"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        help_text=_("Wird beim Siegel verlinkt."),
+    )
+
     # Umami (self-hosted, cookieless). Tracking stays off until script URL and website ID are set.
     analytics_script_url = models.URLField(
         _("Umami-Script-URL"),
@@ -130,6 +159,14 @@ class SiteSettings(BaseSiteSetting, ClusterableModel):
         InlinePanel("social_links", label=_("Social-Media-Links")),
         MultiFieldPanel(
             [
+                FieldPanel("certificate_seal"),
+                FieldPanel("certificate_label"),
+                FieldPanel("certificate_document"),
+            ],
+            _("Zertifizierung"),
+        ),
+        MultiFieldPanel(
+            [
                 FieldPanel("analytics_script_url"),
                 FieldPanel("analytics_website_id"),
                 FieldPanel("analytics_host_url"),
@@ -162,7 +199,20 @@ class SiteSettings(BaseSiteSetting, ClusterableModel):
             "social_links": [
                 {"platform": s.platform, "url": s.url} for s in self.social_links.all()
             ],
+            "certificate": self.certificate_api(),
             "analytics": self.analytics_api(),
+        }
+
+    def certificate_api(self, height: int = 64) -> dict | None:
+        """Seal for the frontend, or None while no seal is uploaded."""
+        if not self.certificate_seal:
+            return None
+        seal = logo_api_representation(self.certificate_seal, height=height)
+        seal["alt"] = self.certificate_label or seal["alt"]
+        return {
+            "label": self.certificate_label,
+            "seal": seal,
+            "document_url": self.certificate_document.url if self.certificate_document else "",
         }
 
     def analytics_api(self) -> dict | None:

@@ -13,6 +13,7 @@ import ContactForm from "./ContactForm.astro";
 import JobList from "./JobList.astro";
 import Map from "./Map.astro";
 import Gallery from "./Gallery.astro";
+import Certificate from "./Certificate.astro";
 
 interface Props {
   blocks: Block[];
@@ -38,6 +39,7 @@ const { blocks, contact, sourcePath, job, service } = Astro.props;
     case "job_list": return <JobList value={b.value} />;
     case "map": return <Map value={b.value} contact={contact} />;
     case "gallery": return <Gallery value={b.value} />;
+    case "certificate": return <Certificate value={b.value} />;
     default: return null;
   }
 })}

@@ -557,6 +557,8 @@ class Command(BaseCommand):
                         ],
                     },
                 ),
+                # Seal from the site settings; invisible until it is uploaded there.
+                ("certificate", {}),
                 (
                     "service_grid",
                     {

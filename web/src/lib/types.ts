@@ -136,7 +136,16 @@ export type Block =
   | { type: "contact_form"; id: string; value: ContactFormValue }
   | { type: "job_list"; id: string; value: JobListValue }
   | { type: "map"; id: string; value: MapValue }
-  | { type: "gallery"; id: string; value: GalleryValue };
+  | { type: "gallery"; id: string; value: GalleryValue }
+  | { type: "certificate"; id: string; value: CertificateValue };
+
+/** CertificateBlock (cms/blocks/blocks.py): seal comes from the site settings, null until uploaded. */
+export interface CertificateValue {
+  heading: string;
+  text: string;
+  seal: LogoImage | null;
+  document_url: string;
+}
 
 export type BlockType = Block["type"];
 
@@ -234,6 +243,13 @@ export interface LogoImage {
   alt: string;
 }
 
+/** Site-wide certification seal (cms/site_settings: SiteSettings.certificate_api). */
+export interface CertificateSettings {
+  label: string;
+  seal: LogoImage;
+  document_url: string;
+}
+
 export interface AnalyticsSettings {
   provider: "umami";
   script_url: string;
@@ -252,6 +268,8 @@ export interface SiteSettings {
   default_og_image: ApiImage | null;
   footer_links: { label: string; href: string; external: boolean }[];
   social_links: { platform: string; url: string }[];
+  /** Certification seal for the footer (null = not uploaded yet). */
+  certificate: CertificateSettings | null;
   /** Umami config from cms/site_settings (null = tracking not set up). */
   analytics: AnalyticsSettings | null;
 }
