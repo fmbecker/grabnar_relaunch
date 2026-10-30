@@ -3,13 +3,13 @@
 - Pfad: `/handwerkerdienste/bodenverlegerarbeiten/`
 - Status: freigegeben
 - Quelle: `content-export/handwerkerdienste__bodenverlegerarbeiten.md`
-- Hinweise: keine
+- Hinweise: „Privatwohnung“ entfernt – keine Privatkunden ansprechen (30.10.2026).
 
 ---
 
 ## Der passende Boden für jeden Raum
 
-Schönes Wohnen beginnt beim Boden. Die Gestaltungsmöglichkeiten sind vielfältig und lassen sich jedem Einrichtungsstil anpassen. Ob Privatwohnung oder Objektbereich: Wir bieten Ihnen den Bodenbelag an, der zu Ihrer Raumsituation passt, und verlegen ihn fachgerecht.
+Der Boden prägt jeden Raum. Die Gestaltungsmöglichkeiten sind vielfältig und lassen sich jedem Einrichtungsstil anpassen. Für Ihr Objekt bieten wir Ihnen den Bodenbelag an, der zur Raumsituation passt, und verlegen ihn fachgerecht.
 
 ## Was wir verlegen
 

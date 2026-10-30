@@ -1,9 +1,9 @@
 # Maler- und Maurerarbeiten
 
 - Pfad: `/handwerkerdienste/malerarbeiten/`
-- Status: freigegeben
+- Status: Vorschlag
 - Quelle: `content-export/handwerkerdienste__malerarbeiten.md`
-- Hinweise: Die Seite heißt „Maler- und Maurerarbeiten“, beschreibt aber nur Malerarbeiten. Bitte Maurerleistungen ergänzen oder den Titel auf „Malerarbeiten“ kürzen.
+- Hinweise: Abschnitt „Maurerarbeiten“ auf Wunsch der Firma ergänzt (30.10.2026). Die Leistungsliste ist ein Vorschlag – bitte bestätigen oder korrigieren.
 
 ---
 
@@ -15,7 +15,7 @@ Ein Anstrich ist mehr als Optik: Er schützt vor Verschmutzung, Hitze, Feuchtigk
 
 Mit der richtigen Farbwahl haben wir schon an Arbeitsplätzen, in Kindergärten und in Krankenhäusern eine angenehme Atmosphäre geschaffen.
 
-## Unsere Leistungen
+## Malerarbeiten
 
 - Streicharbeiten an Wänden und Decken
 - Streicharbeiten an Fenstern und Türen
@@ -25,3 +25,12 @@ Mit der richtigen Farbwahl haben wir schon an Arbeitsplätzen, in Kindergärten 
 - Maßnahmen für eine bessere Wärmedämmung
 - Renovierungen und Sanierungen
 - [Verlegen von Böden](/handwerkerdienste/bodenverlegerarbeiten/)
+
+## Maurerarbeiten
+
+Auch am Mauerwerk packen wir an – bei Umbau, Renovierung und Sanierung, oft in einem Zug mit den Malerarbeiten. So haben Sie für Wand und Oberfläche einen Ansprechpartner.
+
+- Errichten und Ausbessern von Mauerwerk
+- Putzarbeiten innen und außen
+- Wanddurchbrüche und das Schließen von Öffnungen
+- Ausbesserungs- und Sanierungsarbeiten an Mauerwerk

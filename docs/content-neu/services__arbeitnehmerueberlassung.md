@@ -3,7 +3,7 @@
 - Pfad: `/services/arbeitnehmerueberlassung/`
 - Status: freigegeben
 - Quelle: `content-export/services__arbeitnehmerüberlassung.md`
-- Hinweise: Bitte bestätigen, dass die Erlaubnis zur Arbeitnehmerüberlassung (AÜG) besteht und das Angebot aktuell ist.
+- Hinweise: Erlaubnis nach AÜG von der Firma bestätigt (30.10.2026).
 
 ---
 
@@ -20,7 +20,7 @@ Schwankt Ihr Arbeitsaufkommen oder soll Ihr Stammpersonal entlastet werden? Mit 
 
 ## So funktioniert es
 
-Wir überlassen Ihnen unsere Mitarbeiter zur Arbeitsleistung – unter Einhaltung aller arbeitsvertraglichen, tarifvertraglichen und gesetzlichen Regelungen. Tätigkeit, Einsatzort und Dauer richten sich nach Ihrem Bedarf.
+Wir überlassen Ihnen unsere Mitarbeiter zur Arbeitsleistung – unter Einhaltung aller arbeitsvertraglichen, tarifvertraglichen und gesetzlichen Regelungen. Die Erlaubnis zur Arbeitnehmerüberlassung nach dem AÜG liegt uns vor. Tätigkeit, Einsatzort und Dauer richten sich nach Ihrem Bedarf.
 
 ## Welches Personal wir überlassen
 

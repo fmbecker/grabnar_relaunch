@@ -57,7 +57,10 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 - [x] 🤖 Neutexte (Vorschläge) für 22 Leistungen, Startseite und „Unternehmen“ in `docs/content-neu/` – nur Aussagen der Altseite, offene Fragen je Datei unter „Hinweise“; `import_legacy` übernimmt sie (`--originaltexte` zeigt die Alttexte). Doppelter Eintrag „Verkehrsmittel“ dort bereits entfernt
 - [x] 👤 Neutexte in `docs/content-neu/` von der Firma freigegeben (30.10.2026), Status in allen Dateien auf „freigegeben“
 - [x] 🤖 Seite „Unternehmen“ (`/unternehmen/`): Leitgedanke + Firmentext, 6 Merkmale („Was uns auszeichnet“) ausschließlich aus Aussagen der Altseite (Quellen in `import_legacy.FEATURES`), Leistungsbereiche, CTA
-- [ ] 👤 Merkmale auf „Unternehmen“ von der Firma bestätigen lassen (z. B. ob die QM-Zertifizierung noch gültig ist, Name des Zertifikats), ggf. ergänzen: Gründungsjahr, Mitarbeiterzahl, Team-Fotos
+- [x] 👤 Rückfragen der Firma beantwortet (30.10.2026): ISO 9001 + ISO 14001, AÜG-Erlaubnis, Bewachungserlaubnis (nicht nennen), Maurerarbeiten ergänzen, Versiegelung ohne Einschränkung, IfSG-Paragraf korrekt, keine Privatkunden – eingearbeitet, siehe `docs/02-konzept.md`
+- [ ] 👤 Kombiniertes Siegel ISO 9001/14001 nachreichen (SVG oder PNG) → auf „Unternehmen“ und im Footer einbauen
+- [ ] 👤 Leistungsliste „Maurerarbeiten“ (`docs/content-neu/handwerkerdienste__malerarbeiten.md`) bestätigen
+- [ ] 👤 Optional: Gründungsjahr, Mitarbeiterzahl, Team-Fotos für „Unternehmen“
 - [ ] 👤 Bilder einpflegen (Wagtail-Admin)
 - [ ] 👤 Impressum / Datenschutz / AGB rechtlich prüfen. Datenschutz muss neue Formulare (Bewerbung mit Upload, Speicherfrist 180 Tage) und ggf. Umami abdecken; Impressum: Feld „Vertretungsberechtigt“ ist in der Altseite leer
 - [x] 🤖 Lighthouse (mobil) + axe-core (WCAG 2.1/2.2 AA) für 8 Seitentypen: überall 100/100/100/100, 0 axe-Verstöße (29.10.2026). Behoben: Touch-Ziele in Kategorie-Kacheln, Kontrast Kartenplatzhalter, Überschriften-Reihenfolge der Alttexte, fehlende Meta-Beschreibungen. Läuft als Job `audit` in `web.yml`, lokal: `web/scripts/audit.mjs` + `web/scripts/serve-prod.mjs`

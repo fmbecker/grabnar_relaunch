@@ -3,7 +3,7 @@
 - Pfad: `/gebaeudereinigung/desinfektion/`
 - Status: freigegeben
 - Quelle: `content-export/gebäudereinigung__desinfektion.md`
-- Hinweise: Absatz zu physikalischen Verfahren (Hitze, Sterilisation, Strahlen, Verbrennung) weggelassen, weil unklar ist, ob die Firma diese anbietet. Bitte prüfen, ob die Angabe „IfSG §17/3“ im Seitentitel rechtlich so stimmt.
+- Hinweise: Absatz zu physikalischen Verfahren (Hitze, Sterilisation, Strahlen, Verbrennung) weggelassen. Paragraf im Titel von der Firma bestätigt (30.10.2026).
 
 ---
 

@@ -3,7 +3,7 @@
 - Pfad: `/services/wachdienste/`
 - Status: freigegeben
 - Quelle: `content-export/services__wachdienste.md`
-- Hinweise: Bitte bestätigen, dass die Bewachungserlaubnis (§ 34a GewO) besteht und das Angebot aktuell ist.
+- Hinweise: Bewachungserlaubnis liegt vor, soll aber auf der Website nicht erwähnt werden (Firma, 30.10.2026).
 
 ---
 

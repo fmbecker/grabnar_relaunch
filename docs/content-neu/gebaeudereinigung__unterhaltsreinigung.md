@@ -3,7 +3,7 @@
 - Pfad: `/gebaeudereinigung/unterhaltsreinigung/`
 - Status: freigegeben
 - Quelle: `content-export/gebäudereinigung__unterhaltsreinigung.md`
-- Hinweise: Doppelter Eintrag „Verkehrsmittel“ entfernt, Objektliste zusammengefasst. Bitte bestätigen, dass das zertifizierte Qualitätsmanagement noch gilt (Name des Zertifikats?).
+- Hinweise: Doppelter Eintrag „Verkehrsmittel“ entfernt, Objektliste zusammengefasst. Zertifizierung ISO 9001 und ISO 14001 von der Firma bestätigt (30.10.2026).
 
 ---
 
@@ -13,8 +13,8 @@ Die Unterhaltsreinigung umfasst alle Reinigungs- und Pflegearbeiten, die in Ihre
 
 ## So arbeiten wir
 
-- nach einem zertifizierten Qualitätsmanagement – für eine vertragsgemäße und hygienische Reinigung
-- nach strengen Umweltleitlinien, denen wir uns freiwillig verpflichtet haben
+- nach einem Qualitätsmanagement, zertifiziert nach ISO 9001 – für eine vertragsgemäße und hygienische Reinigung
+- nach einem Umweltmanagement, zertifiziert nach ISO 14001, und strengen Umweltleitlinien, denen wir uns freiwillig verpflichtet haben
 - mit Geräten, Maschinen und Reinigungsmitteln, die zu Ihrem Objekt und zur Art der Verschmutzung passen
 
 Reinigen bleibt dabei vor allem eines: sorgfältige Handarbeit.

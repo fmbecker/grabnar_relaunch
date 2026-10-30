@@ -338,3 +338,36 @@ def test_send_report_mail(monkeypatch):
     monkeypatch.setattr("sys.stdin", io.StringIO(""))
     with pytest.raises(CommandError):
         call_command("send_report_mail", to="a@example.com", subject="x")
+
+
+def test_company_wording_rules():
+    """Rules confirmed by the company (docs/02-konzept.md): no private customers, never mention
+    the security licence; ISO 9001/14001 appear on the company page."""
+    import re
+
+    from wagtail.fields import StreamField
+    from wagtail.models import Page
+
+    forbidden = re.compile(r"privat|§\s*34a|34a\s*GewO|bewachungserlaubnis", re.I)
+    problems = []
+    for page in Page.objects.live().filter(depth__gt=1).specific():
+        if page.slug in ("datenschutz", "impressum", "agb"):
+            continue  # legal texts are reviewed separately
+        texts = [
+            page.title,
+            getattr(page, "teaser", ""),
+            getattr(page, "intro", ""),
+            page.search_description,
+        ]
+        for field in page._meta.get_fields():
+            if isinstance(field, StreamField):
+                texts.append(str(getattr(page, field.name).get_prep_value()))
+        for text in texts:
+            if text and (m := forbidden.search(str(text))):
+                problems.append(
+                    f"{page.url_path}: …{str(text)[max(0, m.start() - 30) : m.end() + 30]}…"
+                )
+    assert not problems, "\n".join(problems)
+    about = Page.objects.get(slug="unternehmen").specific
+    body = str(about.body.get_prep_value())
+    assert "ISO 9001" in body and "ISO 14001" in body

@@ -13,7 +13,22 @@
 |---|---|---|
 | Hausverwaltungen, Facility-Verantwortliche, Geschäftsführer KMU | Zuverlässigkeit, Referenzen, schnelle Angebotsanfrage | Ein Ansprechpartner für Reinigung, Hausmeister, Handwerk, Winterdienst – regional, seit Jahren etabliert |
 | Bewerber (Reinigungskräfte, Vorarbeiter, Objektleitung) | Offene Stellen, einfache Bewerbung, ehrliche Infos zu Arbeitsort/Zeiten | Sicherer Arbeitsplatz in der Region, faire Bedingungen, unkomplizierte Bewerbung |
-| Privatkunden (optional) | Preisorientierung, Terminanfrage | Einzelne Leistungen auch für Privathaushalte |
+
+**Keine Privatkunden ansprechen** (Entscheidung der Firma, 30.10.2026): keine Formulierungen wie
+„Privathaushalt“, „Privatumzug“ oder „Privatwohnung“.
+
+## Bestätigte Angaben der Firma (30.10.2026)
+
+Diese Aussagen dürfen auf der Website stehen:
+
+- **Zertifiziert nach ISO 9001** (Qualitätsmanagement) und **ISO 14001** (Umweltmanagement). Ein
+  kombiniertes Siegel wird nachgereicht und kommt dann auf „Unternehmen“ und in den Footer.
+- **Erlaubnis zur Arbeitnehmerüberlassung (AÜG)** liegt vor – wird auf der Leistungsseite genannt.
+- **Bewachungserlaubnis (§ 34a GewO)** liegt vor, soll aber **nicht** erwähnt oder aufgeführt werden.
+- **Maurerarbeiten** gehören zum Angebot (Seite „Maler- und Maurerarbeiten“; Leistungsliste als Vorschlag
+  zur Bestätigung).
+- **Bodenversiegelung** ohne Einschränkung der Bodenarten.
+- Der Paragraf im Titel **„Desinfektion nach IfSG §17/3“** ist korrekt.
 
 ## Seitenbaum (Soll)
 

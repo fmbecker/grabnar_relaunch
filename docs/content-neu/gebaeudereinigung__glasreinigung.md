@@ -3,13 +3,13 @@
 - Pfad: `/gebaeudereinigung/glasreinigung/`
 - Status: freigegeben
 - Quelle: `content-export/gebäudereinigung__glasreinigung.md`
-- Hinweise: „zertifiziertes Reinigungsunternehmen“ steht bereits im Kurztext – bitte mit der QM-Zertifizierung abgleichen.
+- Hinweise: Zertifizierung ISO 9001 und ISO 14001 von der Firma bestätigt (30.10.2026).
 
 ---
 
 ## Klare Sicht, gepflegte Fassade
 
-Die Glasreinigung gehört zu den traditionellen Aufgaben des Gebäudereinigers – und verlangt handwerkliches Können und Geschick. Witterung, äußere Einflüsse und Graffiti hinterlassen Ablagerungen und Versinterungen, die Glas und Fassade auf Dauer schädigen können. Weil jede Oberfläche anders ist, reinigen und pflegen wir mit dem passenden Fachwissen.
+Die Glasreinigung gehört zu den traditionellen Aufgaben des Gebäudereinigers – und verlangt handwerkliches Können und Geschick. Witterung, äußere Einflüsse und Graffiti hinterlassen Ablagerungen und Versinterungen, die Glas und Fassade auf Dauer schädigen können. Weil jede Oberfläche anders ist, reinigen und pflegen wir mit dem passenden Fachwissen – als Reinigungsunternehmen, zertifiziert nach ISO 9001 und ISO 14001.
 
 ## Auch an schwer zugänglichen Stellen
 

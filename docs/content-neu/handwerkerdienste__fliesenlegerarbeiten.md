@@ -3,13 +3,13 @@
 - Pfad: `/handwerkerdienste/fliesenlegerarbeiten/`
 - Status: freigegeben
 - Quelle: `content-export/handwerkerdienste__fliesenlegerarbeiten.md`
-- Hinweise: keine
+- Hinweise: „Privathaushalt“ entfernt – keine Privatkunden ansprechen (30.10.2026).
 
 ---
 
 ## Fliesen, die zum Raum passen
 
-Ob Neuverlegung oder Renovierung, innen oder außen, Privathaushalt oder Gewerbebetrieb: Mit Know-how und Kreativität sorgen wir für einen reibungslosen, gut koordinierten Ablauf.
+Ob Neuverlegung oder Renovierung, innen oder außen: Mit Know-how und Kreativität sorgen wir für einen reibungslosen, gut koordinierten Ablauf.
 
 ## Von der Planung bis zur Fertigstellung
 

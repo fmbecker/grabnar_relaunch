@@ -3,7 +3,7 @@
 - Pfad: `/services/transportarbeiten/`
 - Status: freigegeben
 - Quelle: `content-export/services__transportarbeiten.md`
-- Hinweise: keine
+- Hinweise: „Privatumzüge“ entfernt – keine Privatkunden ansprechen (30.10.2026).
 
 ---
 
@@ -19,7 +19,6 @@ Transporte und Umzüge bedeuten viel Arbeit und Organisation – und meist falle
 
 ## Umzüge
 
-- Privatumzüge
 - Firmenumzüge
 - Verwaltungsumzüge
 

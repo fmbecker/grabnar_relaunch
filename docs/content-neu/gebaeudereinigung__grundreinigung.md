@@ -3,7 +3,7 @@
 - Pfad: `/gebaeudereinigung/grundreinigung/`
 - Status: freigegeben
 - Quelle: `content-export/gebäudereinigung__grundreinigung.md`
-- Hinweise: „Grundreinigung von Privateigentum“ als „private Objekte“ formuliert – bitte bestätigen, dass Privatkunden weiterhin bedient werden.
+- Hinweise: „Privateigentum“ der Altseite entfernt – die Firma spricht keine Privatkunden an (30.10.2026).
 
 ---
 
@@ -38,6 +38,5 @@ Wir empfehlen eine Grundreinigung ein- bis zweimal im Jahr. Stark genutzte Räum
 - Sanitärräume und Schwimmbäder
 - Tiefgaragen und Parkplätze
 - Balkone, Terrassen und Flachdächer
-- private Objekte
 
 Böden, die frisch grundgereinigt sind, können wir im Anschluss auch [versiegeln](/handwerkerdienste/bodenversiegelung/).

@@ -91,15 +91,15 @@ FEATURES = [
     ),
     (
         "shield",
-        "Zertifiziertes Qualitätsmanagement",
-        "Vertragsgemäße und hygienische Reinigung nach einem zertifizierten Qualitätsmanagement.",
-        "gebäudereinigung__unterhaltsreinigung.md",
+        "Qualität nach ISO 9001",
+        "Zertifiziertes Qualitätsmanagement für eine vertragsgemäße und hygienische Reinigung.",
+        "gebäudereinigung__unterhaltsreinigung.md; ISO 9001 von der Firma bestätigt (30.10.2026)",
     ),
     (
         "leaf",
-        "Strenge Umweltleitlinien",
-        "Freiwillig strenge Umweltleitlinien, umweltgerechte Entsorgung über zertifizierte Entsorgungsunternehmen.",
-        "gebäudereinigung__unterhaltsreinigung.md, services__entrümpelung.md",
+        "Umwelt nach ISO 14001",
+        "Zertifiziertes Umweltmanagement, strenge Umweltleitlinien und umweltgerechte Entsorgung über zertifizierte Entsorgungsunternehmen.",
+        "gebäudereinigung__unterhaltsreinigung.md, services__entrümpelung.md; ISO 14001 von der Firma bestätigt (30.10.2026)",
     ),
     (
         "users",
