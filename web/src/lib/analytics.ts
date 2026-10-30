@@ -20,6 +20,11 @@ export const EVENT = {
   phone: "phone-click",
   /** mailto: links. data: placement */
   email: "email-click",
+  /** Phone number or e-mail address copied (desktop users rarely click tel:). data: type, placement */
+  contactCopy: "contact-copy",
+  /** Every contact: one goal for "Kontakte gesamt".
+   *  data: channel (form, phone, email, phone-copy, email-copy), service, placement */
+  lead: "lead",
   /** Category tiles on home/Unternehmen. data: category, target (overview|service) */
   category: "category-click",
   /** Service cards. data: service, list (category|related|manual) */
@@ -38,8 +43,12 @@ export const EVENT = {
   download: "download-click",
   /** First interaction with a form. data: form, job */
   formStart: "form-start",
-  /** Form sent. data: form, job, result (success|invalid|error) */
-  formSubmit: "form-submit",
+  /** Contact form sent successfully. data: service (from ?leistung=, never typed text) */
+  inquirySent: "inquiry-sent",
+  /** Application sent successfully. data: job */
+  applicationSent: "application-sent",
+  /** Sending failed. data: form, reason (invalid|error), fields (names of invalid fields) */
+  formError: "form-error",
   /** Job list filter changed. data: field, value */
   jobFilter: "job-filter",
   /** Job opened from the list. data: job */
@@ -90,6 +99,22 @@ export function target(href: string): string {
   try {
     const url = new URL(href, "https://www.grabnar.de");
     return url.hostname.endsWith("grabnar.de") ? url.pathname + url.hash : url.href;
+  } catch {
+    return href;
+  }
+}
+
+/** Query parameter that carries the service from a service page's CTA into the contact form. */
+export const SERVICE_PARAM = "leistung";
+
+/** Append ?leistung=<service> to links that go to the contact page. */
+export function withService(href: string, service?: string): string {
+  if (!service) return href;
+  try {
+    const url = new URL(href, "https://www.grabnar.de");
+    if (!url.hostname.endsWith("grabnar.de") || url.pathname !== "/kontakt/") return href;
+    url.searchParams.set(SERVICE_PARAM, service);
+    return url.pathname + url.search + url.hash;
   } catch {
     return href;
   }

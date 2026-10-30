@@ -6,11 +6,14 @@
  * Explicit events sit on the components (see lib/analytics.ts). This script adds
  * what applies to every link on every page, including links inside rich text
  * that editors write: tel:, mailto:, outbound links, downloads, plus opening
- * <details> elements marked with data-track-toggle.
+ * <details> elements marked with data-track-toggle, and copying the company's
+ * phone number or e-mail address. Phone, e-mail and copy also count as `lead`.
  */
-import type { AnalyticsSettings } from "@/lib/types";
-interface Props { config: AnalyticsSettings }
-const { config } = Astro.props;
+import type { AnalyticsSettings, ContactSettings } from "@/lib/types";
+interface Props { config: AnalyticsSettings; contact: ContactSettings }
+const { config, contact } = Astro.props;
+// Only the last 6 digits: enough to recognise our number in a copied text, whatever the format.
+const contactConfig = { phoneTail: contact.phone.replace(/\D/g, "").slice(-6), email: contact.email.toLowerCase() };
 ---
 <script
   is:inline
@@ -23,6 +26,7 @@ const { config } = Astro.props;
   data-do-not-track={config.do_not_track ? "true" : undefined}
   data-exclude-hash="true"
 ></script>
+<script type="application/json" id="track-contact" set:html={JSON.stringify(contactConfig)} />
 
 <script>
   import { EVENT, track } from "@/lib/analytics";
@@ -38,8 +42,11 @@ const { config } = Astro.props;
       const link = (e.target as Element | null)?.closest?.("a[href]") as HTMLAnchorElement | null;
       if (!link || link.closest("[data-umami-event]")) return; // explicit events win
       const href = link.getAttribute("href") ?? "";
-      if (href.startsWith("tel:")) return track(EVENT.phone, { placement: area(link) });
-      if (href.startsWith("mailto:")) return track(EVENT.email, { placement: area(link) });
+      if (href.startsWith("tel:") || href.startsWith("mailto:")) {
+        const channel = href.startsWith("tel:") ? "phone" : "email";
+        track(channel === "phone" ? EVENT.phone : EVENT.email, { placement: area(link) });
+        return track(EVENT.lead, { channel, placement: area(link) });
+      }
       let url: URL;
       try { url = new URL(link.href); } catch { return; }
       if (DOWNLOAD.test(url.pathname) || url.pathname.startsWith("/documents/")) {
@@ -51,6 +58,27 @@ const { config } = Astro.props;
     },
     { capture: true },
   );
+
+  // Copying our phone number or e-mail address (desktop visitors often dial by hand).
+  let contact: { phoneTail: string; email: string } = { phoneTail: "", email: "" };
+  try {
+    contact = JSON.parse(document.getElementById("track-contact")?.textContent ?? "{}");
+  } catch { /* keep defaults */ }
+  let lastCopy = "";
+  document.addEventListener("copy", () => {
+    const selection = document.getSelection();
+    const text = selection?.toString() ?? "";
+    let type = "";
+    if (contact.email && text.toLowerCase().includes(contact.email)) type = "email";
+    else if (contact.phoneTail && text.replace(/\D/g, "").includes(contact.phoneTail)) type = "phone";
+    if (!type || type === lastCopy) return; // count each type once per page view
+    lastCopy = type;
+    const node = selection?.anchorNode;
+    const el = node instanceof Element ? node : node?.parentElement;
+    const placement = el ? area(el) : "content";
+    track(EVENT.contactCopy, { type, placement });
+    track(EVENT.lead, { channel: `${type}-copy`, placement });
+  });
 
   // <details data-track-toggle="faq-open" data-track-label="…">: count openings only.
   document.addEventListener(

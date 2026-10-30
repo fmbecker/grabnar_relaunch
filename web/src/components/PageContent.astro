@@ -43,7 +43,7 @@ const job = isJobPage(page) ? page : null;
         <p class="mt-4 max-w-2xl text-lg text-brand-100">{svc.teaser}</p>
       </div>
     </div>
-    <BlockRenderer blocks={svc.body} contact={settings.contact} sourcePath={path} />
+    <BlockRenderer blocks={svc.body} contact={settings.contact} sourcePath={path} service={page.title} />
     {svc.related.length > 0 && <ServiceGrid list="related" value={{ heading: "Verwandte Leistungen", intro: "", kind: "services", services: svc.related }} />}
   </>
 )}

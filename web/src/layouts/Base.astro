@@ -31,7 +31,7 @@ const fullTitle = title.includes("Grabnar") ? title : `${title} â€“ Grabnar GebÃ
     <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="theme-color" content="#2d78bc" />
-    {analytics && <Analytics config={analytics} />}
+    {analytics && <Analytics config={analytics} contact={settings.contact} />}
   </head>
   <body class="flex min-h-full flex-col">
     <a href="#inhalt" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-white focus:p-3">Zum Inhalt springen</a>

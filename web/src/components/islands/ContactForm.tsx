@@ -1,5 +1,5 @@
-import { useId, useRef, useState, type FormEvent } from "react";
-import { EVENT, track } from "@/lib/analytics";
+import { useEffect, useId, useRef, useState, type FormEvent } from "react";
+import { EVENT, SERVICE_PARAM, track } from "@/lib/analytics";
 
 interface Props {
   variant: "contact" | "application";
@@ -18,7 +18,16 @@ export default function ContactForm({ variant, successMessage, sourcePath, apiUr
   const started = useRef(false);
   const uid = useId();
   const isApplication = variant === "application";
-  // Tracking: form type and job title only, never what visitors type.
+  // Service handed over by a CTA link (?leistung=…). Prefills the field; tracked as is,
+  // because it comes from our own link and not from what the visitor typed.
+  const [service, setService] = useState("");
+  useEffect(() => {
+    if (variant !== "contact") return;
+    const fromLink = new URLSearchParams(window.location.search).get(SERVICE_PARAM)?.slice(0, 120) ?? "";
+    setService(fromLink);
+  }, [variant]);
+
+  // Tracking: form type, job title and the linked service only, never what visitors type.
   const trackData = { form: variant, job: job?.title };
   function onFirstInput() {
     if (started.current) return;
@@ -47,15 +56,17 @@ export default function ContactForm({ variant, successMessage, sourcePath, apiUr
       if (res.ok && json.ok) {
         setStatus("success");
         form.reset();
-        track(EVENT.formSubmit, { ...trackData, result: "success" });
+        if (isApplication) track(EVENT.applicationSent, { job: job?.title });
+        else track(EVENT.inquirySent, { service });
+        track(EVENT.lead, { channel: isApplication ? "application" : "form", service: isApplication ? undefined : service });
       } else {
         setErrors(json.errors ?? {});
         setStatus("error");
-        track(EVENT.formSubmit, { ...trackData, result: json.errors ? "invalid" : "error", fields: Object.keys(json.errors ?? {}).join(",") });
+        track(EVENT.formError, { ...trackData, reason: json.errors ? "invalid" : "error", fields: Object.keys(json.errors ?? {}).join(",") });
       }
     } catch {
       setStatus("error");
-      track(EVENT.formSubmit, { ...trackData, result: "error" });
+      track(EVENT.formError, { ...trackData, reason: "error" });
     }
   }
 
@@ -68,13 +79,14 @@ export default function ContactForm({ variant, successMessage, sourcePath, apiUr
   }
 
   const err = (k: string) => errors[k]?.[0];
-  const field = (name: string, label: string, props: React.InputHTMLAttributes<HTMLInputElement> = {}) => (
+  // `remountKey` re-creates the uncontrolled input when its default value arrives after hydration.
+  const field = (name: string, label: string, props: React.InputHTMLAttributes<HTMLInputElement> = {}, remountKey?: string) => (
     <div>
       <label className="label" htmlFor={`${uid}-${name}`}>
         {label}
         {props.required && " *"}
       </label>
-      <input id={`${uid}-${name}`} name={name} className="field" {...props} />
+      <input key={remountKey} id={`${uid}-${name}`} name={name} className="field" {...props} />
       {err(name) && <p className="mt-1 text-sm text-red-700">{err(name)}</p>}
     </div>
   );
@@ -102,7 +114,7 @@ export default function ContactForm({ variant, successMessage, sourcePath, apiUr
           : field("company", "Firma", { type: "text", autoComplete: "organization" })}
       </div>
 
-      {!isApplication && field("service", "Gewünschte Leistung", { type: "text", placeholder: "z. B. Unterhaltsreinigung Bürogebäude" })}
+      {!isApplication && field("service", "Gewünschte Leistung", { type: "text", placeholder: "z. B. Unterhaltsreinigung Bürogebäude", defaultValue: service }, service)}
 
       <div>
         <label className="label" htmlFor={`${uid}-message`}>

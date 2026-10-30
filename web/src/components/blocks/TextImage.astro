@@ -2,8 +2,8 @@
 import type { TextImageValue } from "@/lib/types";
 import Picture from "@/components/ui/Picture.astro";
 import LinkButton from "@/components/ui/LinkButton.astro";
-interface Props { value: TextImageValue }
-const { value } = Astro.props;
+interface Props { value: TextImageValue; service?: string }
+const { value, service } = Astro.props;
 const imgFirst = value.image_position === "left";
 ---
 <section class="section">
@@ -14,7 +14,7 @@ const imgFirst = value.image_position === "left";
     <div class={imgFirst ? "lg:order-2" : "lg:order-1"}>
       {value.heading && <h2 class="h2 mb-4">{value.heading}</h2>}
       <div class="prose-site" set:html={value.text} />
-      {value.link && <LinkButton block="text-image" link={value.link} class="mt-4" />}
+      {value.link && <LinkButton block="text-image" link={value.link} service={service} class="mt-4" />}
     </div>
   </div>
 </section>

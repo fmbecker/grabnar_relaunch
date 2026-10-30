@@ -14,19 +14,26 @@ import JobList from "./JobList.astro";
 import Map from "./Map.astro";
 import Gallery from "./Gallery.astro";
 
-interface Props { blocks: Block[]; contact: ContactSettings; sourcePath: string; job?: Pick<JobSummary, "id" | "title"> }
-const { blocks, contact, sourcePath, job } = Astro.props;
+interface Props {
+  blocks: Block[];
+  contact: ContactSettings;
+  sourcePath: string;
+  job?: Pick<JobSummary, "id" | "title">;
+  /** Title of the service page being rendered (CTA links carry it to the contact form). */
+  service?: string;
+}
+const { blocks, contact, sourcePath, job, service } = Astro.props;
 ---
 {blocks.map((b) => {
   switch (b.type) {
     case "rich_text": return <RichText value={b.value} />;
-    case "text_image": return <TextImage value={b.value} />;
+    case "text_image": return <TextImage value={b.value} service={service} />;
     case "service_grid": return <ServiceGrid value={b.value} />;
     case "feature_list": return <FeatureList value={b.value} />;
     case "stats": return <Stats value={b.value} />;
     case "testimonial": return <Testimonial value={b.value} />;
     case "faq": return <Faq value={b.value} />;
-    case "cta": return <Cta value={b.value} />;
+    case "cta": return <Cta value={b.value} service={service} />;
     case "contact_form": return <ContactForm value={b.value} sourcePath={sourcePath} job={job} />;
     case "job_list": return <JobList value={b.value} />;
     case "map": return <Map value={b.value} contact={contact} />;

@@ -34,9 +34,11 @@ Namen, E-Mail-Adressen, Telefonnummern oder Formulartexte – nur Seiten-, Leist
 
 | Ereignis | Wann | Eigenschaften | Wo im Code |
 |---|---|---|---|
-| `cta-click` | Klick auf einen Aktions-Button | `block` (hero, cta, text-image), `label`, `target` | `ui/LinkButton.astro` |
+| `lead` | **Jeder Kontakt** – ein Ziel für „Kontakte gesamt“ | `channel` (form, application, phone, email, phone-copy, email-copy), `service`, `placement` | `Analytics.astro`, `islands/ContactForm.tsx` |
+| `cta-click` | Klick auf einen Aktions-Button | `block` (hero, cta, text-image), `label`, `target`, `service` (auf Leistungsseiten) | `ui/LinkButton.astro` |
 | `phone-click` | Klick auf eine Telefonnummer | `placement` (header, mobile-menu, footer, job-sidebar, content) | automatisch, `Analytics.astro` |
 | `email-click` | Klick auf eine E-Mail-Adresse | `placement` | automatisch |
+| `contact-copy` | Telefonnummer oder E-Mail-Adresse der Firma kopiert (am Desktop wird oft abgetippt statt geklickt); je Typ einmal pro Seitenaufruf | `type` (phone, email), `placement` | automatisch |
 | `category-click` | Kachel einer Leistungskategorie | `category`, `target` (overview, service), `service` | `blocks/ServiceGrid.astro` |
 | `service-click` | Karte einer Leistung | `service`, `list` (category, related, manual) | `blocks/ServiceGrid.astro` |
 | `nav-click` | Menüpunkt | `item`, `parent`, `level`, `menu` (desktop, mobile, footer, header) | `Header.astro`, `Footer.astro` |
@@ -46,25 +48,60 @@ Namen, E-Mail-Adressen, Telefonnummern oder Formulartexte – nur Seiten-, Leist
 | `outbound-click` | Link auf eine andere Website (auch im Fließtext) | `url` (ohne Parameter), `placement` | automatisch |
 | `download-click` | Dokument-Download (PDF, Word, Excel …) | `file`, `placement` | automatisch |
 | `form-start` | Erste Eingabe in ein Formular | `form` (contact, application), `job` | `islands/ContactForm.tsx` |
-| `form-submit` | Formular abgeschickt | `form`, `job`, `result` (success, invalid, error), `fields` (nur Namen fehlerhafter Felder) | `islands/ContactForm.tsx` |
+| `inquiry-sent` | Kontaktanfrage erfolgreich gesendet | `service` (nur aus dem Link `?leistung=`, nie getippter Text) | `islands/ContactForm.tsx` |
+| `application-sent` | Bewerbung erfolgreich gesendet | `job` | `islands/ContactForm.tsx` |
+| `form-error` | Senden fehlgeschlagen | `form`, `job`, `reason` (invalid, error), `fields` (nur Namen fehlerhafter Felder) | `islands/ContactForm.tsx` |
 | `job-filter` | Filter in der Stellenliste | `field`, `value` | `islands/JobFilter.tsx` |
 | `job-open` | Stelle aus der Liste geöffnet | `job` | `blocks/JobList.astro`, `islands/JobFilter.tsx` |
 | `job-apply-click` | „Jetzt bewerben“ auf einer Stellenseite | `job` | `PageContent.astro` |
 | `page-not-found` | 404-Seite angezeigt | `path`, `referrer` (nur Hostname) | `pages/404.astro` |
+
+**Leistung bis ins Formular:** Aktions-Buttons auf Leistungsseiten, die auf `/kontakt/` zeigen,
+hängen `?leistung=<Leistung>` an (`withService()` in `lib/analytics.ts`, gesetzt in
+`ui/LinkButton.astro`). Das Kontaktformular füllt damit „Gewünschte Leistung“ vor, und
+`inquiry-sent`/`lead` tragen die Leistung. Gespeichert wird dafür nichts im Browser (kein
+localStorage/sessionStorage – das bräuchte nach § 25 TDDDG eine Einwilligung).
 
 Neue interaktive Elemente: Ereignis in `EVENT` ergänzen, an Links/Buttons `{...umami(EVENT.x, {...})}`
 setzen, in Islands `track(EVENT.x, {...})` aufrufen, Tabelle oben ergänzen.
 
 Geprüft am 30.10.2026 mit einem Test-Tracker im Browser (Playwright): alle Ereignisse oben außer
 `faq-open`, `gallery-open` und `download-click` (auf der Seite derzeit kein FAQ, keine Galerie,
-kein Dokument), `job-apply-click` (gleiche Technik wie `job-open`).
+kein Dokument), `job-apply-click` (gleiche Technik wie `job-open`) und `application-sent`
+(gleicher Code wie `inquiry-sent`).
 
 ## Auswertung in Umami (Vorschlag)
 
-- **Ziele:** `form-submit` mit `result = success` (Anfragen/Bewerbungen), `phone-click`, `email-click`.
-- **Trichter Anfrage:** Leistungsseite → `cta-click` → `/kontakt/` → `form-start` → `form-submit` (success).
-- **Trichter Bewerbung:** `/karriere/` → `job-open` → `job-apply-click` → `form-submit` (application, success).
-- **Weiterleitungen prüfen:** `page-not-found` nach `path` gruppieren und fehlende Redirects nachtragen.
+- **Ziele (Goal-Report):** `lead` (Kontakte gesamt), `inquiry-sent` (Anfragen), `application-sent` (Bewerbungen).
+- **Funnel „Anfrage“:** Leistungsseite → `cta-click` → `/kontakt/` → `form-start` → `inquiry-sent`.
+- **Funnel „Bewerbung“:** `/karriere/` → `job-open` → `job-apply-click` → `application-sent`.
+- **Journey-Report:** Ende = `lead` – welche Wege führen tatsächlich zu einem Kontakt.
+- **Breakdown:** `lead` nach `channel` und `service`; `inquiry-sent` nach `service` (welche Leistung bringt Anfragen).
+- **Filter:** Für Kundenkennzahlen `/karriere/` ausschließen, sonst zählen Bewerber mit.
+- **Weiterleitungen prüfen (monatlich):** `page-not-found` nach `path` gruppieren und fehlende Redirects nachtragen.
+
+Grenzen: Ohne Cookie gilt ein Weg nur innerhalb eines Besuchs (wer am nächsten Tag anfragt, erscheint
+als neuer Besuch). Anrufe selbst sind nicht messbar, nur Klick oder Kopieren der Nummer. Suchbegriffe
+liefert nur die Google Search Console.
+
+## Kampagnen-Links (UTM)
+
+Für Werbung außerhalb der Website immer diese Links verwenden; der UTM-Report in Umami zeigt dann,
+was davon Besucher und Kontakte bringt:
+
+| Wo | Link |
+|---|---|
+| Google-Unternehmensprofil | `https://www.grabnar.de/?utm_source=google&utm_medium=unternehmensprofil` |
+| QR-Code Fahrzeuge | `https://www.grabnar.de/?utm_source=fahrzeug&utm_medium=qr` |
+| QR-Code Flyer | `https://www.grabnar.de/?utm_source=flyer&utm_medium=qr&utm_campaign=<Aktion>` |
+| E-Mail-Signatur | `https://www.grabnar.de/?utm_source=email&utm_medium=signatur` |
+| Rechnungen/Angebote | `https://www.grabnar.de/?utm_source=dokument&utm_medium=qr` |
+
+## Eigene Besuche nicht zählen
+
+Auf Firmenrechnern und eigenen Handys einmal in der Browser-Konsole (F12 → Konsole) auf
+www.grabnar.de eingeben: `localStorage.setItem("umami.disabled", 1)`. Rückgängig mit
+`localStorage.removeItem("umami.disabled")`. Gilt pro Browser.
 
 ## Umami auf die neueste Version bringen
 
