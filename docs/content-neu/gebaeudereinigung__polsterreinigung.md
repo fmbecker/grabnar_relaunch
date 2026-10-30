@@ -1,7 +1,7 @@
 # Teppich- und Polsterreinigung
 
 - Pfad: `/gebaeudereinigung/polsterreinigung/`
-- Status: Vorschlag
+- Status: freigegeben
 - Quelle: `content-export/gebäudereinigung__polsterreinigung.md`
 - Hinweise: keine
 

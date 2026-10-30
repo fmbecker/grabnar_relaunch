@@ -1,7 +1,7 @@
 # Entrümpelung
 
 - Pfad: `/services/entruempelung/`
-- Status: Vorschlag
+- Status: freigegeben
 - Quelle: `content-export/services__entrümpelung.md`
 - Hinweise: keine
 

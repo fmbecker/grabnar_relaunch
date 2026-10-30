@@ -1,7 +1,7 @@
 # Grundreinigung
 
 - Pfad: `/gebaeudereinigung/grundreinigung/`
-- Status: Vorschlag
+- Status: freigegeben
 - Quelle: `content-export/gebäudereinigung__grundreinigung.md`
 - Hinweise: „Grundreinigung von Privateigentum“ als „private Objekte“ formuliert – bitte bestätigen, dass Privatkunden weiterhin bedient werden.
 

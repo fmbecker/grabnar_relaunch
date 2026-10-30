@@ -1,7 +1,7 @@
 # Sonderreinigung
 
 - Pfad: `/gebaeudereinigung/sonderreinigung/`
-- Status: Vorschlag
+- Status: freigegeben
 - Quelle: `content-export/gebäudereinigung__sonderreinigung.md`
 - Hinweise: Die Altseite nennt nur die Krankenhausreinigung als Beispiel. Weitere typische Sonderreinigungen der Firma ergänzen?
 

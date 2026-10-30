@@ -1,7 +1,7 @@
 # Glas- und Fassadenreinigung
 
 - Pfad: `/gebaeudereinigung/glasreinigung/`
-- Status: Vorschlag
+- Status: freigegeben
 - Quelle: `content-export/gebäudereinigung__glasreinigung.md`
 - Hinweise: „zertifiziertes Reinigungsunternehmen“ steht bereits im Kurztext – bitte mit der QM-Zertifizierung abgleichen.
 

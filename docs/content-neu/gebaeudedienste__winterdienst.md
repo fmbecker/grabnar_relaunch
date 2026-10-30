@@ -1,7 +1,7 @@
 # Winterdienst
 
 - Pfad: `/gebaeudedienste/winterdienst/`
-- Status: Vorschlag
+- Status: freigegeben
 - Quelle: `content-export/gebäudedienste__winterdienst.md`
 - Hinweise: Bewusst keine Aussage zur Übertragung der Haftung/Verkehrssicherungspflicht – falls die Verträge das vorsehen, kann die Firma es ergänzen.
 

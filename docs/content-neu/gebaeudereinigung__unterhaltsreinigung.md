@@ -1,7 +1,7 @@
 # Unterhaltsreinigung
 
 - Pfad: `/gebaeudereinigung/unterhaltsreinigung/`
-- Status: Vorschlag
+- Status: freigegeben
 - Quelle: `content-export/gebäudereinigung__unterhaltsreinigung.md`
 - Hinweise: Doppelter Eintrag „Verkehrsmittel“ entfernt, Objektliste zusammengefasst. Bitte bestätigen, dass das zertifizierte Qualitätsmanagement noch gilt (Name des Zertifikats?).
 

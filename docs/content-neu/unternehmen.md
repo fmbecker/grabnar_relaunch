@@ -1,7 +1,7 @@
 # Unternehmen
 
 - Pfad: `/unternehmen/`
-- Status: Vorschlag
+- Status: freigegeben
 - Quelle: `content-export/home.md`
 - Hinweise: Gleiche Aussagen wie der Firmentext der Altseite, neu gegliedert. Gründungsjahr, Mitarbeiterzahl oder Teamfotos würden die Seite stärken – nur nach Freigabe ergänzen.
 

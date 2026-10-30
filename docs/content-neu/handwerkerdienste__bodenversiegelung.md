@@ -1,7 +1,7 @@
 # Bodenversiegelung
 
 - Pfad: `/handwerkerdienste/bodenversiegelung/`
-- Status: Vorschlag
+- Status: freigegeben
 - Quelle: `content-export/handwerkerdienste__bodenversiegelung.md`
 - Hinweise: Die Altseite nennt nicht, welche Bodenarten versiegelt werden. Bitte ergänzen (z. B. Linoleum, PVC, Stein, Holz?).
 

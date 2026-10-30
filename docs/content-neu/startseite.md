@@ -1,7 +1,7 @@
 # Startseite
 
 - Pfad: `/`
-- Status: Vorschlag
+- Status: freigegeben
 - Quelle: `content-export/home.md`
 - Hinweise: Kurzer Text unter den Leistungskacheln der Startseite. Der ausführliche Firmentext steht auf „Unternehmen“.
 

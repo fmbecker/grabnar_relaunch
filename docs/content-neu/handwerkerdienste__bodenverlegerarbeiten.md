@@ -1,7 +1,7 @@
 # Bodenverlegerarbeiten
 
 - Pfad: `/handwerkerdienste/bodenverlegerarbeiten/`
-- Status: Vorschlag
+- Status: freigegeben
 - Quelle: `content-export/handwerkerdienste__bodenverlegerarbeiten.md`
 - Hinweise: keine
 

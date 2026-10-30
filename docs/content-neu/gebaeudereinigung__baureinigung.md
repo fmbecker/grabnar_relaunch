@@ -1,7 +1,7 @@
 # Baureinigung
 
 - Pfad: `/gebaeudereinigung/baureinigung/`
-- Status: Vorschlag
+- Status: freigegeben
 - Quelle: `content-export/gebäudereinigung__baureinigung.md`
 - Hinweise: keine
 

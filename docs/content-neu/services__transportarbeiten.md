@@ -1,7 +1,7 @@
 # Transportarbeiten
 
 - Pfad: `/services/transportarbeiten/`
-- Status: Vorschlag
+- Status: freigegeben
 - Quelle: `content-export/services__transportarbeiten.md`
 - Hinweise: keine
 

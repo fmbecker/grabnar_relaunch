@@ -1,7 +1,7 @@
 # Trockenbau
 
 - Pfad: `/handwerkerdienste/trockenbau/`
-- Status: Vorschlag
+- Status: freigegeben
 - Quelle: `content-export/handwerkerdienste__trockenbau.md`
 - Hinweise: keine
 

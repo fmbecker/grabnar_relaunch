@@ -1,7 +1,7 @@
 # Fliesenlegerarbeiten
 
 - Pfad: `/handwerkerdienste/fliesenlegerarbeiten/`
-- Status: Vorschlag
+- Status: freigegeben
 - Quelle: `content-export/handwerkerdienste__fliesenlegerarbeiten.md`
 - Hinweise: keine
 

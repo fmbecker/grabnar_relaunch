@@ -1,7 +1,7 @@
 # Wach- und Schließdienste
 
 - Pfad: `/services/wachdienste/`
-- Status: Vorschlag
+- Status: freigegeben
 - Quelle: `content-export/services__wachdienste.md`
 - Hinweise: Bitte bestätigen, dass die Bewachungserlaubnis (§ 34a GewO) besteht und das Angebot aktuell ist.
 

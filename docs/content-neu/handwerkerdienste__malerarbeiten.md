@@ -1,7 +1,7 @@
 # Maler- und Maurerarbeiten
 
 - Pfad: `/handwerkerdienste/malerarbeiten/`
-- Status: Vorschlag
+- Status: freigegeben
 - Quelle: `content-export/handwerkerdienste__malerarbeiten.md`
 - Hinweise: Die Seite heißt „Maler- und Maurerarbeiten“, beschreibt aber nur Malerarbeiten. Bitte Maurerleistungen ergänzen oder den Titel auf „Malerarbeiten“ kürzen.
 

@@ -1,7 +1,7 @@
 # Hausmeisterdienste
 
 - Pfad: `/gebaeudedienste/hausmeisterdienste/`
-- Status: Vorschlag
+- Status: freigegeben
 - Quelle: `content-export/gebäudedienste__hausmeisterdienste.md`
 - Hinweise: Doppelte Einträge „Reparaturarbeiten“ / „Ausbesserungs- und Reparaturarbeiten“ zusammengeführt; Liste in drei Gruppen geteilt.
 

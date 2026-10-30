@@ -1,7 +1,7 @@
 # Hallen- und Industriereinigung
 
 - Pfad: `/gebaeudereinigung/industriereinigung/`
-- Status: Vorschlag
+- Status: freigegeben
 - Quelle: `content-export/gebäudereinigung__industriereinigung.md`
 - Hinweise: keine
 

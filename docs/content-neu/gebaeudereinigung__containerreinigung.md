@@ -1,7 +1,7 @@
 # Containerreinigung
 
 - Pfad: `/gebaeudereinigung/containerreinigung/`
-- Status: Vorschlag
+- Status: freigegeben
 - Quelle: `content-export/gebäudereinigung__containerreinigung.md`
 - Hinweise: keine
 

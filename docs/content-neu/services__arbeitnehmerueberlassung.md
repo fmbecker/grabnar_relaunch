@@ -1,7 +1,7 @@
 # Arbeitnehmerüberlassung
 
 - Pfad: `/services/arbeitnehmerueberlassung/`
-- Status: Vorschlag
+- Status: freigegeben
 - Quelle: `content-export/services__arbeitnehmerüberlassung.md`
 - Hinweise: Bitte bestätigen, dass die Erlaubnis zur Arbeitnehmerüberlassung (AÜG) besteht und das Angebot aktuell ist.
 

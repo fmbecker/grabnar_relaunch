@@ -1,7 +1,7 @@
 # Grau- und Grünanlagenpflege
 
 - Pfad: `/gebaeudedienste/gruenanlagenpflege/`
-- Status: Vorschlag
+- Status: freigegeben
 - Quelle: `content-export/gebäudedienste__grünanlagenpflege.md`
 - Hinweise: Leistungen nach Grün- und Grauflächen gruppiert; „Grauflächen“ für Laien kurz erklärt.
 

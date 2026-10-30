@@ -1,7 +1,7 @@
 # Bauhilfsarbeiten
 
 - Pfad: `/handwerkerdienste/bauhilfsarbeiten/`
-- Status: Vorschlag
+- Status: freigegeben
 - Quelle: `content-export/handwerkerdienste__bauhilfsarbeiten.md`
 - Hinweise: keine
 
