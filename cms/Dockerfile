@@ -1,7 +1,8 @@
 FROM python:3.13-slim AS base
 ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 UV_SYSTEM_CERTS=1
 RUN apt-get update && apt-get install -y --no-install-recommends libpq5 libjpeg62-turbo libwebp7 zlib1g && rm -rf /var/lib/apt/lists/*
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+# Pinned: the same uv that wrote uv.lock, so CI and server builds are reproducible.
+COPY --from=ghcr.io/astral-sh/uv:0.11.32 /uv /usr/local/bin/uv
 WORKDIR /app
 COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev --no-install-project

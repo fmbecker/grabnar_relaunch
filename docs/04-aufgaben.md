@@ -71,6 +71,8 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 ## Phase 4 – Go-Live
 
 - [x] 🤖 `deploy/`: `docker-compose.yml`, `nginx/grabnar.conf`, `rebuild-hook.py` + systemd-Unit, `build-web.sh`, `deploy.sh`, Backup-Skript
+- [x] 🤖 CMS-Image wird von GitHub Actions gebaut und nach `ghcr.io/fmbecker/grabnar-cms` gepusht; `deploy.sh` lädt es nur noch (kein Build auf dem 2-GB-VPS)
+- [ ] 👤 Paket `grabnar-cms` auf GitHub einmalig auf „Public“ stellen (oder Server per Token anmelden, siehe `deploy/README.md`)
 - [ ] 🤝 Docker, Node/pnpm (fnm) auf dem Linode installieren, CMS parallel zur Altseite hochfahren
 - [ ] 🤝 Staging-Server-Block (Port 8443, Basic-Auth) für Abnahme
 - [ ] 🤝 Vorschau-Dienst einrichten: `grabnar-preview.service`, sudoers-Eintrag, `FRONTEND_URL` in `cms.env` (siehe `deploy/README.md`)

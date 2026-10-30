@@ -17,6 +17,10 @@ services:
       retries: 5
 
   cms:
+    # Built by GitHub Actions (.github/workflows/cms.yml) and pulled by deploy.sh, which sets
+    # CMS_IMAGE to the tag matching the checked-out code. `build` is only the fallback
+    # (BUILD_LOCAL=1 ./deploy.sh) – building on the 2 GB VPS costs a lot of RAM.
+    image: ${CMS_IMAGE:-ghcr.io/fmbecker/grabnar-cms:latest}
     build: ../cms
     restart: unless-stopped
     env_file: /srv/grabnar/cms.env
