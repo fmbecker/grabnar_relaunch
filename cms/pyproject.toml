@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Headless Wagtail CMS for www.grabnar.de"
 requires-python = ">=3.12"
 dependencies = [
-    "wagtail>=7.3,<7.4",
+    "wagtail>=7.4,<7.5",  # LTS (supported until ~Nov 2027); 8.x is not LTS
     "django>=5.2,<5.3",
     "wagtail-headless-preview>=0.9,<1.0",
     "psycopg[binary]>=3.2",

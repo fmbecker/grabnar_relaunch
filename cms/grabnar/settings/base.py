@@ -88,6 +88,16 @@ TEMPLATES = [
 DATABASES = {
     "default": env.db("DATABASE_URL", default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"),
 }
+if DATABASES["default"]["ENGINE"] == "django.db.backends.sqlite3":
+    # Local development only. Wagtail 7.4 autosaves while the preview panel posts at the
+    # same time; without WAL and a busy timeout SQLite answers "database is locked".
+    DATABASES["default"].setdefault("OPTIONS", {}).update(
+        {
+            "timeout": 20,
+            "transaction_mode": "IMMEDIATE",
+            "init_command": "PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL;",
+        }
+    )
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -119,6 +129,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 WAGTAIL_SITE_NAME = "Grabnar Gebäudereinigung"
 WAGTAILADMIN_BASE_URL = env("WAGTAILADMIN_BASE_URL", default="http://localhost:8000")
 WAGTAIL_I18N_ENABLED = False
+# Admin "new version" notice: only point to LTS releases (we stay on LTS lines).
+WAGTAIL_ENABLE_UPDATE_CHECK = "lts"
 WAGTAILIMAGES_EXTENSIONS = ["gif", "jpg", "jpeg", "png", "webp", "svg"]
 WAGTAILDOCS_EXTENSIONS = ["pdf", "docx", "doc", "odt"]
 WAGTAILIMAGES_FORMAT_CONVERSIONS = {"webp": "webp", "jpeg": "webp", "png": "webp"}

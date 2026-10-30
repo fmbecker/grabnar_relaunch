@@ -94,6 +94,21 @@ Internet → Nginx (:443, www.grabnar.de)
 - `cms.yml`: ruff, `manage.py check`, Migrations-Check, Tests, Docker-Build.
 - `web.yml`: `pnpm lint`, `astro check`, Build gegen Staging-API.
 
+## Versionen und Updates
+
+- **Wagtail: nur LTS-Linien.** Aktuell 7.4 LTS (seit 30.10.2026, vorher 7.3). LTS-Versionen bekommen
+  18 Monate Sicherheits- und Fehlerkorrekturen, Nicht-LTS-Versionen wie 8.0 nur bis zur nächsten
+  Feature-Version (etwa drei Monate). Laut Release-Prozess folgt eine LTS alle vier Feature-Versionen;
+  die nächste ist damit voraussichtlich 8.3 (rund Mai 2027) – dann umsteigen.
+- Der Update-Hinweis im Admin zeigt nur LTS-Versionen (`WAGTAIL_ENABLE_UPDATE_CHECK = "lts"` in
+  `cms/grabnar/settings/base.py`). Patch-Versionen innerhalb der Linie (7.4.x) kommen mit `uv lock --upgrade`.
+- **Django: 5.2 LTS** (Support bis April 2028). Wagtail 7.4 unterstützt 5.2; ein Wechsel auf Django 6.x
+  bringt keinen Vorteil, solange 5.2 Sicherheitsupdates bekommt.
+- `wagtail-headless-preview` 0.9 ist für Wagtail 7 freigegeben – vor einem Wechsel auf 8.x prüfen.
+- Wagtail 7.4 speichert Entwürfe beim Bearbeiten automatisch zwischen (auch neue Seiten). Lokal mit
+  SQLite deshalb WAL-Modus und Wartezeit (`base.py`), sonst kollidiert das mit der Vorschau
+  („database is locked“). In Produktion (Postgres) nicht relevant.
+
 ## Lokale Entwicklung
 
 ```

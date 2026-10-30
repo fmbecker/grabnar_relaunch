@@ -39,6 +39,7 @@ with sync_playwright() as p:
     page.goto(f"{CMS}/admin/pages/{pid}/edit/")
     open_preview_panel(page)
     expect(preview_frame(page).locator("h1")).to_have_text("Winterdienst", timeout=20000)  # initial render
+    page.wait_for_timeout(3000)  # Wagtail 7.4 starts change tracking only after the panel settles
     page.click("#id_title")
     page.keyboard.press("End")
     page.keyboard.type(" – Vorschau-Test", delay=40)  # real keystrokes trigger Wagtail's change detection
@@ -56,6 +57,7 @@ with sync_playwright() as p:
     page.goto(f"{CMS}/admin/pages/add/services/servicepage/{cat_id}/")
     open_preview_panel(page)
     expect(preview_frame(page).locator("h1")).to_be_visible(timeout=20000)  # placeholder render
+    page.wait_for_timeout(3000)
     page.click("#id_title")
     page.keyboard.type("Neue Leistung im Entwurf", delay=40)
     page.keyboard.press("Tab")

@@ -18,7 +18,7 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 - [ ] 👤 Eigene Fotos (Team, Objekte, Fahrzeuge) sammeln → Wagtail-Mediathek
 - [ ] 👤 Logo als Vektor (SVG/PDF/EPS) bei der Firma oder Agentur anfragen
 
-## Phase 1 – CMS-Grundgerüst (`cms/`) ✅ erledigt am 26.10.2026 (Wagtail 7.3 LTS, Django 5.2)
+## Phase 1 – CMS-Grundgerüst (`cms/`) ✅ erledigt am 26.10.2026 (Wagtail 7.3, Django 5.2; am 30.10.2026 auf Wagtail 7.4 LTS aktualisiert)
 
 - [x] 🤖 Wagtail-Projekt mit `uv` aufsetzen, Settings-Split, Postgres via `docker-compose.yml`
 - [x] 🤖 `BasePage` (abstract) mit SEO-Feldern
