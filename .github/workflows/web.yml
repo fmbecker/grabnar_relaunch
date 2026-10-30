@@ -13,9 +13,9 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       # Cache disabled: the post-step "uv cache prune" failed sporadically and turned green runs red.
-      - uses: astral-sh/setup-uv@v5
+      - uses: astral-sh/setup-uv@v7
         with: { enable-cache: false }
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with: { package_json_file: web/package.json }
       - uses: actions/setup-node@v5
         with: { node-version: 22, cache: pnpm, cache-dependency-path: web/pnpm-lock.yaml }
@@ -59,9 +59,9 @@ jobs:
       ASTRO_TELEMETRY_DISABLED: "1"
     steps:
       - uses: actions/checkout@v5
-      - uses: astral-sh/setup-uv@v5
+      - uses: astral-sh/setup-uv@v7
         with: { enable-cache: false }
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with: { package_json_file: web/package.json }
       - uses: actions/setup-node@v5
         with: { node-version: 22, cache: pnpm, cache-dependency-path: web/pnpm-lock.yaml }
