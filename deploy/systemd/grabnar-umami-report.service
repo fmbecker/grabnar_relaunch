@@ -1,0 +1,11 @@
+[Unit]
+Description=Monthly Umami website report by e-mail (deploy/umami/send-monthly-report.sh)
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=felix
+# felix needs docker group membership (docker compose exec) and fnm's node on PATH:
+Environment=PATH=/home/felix/.local/share/fnm/aliases/default/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/srv/grabnar/repo/deploy/umami/send-monthly-report.sh

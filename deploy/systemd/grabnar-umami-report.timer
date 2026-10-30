@@ -1,0 +1,10 @@
+[Unit]
+Description=Monthly Umami website report (1st of each month, 07:15)
+
+[Timer]
+OnCalendar=*-*-01 07:15:00
+Persistent=true
+RandomizedDelaySec=10min
+
+[Install]
+WantedBy=timers.target

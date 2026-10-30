@@ -17,6 +17,7 @@ Einmalige Einrichtung (Details: `docs/03-technik.md`):
 7. **Einmalig** die Inhalte der Altseite importieren (ersetzt den Seitenbaum!):
    `docker compose -f deploy/docker-compose.yml --env-file /srv/grabnar/cms.env run --rm -v /srv/grabnar/repo/docs:/docs:ro cms python manage.py import_legacy --source /docs`
 8. Backup: `backup.sh` in die root-Crontab.
+9. Optional: Monatsbericht aus Umami per E-Mail – `systemd/grabnar-umami-report.{service,timer}`, Einrichtung in `docs/05-tracking.md` („Monatsbericht per E-Mail“). `felix` muss dafür in der Gruppe `docker` sein.
 
 Jedes weitere Deployment: `./deploy.sh`. Es lädt das Image passend zum ausgecheckten Code (Tag `cms-<Tree-Hash von cms/>`) und wartet bis zu 15 Minuten, falls GitHub Actions noch baut. Auf dem Server wird nichts kompiliert.
 

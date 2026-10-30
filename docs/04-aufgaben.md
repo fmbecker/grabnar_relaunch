@@ -68,6 +68,8 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 - [ ] 👤 Umami auf v3 aktualisieren (nur noch PostgreSQL – ggf. MySQL-Migration), Website anlegen, Website-ID im CMS eintragen
 - [x] 🤖 Ziele, Funnels und Segmente als `deploy/umami/reports.json` + Skript `deploy/umami/setup-reports.mjs` (Umami-API ≥ 3.4)
 - [ ] 🤝 Nach dem Umami-Update: API-Schlüssel anlegen, `setup-reports.mjs` ausführen, Journey-Bericht in der Oberfläche anlegen (`docs/05-tracking.md`)
+- [x] 🤖 Monatsbericht per E-Mail aus Umami: `deploy/umami/monthly-report.mjs` + `send-monthly-report.sh` + systemd-Timer (1. des Monats, 07:15)
+- [ ] 👤 Empfänger des Monatsberichts festlegen, `/srv/grabnar/umami-report.env` anlegen, Timer aktivieren (`docs/05-tracking.md`)
 
 ## Phase 4 – Go-Live
 

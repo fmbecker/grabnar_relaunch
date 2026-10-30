@@ -315,3 +315,26 @@ def test_analytics_settings(client):
     finally:
         ss.analytics_script_url = ""
         ss.save()
+
+
+def test_send_report_mail(monkeypatch):
+    import io
+
+    from django.core import mail
+    from django.core.management import CommandError
+
+    html = "<html><body><h1>Statistik Oktober</h1><p>Kontakte: 12</p></body></html>"
+    monkeypatch.setattr("sys.stdin", io.StringIO(html))
+    call_command(
+        "send_report_mail",
+        to="a@example.com, b@example.com",
+        subject="Bericht",
+        stdout=io.StringIO(),
+    )
+    sent = mail.outbox[-1]
+    assert sent.to == ["a@example.com", "b@example.com"] and sent.subject == "Bericht"
+    assert "Kontakte: 12" in sent.body and sent.alternatives[0][0] == html
+
+    monkeypatch.setattr("sys.stdin", io.StringIO(""))
+    with pytest.raises(CommandError):
+        call_command("send_report_mail", to="a@example.com", subject="x")

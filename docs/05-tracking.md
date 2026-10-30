@@ -122,6 +122,38 @@ Geprüft: `reports.json` gegen die Eingabe-Schemas aus dem Umami-Quellcode v3.4.
 gültig), das Skript gegen eine nachgebaute API (Anlegen, Aktualisieren, Probelauf). Gegen eine echte
 Umami-Instanz noch nicht ausgeführt.
 
+## Monatsbericht per E-Mail
+
+Am 1. jedes Monats um 07:15 Uhr verschickt der Server einen Bericht über den Vormonat (Vergleich mit
+dem Monat davor) – über dieselbe SMTP-Konfiguration wie die Formulare (`EMAIL_URL` in `cms.env`).
+
+Inhalt: automatische Hinweise („Auf einen Blick“: starke Veränderungen bei Kontakten und Besuchern,
+größter Absprung im Anfrage-Weg, neue 404-Adressen, häufigste Leistung), Besucherkennzahlen mit
+Vormonat, alle Ziele aus `reports.json` mit Anteil und Vormonat, Kontakte nach Weg und nach Leistung,
+Anfrage-Funnel Schritt für Schritt, meistbesuchte Seiten, Herkunft, Kanäle, Geräte, UTM-Kampagnen
+und nicht gefundene Adressen. Nur Summen, keine Einzelbesuche.
+
+| Datei | Aufgabe |
+|---|---|
+| `deploy/umami/monthly-report.mjs` | holt die Zahlen über die Umami-API und baut die HTML-Mail (`--month=JJJJ-MM`, `--out=…`, `--demo` für eine Vorschau ohne Umami) |
+| `deploy/umami/send-monthly-report.sh` | erzeugt den Bericht und verschickt ihn über `manage.py send_report_mail` im CMS-Container |
+| `deploy/umami/umami-report.env.example` | Vorlage für `/srv/grabnar/umami-report.env` (Umami-URL, API-Schlüssel, Website-ID, Empfänger) |
+| `deploy/systemd/grabnar-umami-report.{service,timer}` | Zeitplan |
+
+Einrichten (nach dem Umami-Update und `setup-reports.mjs`):
+
+    cp deploy/umami/umami-report.env.example /srv/grabnar/umami-report.env && chmod 600 /srv/grabnar/umami-report.env
+    # Werte eintragen, dann einmal von Hand testen:
+    deploy/umami/send-monthly-report.sh
+    sudo cp deploy/systemd/grabnar-umami-report.* /etc/systemd/system/
+    sudo systemctl daemon-reload && sudo systemctl enable --now grabnar-umami-report.timer
+
+Vorschau des Layouts ohne Umami: `node deploy/umami/monthly-report.mjs --demo --out=/tmp/bericht.html`.
+
+Geprüft: Monatsgrenzen in Europe/Berlin (inkl. Sommerzeitwechsel), Abruf aller 13 Endpunkte gegen
+eine nachgebaute Umami-API, Versand über `send_report_mail` (Test in `cms/grabnar/tests/test_api.py`).
+Gegen eine echte Umami-Instanz noch nicht ausgeführt.
+
 ## Kampagnen-Links (UTM)
 
 Für Werbung außerhalb der Website immer diese Links verwenden; der UTM-Report in Umami zeigt dann,
