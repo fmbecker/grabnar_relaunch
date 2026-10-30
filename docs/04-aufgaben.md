@@ -59,7 +59,7 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 - [x] 🤖 Seite „Unternehmen“ (`/unternehmen/`): Leitgedanke + Firmentext, 6 Merkmale („Was uns auszeichnet“) ausschließlich aus Aussagen der Altseite (Quellen in `import_legacy.FEATURES`), Leistungsbereiche, CTA
 - [x] 👤 Rückfragen der Firma beantwortet (30.10.2026): ISO 9001 + ISO 14001, AÜG-Erlaubnis, Bewachungserlaubnis (nicht nennen), Maurerarbeiten ergänzen, Versiegelung ohne Einschränkung, IfSG-Paragraf korrekt, keine Privatkunden – eingearbeitet, siehe `docs/02-konzept.md`
 - [ ] 👤 Kombiniertes Siegel ISO 9001/14001 nachreichen (SVG oder PNG) → auf „Unternehmen“ und im Footer einbauen
-- [ ] 👤 Leistungsliste „Maurerarbeiten“ (`docs/content-neu/handwerkerdienste__malerarbeiten.md`) bestätigen
+- [x] 👤 Alle 24 Neutexte inkl. Maurerarbeiten und geänderter Baureinigung von der Firma freigegeben (Vergleichsseite, 30.10.2026)
 - [ ] 👤 Optional: Gründungsjahr, Mitarbeiterzahl, Team-Fotos für „Unternehmen“
 - [ ] 👤 Bilder einpflegen (Wagtail-Admin)
 - [ ] 👤 Impressum / Datenschutz / AGB rechtlich prüfen. Datenschutz muss neue Formulare (Bewerbung mit Upload, Speicherfrist 180 Tage) und ggf. Umami abdecken; Impressum: Feld „Vertretungsberechtigt“ ist in der Altseite leer

@@ -1,9 +1,9 @@
 # Maler- und Maurerarbeiten
 
 - Pfad: `/handwerkerdienste/malerarbeiten/`
-- Status: Vorschlag
+- Status: freigegeben
 - Quelle: `content-export/handwerkerdienste__malerarbeiten.md`
-- Hinweise: Abschnitt „Maurerarbeiten“ auf Wunsch der Firma ergänzt (30.10.2026). Die Leistungsliste ist ein Vorschlag – bitte bestätigen oder korrigieren.
+- Hinweise: Abschnitt „Maurerarbeiten“ auf Wunsch der Firma ergänzt, Leistungsliste freigegeben (30.10.2026).
 
 ---
 
