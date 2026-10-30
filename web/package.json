@@ -9,7 +9,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check && tsc --noEmit",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "check:tracking": "node scripts/check-tracking.mjs"
   },
   "dependencies": {
     "@astrojs/node": "^11.1.9",

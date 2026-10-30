@@ -1,8 +1,8 @@
 name: web
 on:
   # docs/ is the content source for import_legacy/seed_dev, so it affects the build too.
-  push: { paths: ["web/**", "cms/**", "docs/**", ".github/workflows/web.yml"] }
-  pull_request: { paths: ["web/**", "cms/**", "docs/**"] }
+  push: { paths: ["web/**", "cms/**", "docs/**", "deploy/umami/**", ".github/workflows/web.yml"] }
+  pull_request: { paths: ["web/**", "cms/**", "docs/**", "deploy/umami/**"] }
 jobs:
   build:
     # Builds against a freshly seeded CMS so the block contract is verified end to end.
@@ -37,6 +37,9 @@ jobs:
       - name: Type check (astro check + tsc)
         working-directory: web
         run: pnpm check
+      - name: Tracking events vs. Umami reports (deploy/umami/reports.json)
+        working-directory: web
+        run: pnpm check:tracking
       - name: Build against seeded CMS
         working-directory: web
         env:

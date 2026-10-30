@@ -1,0 +1,60 @@
+{
+  "$comment": "Ziele, Funnels und Segmente für Umami (>= 3.4). Einspielen: node deploy/umami/setup-reports.mjs. Ereignisse: docs/05-tracking.md. Abgleich über den Namen: vorhandene Einträge mit gleichem Namen werden aktualisiert, nichts wird gelöscht.",
+  "goals": [
+    { "name": "Kontakte gesamt", "description": "lead: Formular, Bewerbung, Telefon, E-Mail, Kopieren", "parameters": { "type": "event", "value": "lead" } },
+    { "name": "Anfragen (Formular)", "description": "Kontaktformular erfolgreich gesendet", "parameters": { "type": "event", "value": "inquiry-sent" } },
+    { "name": "Bewerbungen", "description": "Bewerbung erfolgreich gesendet", "parameters": { "type": "event", "value": "application-sent" } },
+    { "name": "Anrufe (Klick auf Nummer)", "description": "Klick auf eine Telefonnummer (tel:)", "parameters": { "type": "event", "value": "phone-click" } },
+    { "name": "Kontaktseite besucht", "description": "Aufruf von /kontakt/", "parameters": { "type": "path", "value": "/kontakt/" } }
+  ],
+  "funnels": [
+    {
+      "name": "Anfrage: Button → Formular → gesendet",
+      "description": "Aktions-Button bis zur gesendeten Anfrage, innerhalb einer Stunde",
+      "parameters": {
+        "window": 60,
+        "steps": [
+          { "type": "event", "value": "cta-click" },
+          { "type": "path", "value": "/kontakt/" },
+          { "type": "event", "value": "form-start", "filters": [{ "property": "form", "operator": "eq", "value": "contact" }] },
+          { "type": "event", "value": "inquiry-sent" }
+        ]
+      }
+    },
+    {
+      "name": "Bewerbung: Karriere → Stelle → gesendet",
+      "description": "Karriereseite bis zur gesendeten Bewerbung",
+      "parameters": {
+        "window": 60,
+        "steps": [
+          { "type": "path", "value": "/karriere/" },
+          { "type": "event", "value": "job-open" },
+          { "type": "event", "value": "job-apply-click" },
+          { "type": "event", "value": "application-sent" }
+        ]
+      }
+    },
+    {
+      "name": "Startseite → Leistung → Kontakt",
+      "description": "Einstieg über die Startseite, Klick auf eine Kategorie oder Leistung, dann ein Kontakt",
+      "parameters": {
+        "window": 60,
+        "steps": [
+          { "type": "path", "value": "/" },
+          { "type": "event", "value": "category-click" },
+          { "type": "event", "value": "lead" }
+        ]
+      }
+    },
+    { "name": "Gebäudereinigung → Kontakt", "description": "Seiten der Kategorie bis zum Kontakt", "parameters": { "window": 60, "steps": [{ "type": "path", "value": "/gebaeudereinigung/*" }, { "type": "event", "value": "lead" }] } },
+    { "name": "Gebäudedienste → Kontakt", "description": "Seiten der Kategorie bis zum Kontakt", "parameters": { "window": 60, "steps": [{ "type": "path", "value": "/gebaeudedienste/*" }, { "type": "event", "value": "lead" }] } },
+    { "name": "Handwerkerdienste → Kontakt", "description": "Seiten der Kategorie bis zum Kontakt", "parameters": { "window": 60, "steps": [{ "type": "path", "value": "/handwerkerdienste/*" }, { "type": "event", "value": "lead" }] } },
+    { "name": "Services → Kontakt", "description": "Seiten der Kategorie bis zum Kontakt", "parameters": { "window": 60, "steps": [{ "type": "path", "value": "/services/*" }, { "type": "event", "value": "lead" }] } }
+  ],
+  "segments": [
+    { "name": "Kunden (ohne Karriere)", "parameters": { "filters": [{ "name": "path", "operator": "dnc", "value": "/karriere" }], "match": "all" } },
+    { "name": "Bewerber (Karriere)", "parameters": { "filters": [{ "name": "path", "operator": "c", "value": "/karriere" }], "match": "all" } },
+    { "name": "Mobil", "parameters": { "filters": [{ "name": "device", "operator": "eq", "value": "mobile" }], "match": "all" } },
+    { "name": "Desktop", "parameters": { "filters": [{ "name": "device", "operator": "eq", "value": "desktop" }], "match": "all" } }
+  ]
+}

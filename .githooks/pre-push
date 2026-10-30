@@ -21,8 +21,8 @@ if grep -qE '^(cms|docs)/' <<<"$changed"; then
   echo "── cms: ruff + pytest"
   (cd "$ROOT/cms" && run uv run ruff check . && run uv run ruff format --check . && run uv run pytest -q)
 fi
-if grep -qE '^web/' <<<"$changed"; then
-  echo "── web: lint + check"
-  (cd "$ROOT/web" && run pnpm lint && run pnpm check)
+if grep -qE '^(web|deploy/umami)/' <<<"$changed"; then
+  echo "── web: lint + check + tracking"
+  (cd "$ROOT/web" && run pnpm lint && run pnpm check && run pnpm check:tracking)
 fi
 echo "✔ pre-push checks passed"

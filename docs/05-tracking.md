@@ -84,6 +84,44 @@ Grenzen: Ohne Cookie gilt ein Weg nur innerhalb eines Besuchs (wer am nächsten 
 als neuer Besuch). Anrufe selbst sind nicht messbar, nur Klick oder Kopieren der Nummer. Suchbegriffe
 liefert nur die Google Search Console.
 
+## Ziele, Funnels und Segmente per Skript einspielen
+
+Die Definitionen liegen versioniert in **`deploy/umami/reports.json`** und werden mit
+**`deploy/umami/setup-reports.mjs`** über die Umami-API (ab 3.4) angelegt. Abgleich über den Namen:
+Fehlendes wird angelegt, Vorhandenes aktualisiert, nichts gelöscht – in der Oberfläche ergänzte
+Einträge bleiben erhalten. Nach Änderungen an `reports.json` einfach erneut ausführen.
+
+Inhalt:
+- **5 Ziele:** Kontakte gesamt (`lead`), Anfragen (`inquiry-sent`), Bewerbungen (`application-sent`),
+  Anrufe (`phone-click`), Kontaktseite besucht (`/kontakt/`)
+- **7 Funnels** (Zeitfenster 60 Minuten): Anfrage (Button → `/kontakt/` → `form-start` → `inquiry-sent`),
+  Bewerbung (`/karriere/` → `job-open` → `job-apply-click` → `application-sent`),
+  Startseite → Kategorie → Kontakt, und je Leistungskategorie `/<kategorie>/*` → `lead`
+- **4 Segmente:** Kunden (ohne Karriere), Bewerber (Karriere), Mobil, Desktop
+
+Ausführen (auf dem Server, Umami lauscht auf `127.0.0.1:3000`):
+
+1. Umami → Einstellungen → **API-Schlüssel** → neuen Schlüssel anlegen (beginnt mit `umami_`).
+2. Website-ID: Umami → Einstellungen → Websites → www.grabnar.de.
+3. Probelauf, dann echt:
+
+       cd /srv/grabnar/repo
+       export UMAMI_URL=http://127.0.0.1:3000 UMAMI_API_KEY=umami_… UMAMI_WEBSITE_ID=<uuid>
+       node deploy/umami/setup-reports.mjs --dry-run
+       node deploy/umami/setup-reports.mjs
+
+Nicht per API möglich (Umami 3.4 hat dafür keine Definitions-Endpunkte), daher einmal in der
+Oberfläche: **Journey** (Website → Journey, 5 Schritte, Ende = Ereignis `lead`) sowie bei Bedarf
+**Retention**, **Attribution** und **UTM** – diese Berichte brauchen keine Definition, nur den Zeitraum.
+
+`pnpm check:tracking` (in CI und im Pre-Push-Hook) prüft, dass jedes in `reports.json` verwendete
+Ereignis in `web/src/lib/analytics.ts` existiert. Wer ein Ereignis umbenennt, muss also beide Stellen
+anpassen.
+
+Geprüft: `reports.json` gegen die Eingabe-Schemas aus dem Umami-Quellcode v3.4.0 (alle 16 Einträge
+gültig), das Skript gegen eine nachgebaute API (Anlegen, Aktualisieren, Probelauf). Gegen eine echte
+Umami-Instanz noch nicht ausgeführt.
+
 ## Kampagnen-Links (UTM)
 
 Für Werbung außerhalb der Website immer diese Links verwenden; der UTM-Report in Umami zeigt dann,

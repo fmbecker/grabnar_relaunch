@@ -66,7 +66,8 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 
 - [x] 🤖 Tracking mit Umami vorbereitet: Einstellungen im CMS (Script-URL, Website-ID, Domains, Web Vitals, Do Not Track), 21 Ereignisse auf allen Seiten und Komponenten (inkl. `lead`, Kopieren von Kontaktdaten, Leistung per `?leistung=` bis ins Formular), Konzept in `docs/05-tracking.md`
 - [ ] 👤 Umami auf v3 aktualisieren (nur noch PostgreSQL – ggf. MySQL-Migration), Website anlegen, Website-ID im CMS eintragen
-- [ ] 👤 Ziele und Trichter in Umami anlegen (Vorschlag in `docs/05-tracking.md`)
+- [x] 🤖 Ziele, Funnels und Segmente als `deploy/umami/reports.json` + Skript `deploy/umami/setup-reports.mjs` (Umami-API ≥ 3.4)
+- [ ] 🤝 Nach dem Umami-Update: API-Schlüssel anlegen, `setup-reports.mjs` ausführen, Journey-Bericht in der Oberfläche anlegen (`docs/05-tracking.md`)
 
 ## Phase 4 – Go-Live
 
