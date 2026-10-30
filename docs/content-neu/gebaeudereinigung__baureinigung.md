@@ -3,7 +3,7 @@
 - Pfad: `/gebaeudereinigung/baureinigung/`
 - Status: freigegeben
 - Quelle: `content-export/gebäudereinigung__baureinigung.md`
-- Hinweise: keine
+- Hinweise: „Einpflegen von Bodenbelägen“ und „Konservieren von Fassadenteilen“ auf Wunsch der Firma entfernt (30.10.2026).
 
 ---
 
@@ -22,8 +22,6 @@ Erst auf einem gereinigten Bau lassen sich Mängel und Ausführungsfehler bei de
 - Bauendreinigung
 - Baufeinreinigung
 - Innen- und Außenreinigung
-- Einpflegen von Bodenbelägen
-- Konservieren von Fassadenteilen
 - Bereitstellung von Abfallcontainern
 - Trennung und fachgerechte Entsorgung der Abfälle
 
