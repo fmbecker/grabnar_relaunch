@@ -317,12 +317,15 @@ class Command(BaseCommand):
         return lead, html[: m.start()] + new_p + html[m.end() :]
 
     @staticmethod
-    def import_logo(source: Path) -> Image | None:
-        """docs/assets/logo-mbgrabnar.png -> Wagtail image (reused if already imported)."""
-        path = source / "assets" / "logo-mbgrabnar.png"
+    def import_logo(
+        source: Path,
+        filename: str = "logo-mbgrabnar.png",
+        title: str = "Logo M. B. Grabnar GmbH",
+    ) -> Image | None:
+        """docs/assets/<filename> -> Wagtail image (reused if already imported)."""
+        path = source / "assets" / filename
         if not path.is_file():
             return None
-        title = "Logo M. B. Grabnar GmbH"
         existing = Image.objects.filter(title=title).first()
         if existing:
             return existing
@@ -696,6 +699,9 @@ class Command(BaseCommand):
             "in Stuttgart."
         )
         ss.logo = self.import_logo(source)
+        ss.logo_inverse = self.import_logo(
+            source, "logo-mbgrabnar-weiss.png", "Logo M. B. Grabnar GmbH (weiß)"
+        )
         ss.save()
         ss.footer_links.all().delete()
         for page in legal_pages:

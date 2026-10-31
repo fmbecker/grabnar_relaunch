@@ -263,6 +263,8 @@ export interface AnalyticsSettings {
 
 export interface SiteSettings {
   logo: LogoImage | null;
+  /** White logo for blue surfaces (null = not uploaded; fall back to `logo`). */
+  logo_inverse: LogoImage | null;
   tagline: string;
   footer_text: string;
   default_og_image: ApiImage | null;
