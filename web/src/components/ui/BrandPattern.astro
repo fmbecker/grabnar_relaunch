@@ -1,0 +1,42 @@
+---
+/** Photo stand-in drawn from the logo's towers: a skyline of blocks with a lit front face and a
+ *  shaded side, standing on the logo's base line. Decorative only (aria-hidden). */
+interface Props {
+  /** "dark" = on brand-600 surfaces, "light" = on brand-50 surfaces */
+  tone?: "dark" | "light";
+  /** Varies the skyline so neighbouring placeholders differ */
+  seed?: number;
+  class?: string;
+}
+const { tone = "dark", seed = 0, class: cls = "" } = Astro.props;
+const W = 800;
+const H = 600;
+const base = 540;
+// Width/height pairs taken loosely from the logo (middle tower tallest), rotated by seed.
+const shapes = [
+  [110, 300], [150, 430], [120, 360], [90, 240], [140, 400], [100, 290], [130, 470], [110, 330],
+];
+const towers: { x: number; w: number; h: number }[] = [];
+let x = -40;
+for (let i = 0; x < W; i++) {
+  const [w, h] = shapes[(i + seed * 3) % shapes.length];
+  towers.push({ x, w, h });
+  x += w + 46;
+}
+const front = tone === "dark" ? "rgb(255 255 255 / 0.13)" : "rgb(45 120 188 / 0.14)";
+const side = tone === "dark" ? "rgb(255 255 255 / 0.05)" : "rgb(45 120 188 / 0.26)";
+---
+<svg class={cls} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">
+  {towers.map(({ x, w, h }) => {
+    const top = base - h;
+    const rise = w * 0.12;
+    const depth = 40;
+    return (
+      <g>
+        <polygon points={`${x},${base} ${x},${top + rise} ${x + w},${top} ${x + w},${base}`} fill={front} />
+        <polygon points={`${x + w},${top} ${x + w + depth},${top + depth * 0.7} ${x + w + depth},${base} ${x + w},${base}`} fill={side} />
+      </g>
+    );
+  })}
+  <rect x="0" y={base} width={W} height="10" fill={front} />
+</svg>

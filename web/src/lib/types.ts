@@ -52,6 +52,8 @@ export interface JobSummary {
 // ---- Blocks ---------------------------------------------------------------
 
 export interface HeroValue {
+  /** Short quote above the headline (without quotation marks); "" = none. */
+  motto: string;
   headline: string;
   subline: string;
   image: ApiImage | null;

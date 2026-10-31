@@ -68,6 +68,12 @@ class LinkBlock(blocks.StructBlock):
 
 
 class HeroBlock(blocks.StructBlock):
+    motto = blocks.CharBlock(
+        label=_("Motto"),
+        required=False,
+        max_length=160,
+        help_text=_("Kurzes Zitat über der Überschrift, ohne Anführungszeichen."),
+    )
     headline = blocks.CharBlock(label=_("Überschrift"), max_length=120)
     subline = blocks.TextBlock(label=_("Unterzeile"), required=False, max_length=300)
     image = ApiImageChooserBlock(label=_("Bild"), required=False)

@@ -31,7 +31,8 @@ def test_navigation_has_categories_with_children(client):
 
 def test_home_shows_categories(client):
     page = client.get("/api/v2/pages/", {"type": "home.HomePage", "fields": "*"}).json()["items"][0]
-    assert page["hero"][0]["value"]["headline"].startswith("Zusammenkommen")
+    assert page["hero"][0]["value"]["motto"].startswith("Zusammenkommen")
+    assert page["hero"][0]["value"]["headline"].startswith("Reinigung")
     grid = next(b for b in page["body"] if b["type"] == "service_grid")["value"]
     assert grid["kind"] == "categories" and len(grid["services"]) == 4
     assert grid["services"][0]["children"][0]["href"].startswith("/gebaeudereinigung/")

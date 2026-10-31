@@ -392,7 +392,8 @@ class Command(BaseCommand):
                 (
                     "hero",
                     {
-                        "headline": motto,
+                        "motto": motto.rstrip("."),
+                        "headline": "Reinigung, Dienste und Handwerk aus einer Hand",
                         "subline": (
                             "Ihr Meisterbetrieb für Gebäudereinigung, Gebäudedienste und "
                             "Handwerkerleistungen in Stuttgart und der Region."
