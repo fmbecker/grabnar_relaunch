@@ -1,0 +1,94 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "A-Leistung.dc.html": {
+      "expand": "fill",
+      "h": 3100,
+      "title": "A · Klar & hochwertig – Unterhaltsreinigung",
+      "w": 1440,
+      "x": 0,
+      "y": 4920
+    },
+    "B-Leistung.dc.html": {
+      "expand": "fill",
+      "h": 3200,
+      "title": "B · Handwerk & Präsenz – Unterhaltsreinigung",
+      "w": 1440,
+      "x": 1520,
+      "y": 4920
+    },
+    "B-Start.dc.html": {
+      "expand": "fill",
+      "h": 4500,
+      "title": "B · Handwerk & Präsenz – Startseite",
+      "w": 1440,
+      "x": 1520,
+      "y": 0
+    },
+    "C-Leistung.dc.html": {
+      "expand": "fill",
+      "h": 3100,
+      "title": "C · Modern-regional – Unterhaltsreinigung",
+      "w": 1440,
+      "x": 3040,
+      "y": 4920
+    },
+    "C-Start.dc.html": {
+      "expand": "fill",
+      "h": 4300,
+      "title": "C · Modern-regional – Startseite",
+      "w": 1440,
+      "x": 3040,
+      "y": 0
+    },
+    "Main.dc.html": {
+      "expand": "fill",
+      "h": 4300,
+      "title": "A · Klar & hochwertig – Startseite",
+      "w": 1440,
+      "x": 0,
+      "y": 0
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-10-30T17:10:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "noteOrder": [
+    "rowStart",
+    "rowService"
+  ],
+  "notes": {
+    "rowService": {
+      "kind": "title1",
+      "maxW": 4480,
+      "text": "Leistungsseite Unterhaltsreinigung",
+      "w": 240,
+      "x": 0,
+      "y": 4620
+    },
+    "rowStart": {
+      "kind": "title1",
+      "maxW": 4480,
+      "text": "Startseite – drei Richtungen",
+      "w": 240,
+      "x": 0,
+      "y": -300
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "B-Start.dc.html",
+    "C-Start.dc.html",
+    "A-Leistung.dc.html",
+    "B-Leistung.dc.html",
+    "C-Leistung.dc.html"
+  ],
+  "pages": [],
+  "title": "Grabnar Gestaltungsrichtungen"
+}

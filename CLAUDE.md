@@ -66,7 +66,7 @@ Pre-Push-Hook (einmal pro Klon aktivieren): `git config core.hooksPath .githooks
 
 ## Arbeitsweise
 
-- Reihenfolge: `docs/01-ist-analyse.md` → `docs/02-konzept.md` → `docs/03-technik.md` → `docs/04-aufgaben.md`. Die Aufgabenliste ist die Quelle der Wahrheit für den Fortschritt; erledigte Punkte dort abhaken.
+- Reihenfolge: `docs/01-ist-analyse.md` → `docs/02-konzept.md` → `docs/03-technik.md` → `docs/04-aufgaben.md` (Gestaltung: `docs/05-tracking.md`, `docs/06-design.md`). Die Aufgabenliste ist die Quelle der Wahrheit für den Fortschritt; erledigte Punkte dort abhaken.
 - **Block-Vertrag zuerst**: Jeder StreamField-Block in `cms/blocks/` hat genau einen Typ in `web/src/lib/types.ts` und genau eine Komponente in `web/src/components/blocks/`. Keine Komponente ohne Block, kein Block ohne Komponente.
 - Sprache: Inhalte und Redakteurs-Oberfläche auf Deutsch (`LANGUAGE_CODE = "de"`), Code und Kommentare auf Englisch, Doku auf Deutsch.
 - Keine coderedcms-Abhängigkeit, kein Bootstrap. Tailwind ausschließlich.

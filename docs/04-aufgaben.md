@@ -48,7 +48,9 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 ## Phase 3 – Design & Inhalte
 
 - [x] 🤖 Farb-Tokens aus dem Logo in `web/src/styles/global.css` (Kontraste geprüft), Logo im Header, Favicon/Touch-Icon aus den Logo-Türmen
-- [ ] 🤝 Design-System weiter ausbauen: Typo-Skala, Abstände, Bildsprache, Hero mit Foto
+- [x] 🤖 Drei Gestaltungsrichtungen als Entwürfe (`docs/design/entwuerfe/`), Felix wählt Aufbau B in Markenfarben – Briefing `docs/06-design.md`
+- [ ] 👤 Akzentfarbe (`#005A96` oder `#8BC1E5`) und Überschriften-Schrift (Manrope oder Arial) bestätigen
+- [ ] 🤖/👤 Richtung B im Frontend umsetzen (`docs/06-design.md`)
 - [ ] 🤖 Startseite, Leistungsseiten, Karriere, Kontakt ausgestalten
 - [x] 🤖 Texte der Altseite migriert (1:1 übernommen)
 - [x] 🤖 Seiten aus den Alttexten aufgebaut: Kurztext im Kopf der Leistungsseiten wird nicht mehr im Fließtext wiederholt; Kategorieseiten mit Einleitung aus ihren Leistungen; „IFSG“ → „IfSG“; Leistungslisten als zweispaltige Häkchenlisten
