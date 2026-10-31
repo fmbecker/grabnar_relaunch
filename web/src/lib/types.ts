@@ -105,6 +105,10 @@ export interface CtaValue {
   heading: string;
   text: string;
   link: ApiLink;
+  /** "contact" = closing band with phone number, "career" = careers teaser */
+  style: "contact" | "career";
+  /** From the contact settings (added by the API). */
+  phone: string;
 }
 
 export interface ContactFormValue {

@@ -95,6 +95,8 @@
   .btn-secondary { @apply border-2 border-brand-500 text-brand-700 hover:bg-brand-50 active:bg-brand-100; }
   /* On brand-500 surfaces */
   .btn-secondary-on-dark { @apply border-2 border-white text-white hover:bg-white/10 active:bg-white/20; }
+  /* Primary button on the accent band: inverted so it stays visible */
+  .band-accent .btn-primary { @apply bg-white text-accent-700 hover:bg-accent-100 active:bg-accent-100; }
   .btn-link { @apply inline-flex items-center gap-1 font-semibold text-brand-600 underline-offset-4 hover:underline; }
   .prose-site { @apply max-w-none leading-relaxed text-ink-700; }
   .prose-site h2 { @apply mt-10 mb-4 font-display text-subtitle font-extrabold text-ink-900; }

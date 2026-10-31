@@ -689,6 +689,20 @@ class Command(BaseCommand):
                     ],
                 },
             ),
+            (
+                "cta",
+                {
+                    "heading": "Arbeiten bei M. B. Grabnar",
+                    "text": jobs.intro,
+                    "link": {
+                        "label": "Offene Stellen ansehen",
+                        "page": jobs,
+                        "url": "",
+                        "style": "secondary",
+                    },
+                    "style": "career",
+                },
+            ),
             cta("Maßgeschneidertes Gebäudemanagement für Ihr Objekt"),
         ]
         for page in [home, *category_pages, about, jobs, contact, *legal_pages]:

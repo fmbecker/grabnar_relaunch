@@ -234,10 +234,28 @@ class CtaBlock(blocks.StructBlock):
     heading = blocks.CharBlock(label=_("Überschrift"), max_length=120)
     text = blocks.TextBlock(label=_("Text"), required=False, max_length=300)
     link = LinkBlock(label=_("Button"))
+    style = blocks.ChoiceBlock(
+        label=_("Darstellung"),
+        choices=[
+            ("contact", _("Abschlussband mit Telefonnummer")),
+            ("career", _("Karriere-Hinweis")),
+        ],
+        default="contact",
+    )
 
     class Meta:
         icon = "pick"
         label = _("Call-to-Action")
+
+    def get_api_representation(self, value, context=None):
+        from wagtail.models import Site
+
+        from site_settings.models import ContactSettings
+
+        data = super().get_api_representation(value, context)
+        site = Site.objects.filter(is_default_site=True).first()
+        data["phone"] = ContactSettings.for_site(site).phone if site else ""
+        return data
 
 
 class ContactFormBlock(blocks.StructBlock):
