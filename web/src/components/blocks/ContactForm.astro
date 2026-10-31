@@ -1,13 +1,36 @@
 ---
-import type { ContactFormValue, JobSummary } from "@/lib/types";
+import type { ContactFormValue, ContactSettings, JobSummary } from "@/lib/types";
 import ContactFormIsland from "@/components/islands/ContactForm";
-interface Props { value: ContactFormValue; sourcePath: string; job?: Pick<JobSummary, "id" | "title"> }
-const { value, sourcePath, job } = Astro.props;
+interface Props { value: ContactFormValue; sourcePath: string; job?: Pick<JobSummary, "id" | "title">; contact?: ContactSettings }
+const { value, sourcePath, job, contact } = Astro.props;
+// Phone/email tracking is added automatically for tel:/mailto: links (Analytics.astro).
 ---
 <section class="section" id="formular">
-  <div class="container-x max-w-2xl">
-    {value.heading && <h2 class="h2">{value.heading}</h2>}
-    {value.intro && <p class="mt-2 mb-8 text-ink-700">{value.intro}</p>}
-    <ContactFormIsland client:visible variant={value.variant} successMessage={value.success_message} sourcePath={sourcePath} job={job} apiUrl={import.meta.env.PUBLIC_FORMS_API_URL} />
+  <div class="container-x grid gap-12 lg:grid-cols-12">
+    <div class="lg:col-span-4">
+      {value.heading && <h2 class="h2">{value.heading}</h2>}
+      {value.intro && <p class="lead mt-4 text-ink-700">{value.intro}</p>}
+      {contact && value.variant === "contact" && (
+        <dl class="mt-8 grid gap-6 border-t-4 border-brand-500 pt-6">
+          <div>
+            <dt class="text-sm font-bold uppercase tracking-wide text-ink-700">Telefon</dt>
+            <dd><a href={`tel:${contact.phone.replace(/\s/g, "")}`} class="font-display text-subtitle font-extrabold text-brand-700 hover:underline">{contact.phone}</a></dd>
+          </div>
+          <div>
+            <dt class="text-sm font-bold uppercase tracking-wide text-ink-700">E-Mail</dt>
+            <dd><a href={`mailto:${contact.email}`} class="inline-flex min-h-11 items-center font-semibold text-brand-700 underline underline-offset-4">{contact.email}</a></dd>
+          </div>
+          {contact.opening_hours.length > 0 && (
+            <div>
+              <dt class="text-sm font-bold uppercase tracking-wide text-ink-700">Erreichbar</dt>
+              {contact.opening_hours.map((h) => <dd class="text-ink-900">{h}</dd>)}
+            </div>
+          )}
+        </dl>
+      )}
+    </div>
+    <div class="border-t-4 border-brand-500 bg-ink-50 p-6 sm:p-10 lg:col-span-8">
+      <ContactFormIsland client:visible variant={value.variant} successMessage={value.success_message} sourcePath={sourcePath} job={job} apiUrl={import.meta.env.PUBLIC_FORMS_API_URL} />
+    </div>
   </div>
 </section>

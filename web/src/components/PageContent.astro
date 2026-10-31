@@ -67,15 +67,15 @@ const enquiry = svc ? withService("/kontakt/", page.title) : "";
 
 {job && (
   <>
-    <div class="border-b border-ink-100 bg-ink-50">
-      <div class="container-x py-12 sm:py-16">
-        <p class="text-sm font-semibold uppercase tracking-wide text-brand-700">Stellenangebot</p>
-        <h1 class="h1 mt-2">{job.title}</h1>
-        <dl class="mt-6 flex flex-wrap gap-x-8 gap-y-2 text-sm text-ink-700">
-          <div><dt class="inline font-semibold">Ort: </dt><dd class="inline">{job.location}</dd></div>
-          <div><dt class="inline font-semibold">Art: </dt><dd class="inline">{job.employment_type_label}</dd></div>
-          <div><dt class="inline font-semibold">Beginn: </dt><dd class="inline">{job.start_date}</dd></div>
-          {job.salary_note && <div><dt class="inline font-semibold">Vergütung: </dt><dd class="inline">{job.salary_note}</dd></div>}
+    <div class="on-dark bg-brand-500 text-white">
+      <div class="container-x py-14 sm:py-20">
+        <a href="/karriere/" class="inline-flex min-h-11 items-center gap-2 border-2 border-white/60 px-3 text-sm font-bold uppercase tracking-wide hover:bg-white/10"><Icon name="arrow" class="h-4 w-4 rotate-180" /> Karriere</a>
+        <h1 class="h1 mt-6 max-w-4xl">{job.title}</h1>
+        <dl class="mt-8 flex flex-wrap gap-x-10 gap-y-3 border-t border-white/40 pt-6">
+          <div><dt class="block text-sm font-bold uppercase tracking-wide text-accent-100">Ort: </dt><dd class="text-lg font-semibold">{job.location}</dd></div>
+          <div><dt class="block text-sm font-bold uppercase tracking-wide text-accent-100">Art: </dt><dd class="text-lg font-semibold">{job.employment_type_label}</dd></div>
+          <div><dt class="block text-sm font-bold uppercase tracking-wide text-accent-100">Beginn: </dt><dd class="text-lg font-semibold">{job.start_date}</dd></div>
+          {job.salary_note && <div><dt class="block text-sm font-bold uppercase tracking-wide text-accent-100">Vergütung: </dt><dd class="text-lg font-semibold">{job.salary_note}</dd></div>}
         </dl>
       </div>
     </div>
@@ -87,16 +87,16 @@ const enquiry = svc ? withService("/kontakt/", page.title) : "";
           <h2>Das bringen Sie mit</h2><div set:html={job.requirements} />
           {job.benefits && <><h2>Wir bieten</h2><div set:html={job.benefits} /></>}
         </div>
-        <aside class="rounded-lg bg-brand-50 p-6 text-sm" data-track-area="job-sidebar">
+        <aside class="self-start border-t-4 border-brand-500 bg-ink-50 p-6 lg:sticky lg:top-24" data-track-area="job-sidebar">
           <h2 class="h3">Fragen zur Stelle?</h2>
-          <p class="mt-2">Rufen Sie uns an: <a class="font-semibold text-brand-700" href={`tel:${settings.contact.phone.replace(/\s/g, "")}`}>{settings.contact.phone}</a></p>
+          <p class="mt-2 text-ink-700">Rufen Sie uns an:</p><p><a class="mt-1 block font-display text-subtitle font-extrabold text-brand-700 hover:underline" href={`tel:${settings.contact.phone.replace(/\s/g, "")}`}>{settings.contact.phone}</a></p>
           {job.show_apply_form && <a href="#formular" class="btn-primary mt-4 w-full" {...umami(EVENT.jobApply, { job: job.title })}>Jetzt bewerben</a>}
         </aside>
       </div>
     </section>
     {job.show_apply_form && (
       <section class="section bg-ink-50" id="formular">
-        <div class="container-x max-w-2xl">
+        <div class="container-x max-w-3xl">
           <h2 class="h2 mb-8">Bewerbung: {job.title}</h2>
           <ContactFormIsland client:visible variant="application" successMessage="Vielen Dank für Ihre Bewerbung! Wir melden uns zeitnah." sourcePath={path} job={{ id: job.id, title: job.title }} apiUrl={import.meta.env.PUBLIC_FORMS_API_URL} />
         </div>
