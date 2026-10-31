@@ -658,6 +658,18 @@ class Command(BaseCommand):
         ]
         home.body = [
             (
+                "facts",
+                {
+                    "items": [
+                        "Meisterbetrieb",
+                        "ISO 9001",
+                        "ISO 14001",
+                        "{anzahl} Leistungen",
+                        "Stuttgart & Region",
+                    ]
+                },
+            ),
+            (
                 "service_grid",
                 {
                     "heading": "Unsere Leistungen",

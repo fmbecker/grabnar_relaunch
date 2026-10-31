@@ -81,6 +81,11 @@ export interface FeatureListValue {
   features: { icon: string; title: string; text: string }[];
 }
 
+/** FactsBlock: "{anzahl}" is already replaced by the API. */
+export interface FactsValue {
+  items: string[];
+}
+
 export interface StatsValue {
   stats: { value: string; label: string }[];
 }
@@ -127,6 +132,7 @@ export interface GalleryValue {
 }
 
 export type Block =
+  | { type: "facts"; id: string; value: FactsValue }
   | { type: "rich_text"; id: string; value: string }
   | { type: "text_image"; id: string; value: TextImageValue }
   | { type: "service_grid"; id: string; value: ServiceGridValue }

@@ -338,9 +338,41 @@ class CertificateBlock(blocks.StructBlock):
         }
 
 
+class FactsBlock(blocks.StructBlock):
+    """Bar of short facts below the hero (Meisterbetrieb · ISO 9001 · …).
+    "{anzahl}" in an item is replaced by the number of published service pages."""
+
+    COUNT_PLACEHOLDER = "{anzahl}"
+
+    items = blocks.ListBlock(
+        blocks.CharBlock(max_length=40),
+        label=_("Fakten"),
+        min_num=2,
+        max_num=6,
+        help_text=_(
+            "Kurze Stichworte. „{anzahl}“ wird durch die Zahl der veröffentlichten "
+            "Leistungsseiten ersetzt, z. B. „{anzahl} Leistungen“."
+        ),
+    )
+
+    class Meta:
+        icon = "list-ul"
+        label = _("Fakten-Leiste")
+
+    def get_api_representation(self, value, context=None):
+        items = list(value["items"])
+        if any(self.COUNT_PLACEHOLDER in item for item in items):
+            from services.models import ServicePage
+
+            count = str(ServicePage.objects.live().public().count())
+            items = [item.replace(self.COUNT_PLACEHOLDER, count) for item in items]
+        return {"items": items}
+
+
 class BodyStreamBlock(blocks.StreamBlock):
     """The body of every page type. HeroBlock is a separate field on HomePage."""
 
+    facts = FactsBlock()
     rich_text = RichTextBlock()
     text_image = TextImageBlock()
     service_grid = ServiceGridBlock()

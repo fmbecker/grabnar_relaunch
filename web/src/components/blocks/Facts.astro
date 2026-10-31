@@ -1,0 +1,10 @@
+---
+import type { FactsValue } from "@/lib/types";
+interface Props { value: FactsValue }
+const { value } = Astro.props;
+---
+<section aria-label="Auf einen Blick" class="on-dark bg-accent-600 text-white">
+  <ul class="container-x flex flex-wrap gap-x-8 gap-y-3 md:justify-between py-5 font-display text-base font-extrabold uppercase tracking-wide sm:py-6 sm:text-lg">
+    {value.items.map((item) => <li>{item}</li>)}
+  </ul>
+</section>
