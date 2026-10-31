@@ -17,8 +17,10 @@ Felix' Eindruck der aktuellen Seite: „spießig, bieder, visuell noch nicht raf
 Das aktuell umgesetzte Frontend ist der Startpunkt der Überarbeitung (sauberer, funktionierender Code,
 Lighthouse/axe 100). Es ist gesichert:
 
-- **Git-Tag `design-ausgangsstand`** – der Code-Stand vor der Überarbeitung. Vergleichen oder zurückholen:
-  `git diff design-ausgangsstand -- web/` · `git checkout design-ausgangsstand -- web/src/components/Header.astro`
+- **Branch `design/ausgangsstand`** (Commit `c9dce5d`) – der Code-Stand vor der Überarbeitung; wird nicht
+  weiterentwickelt. Vergleichen oder zurückholen:
+  `git diff origin/design/ausgangsstand -- web/` · `git checkout origin/design/ausgangsstand -- web/src/components/Header.astro`
+  (Optional zusätzlich als Tag: `git tag design-ausgangsstand c9dce5d && git push origin design-ausgangsstand`.)
 - **Screenshots** in `docs/design/ausgangsstand/` (Seed-Daten mit Platzhalterbildern, 31.10.2026):
   Startseite, Kategorie (Gebäudereinigung), Leistung (Unterhaltsreinigung), Unternehmen, Karriere,
   Kontakt – jeweils `-desktop.jpg` (1440 px) und `-mobil.jpg` (390 px).
