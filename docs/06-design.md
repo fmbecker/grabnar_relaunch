@@ -12,6 +12,20 @@ Felix' Eindruck der aktuellen Seite: „spießig, bieder, visuell noch nicht raf
 3. Flache Typografie: Arial in allen Größen.
 4. Eintönige Farbe: fast nur Markenblau auf Weiß, kein Hell-Dunkel-Wechsel der Abschnitte.
 
+## Ausgangspunkt: das bestehende einfache Design
+
+Das aktuell umgesetzte Frontend ist der Startpunkt der Überarbeitung (sauberer, funktionierender Code,
+Lighthouse/axe 100). Es ist gesichert:
+
+- **Git-Tag `design-ausgangsstand`** – der Code-Stand vor der Überarbeitung. Vergleichen oder zurückholen:
+  `git diff design-ausgangsstand -- web/` · `git checkout design-ausgangsstand -- web/src/components/Header.astro`
+- **Screenshots** in `docs/design/ausgangsstand/` (Seed-Daten mit Platzhalterbildern, 31.10.2026):
+  Startseite, Kategorie (Gebäudereinigung), Leistung (Unterhaltsreinigung), Unternehmen, Karriere,
+  Kontakt – jeweils `-desktop.jpg` (1440 px) und `-mobil.jpg` (390 px).
+- Design-Tokens: `web/src/styles/global.css` (`@theme`: Markenskala `brand-50…950`, `accent`, `ink`; Schrift Arial).
+
+Die Entwürfe A/B/C unten sind Ideensammlung, kein Pflichtenheft.
+
 ## Entwürfe
 
 Drei Richtungen als Design-Artefakt „Grabnar Gestaltungsrichtungen“ auf claude.ai (privat, von Felix
