@@ -51,6 +51,7 @@ def test_service_page_content_and_list(client):
     assert page["meta"]["html_url"].endswith("/services/wachdienste/")
     assert "<li>Citystreifen</li>" in page["body"][0]["value"]
     assert page["teaser"] and len(page["related"]) == 2
+    assert page["category"] == {"title": "Services", "href": "/services/"}
 
 
 def test_category_grid_lists_its_services(client):

@@ -5,14 +5,19 @@ import Hero from "@/components/blocks/Hero.astro";
 import BlockRenderer from "@/components/blocks/BlockRenderer.astro";
 import ServiceGrid from "@/components/blocks/ServiceGrid.astro";
 import Picture from "@/components/ui/Picture.astro";
+import BrandPattern from "@/components/ui/BrandPattern.astro";
+import Icon from "@/components/ui/Icon.astro";
+import Facts from "@/components/blocks/Facts.astro";
 import ContactFormIsland from "@/components/islands/ContactForm";
-import { EVENT, umami } from "@/lib/analytics";
+import { EVENT, target, umami, withService } from "@/lib/analytics";
 interface Props { page: PageData; settings: Settings; path: string }
 const { page, settings, path } = Astro.props;
 const home = isHomePage(page) ? page : null;
 const std = isStandardPage(page) ? page : null;
 const svc = isServicePage(page) ? page : null;
 const job = isJobPage(page) ? page : null;
+const parent = svc?.category ?? null;
+const enquiry = svc ? withService("/kontakt/", page.title) : "";
 ---
 {home && (
   <>
@@ -23,10 +28,10 @@ const job = isJobPage(page) ? page : null;
 
 {std && (
   <>
-    <div class="border-b border-ink-100 bg-ink-50">
-      <div class="container-x py-12 sm:py-16">
-        <h1 class="h1">{page.title}</h1>
-        {std.intro && <p class="mt-4 max-w-2xl text-lg text-ink-700">{std.intro}</p>}
+    <div class="on-dark bg-brand-500 text-white">
+      <div class="container-x py-14 sm:py-20">
+        <h1 class="h1 max-w-4xl">{page.title}</h1>
+        {std.intro && <p class="lead mt-5 max-w-[46ch]">{std.intro}</p>}
       </div>
     </div>
     <BlockRenderer blocks={std.body} contact={settings.contact} sourcePath={path} />
@@ -35,16 +40,28 @@ const job = isJobPage(page) ? page : null;
 
 {svc && (
   <>
-    <div class="relative isolate bg-brand-900 text-white">
-      {svc.hero_image && <Picture image={svc.hero_image} variant="hero" loading="eager" sizes="100vw" class="absolute inset-0 -z-10 h-full w-full object-cover opacity-30" />}
-      <div class="container-x py-16 sm:py-24">
-        <p class="text-sm font-semibold uppercase tracking-wide text-brand-200">Leistung</p>
-        <h1 class="h1 mt-2">{page.title}</h1>
-        <p class="mt-4 max-w-2xl text-lg text-brand-100">{svc.teaser}</p>
+    <div class="on-dark overflow-hidden bg-brand-500 text-white">
+      <div class="container-x grid lg:grid-cols-12 lg:gap-12">
+        <div class="py-14 sm:py-20 lg:col-span-7">
+          {parent && (
+            <a href={parent.href} class="inline-flex min-h-11 items-center gap-2 border-2 border-white/60 px-3 text-sm font-bold uppercase tracking-wide hover:bg-white/10" {...umami(EVENT.category, { category: parent.title, target: "overview" })}>
+              <Icon name="arrow" class="h-4 w-4 rotate-180" /> {parent.title}
+            </a>
+          )}
+          <h1 class="h1 mt-6">{page.title}</h1>
+          <p class="lead mt-5 max-w-[46ch]">{svc.teaser}</p>
+          <a href={enquiry} class="btn-primary mt-8" {...umami(EVENT.cta, { block: "page-header", label: "Angebot anfragen", target: target(enquiry), service: page.title })}>{page.title} anfragen</a>
+        </div>
+        <div class="relative -mx-4 h-56 bg-brand-600 [clip-path:polygon(0_22%,100%_0,100%_100%,0_100%)] sm:-mx-6 sm:h-72 lg:col-span-5 lg:mx-0 lg:mr-[calc(50%-50vw)] lg:h-auto lg:min-h-[26rem] lg:[clip-path:polygon(18%_0,100%_0,100%_100%,0_100%)]">
+          {svc.hero_image
+            ? <Picture image={svc.hero_image} variant="hero" loading="eager" sizes="(min-width: 1024px) 45vw, 100vw" class="absolute inset-0 h-full w-full object-cover" />
+            : <BrandPattern tone="dark" seed={page.id} class="absolute inset-0 h-full w-full" />}
+        </div>
       </div>
     </div>
+    <Facts value={{ items: ["Meisterbetrieb", "ISO 9001", "ISO 14001", ...(parent ? [parent.title] : [])] }} />
     <BlockRenderer blocks={svc.body} contact={settings.contact} sourcePath={path} service={page.title} />
-    {svc.related.length > 0 && <ServiceGrid list="related" value={{ heading: "Verwandte Leistungen", intro: "", kind: "services", services: svc.related }} />}
+    {svc.related.length > 0 && <ServiceGrid list="related" value={{ heading: "Passt auch dazu", intro: "", kind: "services", services: svc.related }} />}
   </>
 )}
 

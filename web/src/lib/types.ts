@@ -211,6 +211,8 @@ export interface ServicePageData extends BasePageData {
   hero_image: ApiImage | null;
   body: Block[];
   related: ServiceSummary[];
+  /** Parent category (ServiceIndexPage). */
+  category: { title: string; href: string } | null;
 }
 
 export interface JobPageData extends BasePageData {

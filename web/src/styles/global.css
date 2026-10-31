@@ -114,7 +114,11 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 8.5l2.2 2.2 4.8-5' fill='none' stroke='%232d78bc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
     background-size: 100% 100%;
   }
-  .prose-site ul:has(> li:nth-child(6)) { @apply sm:columns-2 sm:gap-10; }
+  /* Long lists (objects, single services) become a grid of tiles */
+  .prose-site ul:has(> li:nth-child(6)) { @apply grid gap-px border border-ink-100 bg-ink-100 sm:grid-cols-2; }
+  .prose-site ul:has(> li:nth-child(6)) > li { @apply mb-0 bg-white py-3 pr-4 pl-11; }
+  .prose-site ul:has(> li:nth-child(6)) > li:last-child:nth-child(odd) { @apply sm:col-span-2; }
+  .prose-site ul:has(> li:nth-child(6)) > li::before { @apply left-4 top-[1.05em]; }
   .field { @apply block w-full rounded-ui border border-ink-300 px-3 py-2 text-sm focus:border-brand-500 focus:ring-1 focus:ring-brand-500; }
   .label { @apply mb-1 block text-sm font-medium text-ink-700; }
 }

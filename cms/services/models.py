@@ -111,6 +111,7 @@ class ServicePage(BasePage):
         APIField("hero_image", serializer=ImageRenditionsField()),
         APIField("body"),
         APIField("related", serializer=serializers.ReadOnlyField()),
+        APIField("category", serializer=serializers.ReadOnlyField()),
     ]
 
     parent_page_types = ["services.ServiceIndexPage"]
@@ -118,6 +119,12 @@ class ServicePage(BasePage):
 
     class Meta:
         verbose_name = _("Leistung")
+
+    @property
+    def category(self) -> dict | None:
+        """The parent category, for the category mark in the page header."""
+        parent = self.get_parent()
+        return {"title": parent.title, "href": parent.url} if parent else None
 
     @property
     def related(self) -> list[dict]:
