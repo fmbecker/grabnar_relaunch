@@ -1,10 +1,41 @@
 @import "tailwindcss";
 
+/* Headline face, self-hosted (no external requests). Latin subset, weight 800 only. */
+@font-face {
+  font-family: "Manrope";
+  src: url("/fonts/manrope-800.woff2") format("woff2");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Design tokens – derived from the M. B. Grabnar logo (docs/assets/logo-mbgrabnar.png).
    Brand: #2D78BC (brand-500, "M B GRABNAR"), light: #8BC1E5 (brand-300, towers + subline).
-   Contrast (WCAG): white on brand-500 = 4.64:1 (AA), ink on brand-300 = 8.2:1. */
+   Contrast (WCAG): white on brand-500 = 4.64:1 (AA), ink on brand-300 = 8.2:1.
+   Accent #005A96 (accent-600): white 7.23:1, brand-100 5.87:1; never as text/line on brand-500 (1.56:1).
+   Decisions: docs/06-design.md. */
 @theme {
   --font-sans: Arial, "Helvetica Neue", Helvetica, sans-serif;
+  --font-display: "Manrope", Arial, "Helvetica Neue", Helvetica, sans-serif;
+
+  /* Type scale: few sizes doing the visible work – very large display, body, small */
+  --text-display: clamp(2rem, 1.1rem + 4.4vw, 4.75rem);
+  --text-display--line-height: 1;
+  --text-display--letter-spacing: -0.02em;
+  --text-title: clamp(1.75rem, 1.2rem + 2.4vw, 3.25rem);
+  --text-title--line-height: 1.04;
+  --text-title--letter-spacing: -0.015em;
+  --text-subtitle: clamp(1.25rem, 1.1rem + 0.6vw, 1.625rem);
+  --text-subtitle--line-height: 1.1;
+  --text-lead: clamp(1.125rem, 1rem + 0.4vw, 1.25rem);
+  --text-lead--line-height: 1.55;
+
+  /* Section rhythm */
+  --spacing-section: clamp(4rem, 2.5rem + 6vw, 8rem);
+  --spacing-section-sm: clamp(2.5rem, 2rem + 2vw, 4rem);
+
+  /* Shapes: near-square corners everywhere, decided once */
+  --radius-ui: 2px;
 
   --color-brand-50: #eef4fa;
   --color-brand-100: #dde9f4;
@@ -18,10 +49,13 @@
   --color-brand-900: #153859;
   --color-brand-950: #102c48;
 
-  /* Accent = the light logo blue, for highlights on dark backgrounds and the preview banner */
+  /* Accent = deep blue #005A96 (buttons, phone, fact bar). Text on it: white or accent-100. */
+  --color-accent-100: #dde9f4;
   --color-accent-300: #b4d7ee;
   --color-accent-400: #8bc1e5;
-  --color-accent-500: #5c9cd0;
+  --color-accent-600: #005a96;
+  --color-accent-700: #004a7c;
+  --color-accent-800: #003b63;
 
   --color-ink-900: #1f2328;
   --color-ink-700: #39424c;
@@ -34,24 +68,34 @@
 @layer base {
   html { scroll-behavior: smooth; }
   body { @apply bg-white text-ink-900 antialiased; }
-  :focus-visible { @apply outline-2 outline-offset-2 outline-brand-500; }
+  :focus-visible { @apply outline-3 outline-offset-2 outline-brand-500; }
+  /* Dark surfaces (brand-500, accent-600) mark themselves with .on-dark: white focus ring */
+  .on-dark :focus-visible { @apply outline-white; }
 }
 
 @layer components {
   .container-x { @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8; }
-  .section { @apply py-12 sm:py-16 lg:py-20; }
-  .h1 { @apply text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl; }
-  .h2 { @apply text-2xl font-bold tracking-tight sm:text-3xl; }
-  .h3 { @apply text-lg font-semibold; }
+  .section { @apply py-section; }
+  .section-sm { @apply py-section-sm; }
+  /* Headlines: Manrope 800, capitals only for h1/h2 (never body or long labels) */
+  /* Long German compounds in capitals: allow hyphenation instead of overflow (html lang=de) */
+  .h1, .h2, .h3 { hyphens: auto; overflow-wrap: break-word; }
+  .h1 { @apply font-display text-display font-extrabold uppercase text-balance; }
+  .h2 { @apply font-display text-title font-extrabold uppercase text-balance; }
+  .h3 { @apply font-display text-subtitle font-extrabold text-balance; }
+  .h4 { @apply text-lg font-bold; }
+  .lead { @apply text-lead; }
   .btn-primary, .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-md px-5 py-3 text-sm font-semibold transition;
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-ui px-6 py-3 text-base font-bold transition-colors duration-150;
   }
-  .btn-primary { @apply bg-brand-500 text-white hover:bg-brand-600; }
-  .btn-secondary { @apply border border-brand-500 text-brand-600 hover:bg-brand-50; }
+  .btn-primary { @apply bg-accent-600 text-white hover:bg-accent-700 active:bg-accent-800; }
+  .btn-secondary { @apply border-2 border-brand-500 text-brand-700 hover:bg-brand-50 active:bg-brand-100; }
+  /* On brand-500 surfaces */
+  .btn-secondary-on-dark { @apply border-2 border-white text-white hover:bg-white/10 active:bg-white/20; }
   .btn-link { @apply inline-flex items-center gap-1 font-semibold text-brand-600 underline-offset-4 hover:underline; }
   .prose-site { @apply max-w-none leading-relaxed text-ink-700; }
-  .prose-site h2 { @apply mt-8 mb-3 text-2xl font-bold tracking-tight text-ink-900 sm:text-3xl; }
-  .prose-site h3 { @apply mt-6 mb-2 text-lg font-semibold text-ink-900; }
+  .prose-site h2 { @apply mt-10 mb-4 font-display text-subtitle font-extrabold text-ink-900; }
+  .prose-site h3 { @apply mt-8 mb-2 text-lg font-bold text-ink-900; }
   .prose-site p { @apply mb-4; }
   .prose-site ul { @apply mb-4; }
   .prose-site ol { @apply mb-4 list-decimal pl-6; }
@@ -66,6 +110,6 @@
     background-size: 100% 100%;
   }
   .prose-site ul:has(> li:nth-child(6)) { @apply sm:columns-2 sm:gap-10; }
-  .field { @apply block w-full rounded-md border border-ink-300 px-3 py-2 text-sm focus:border-brand-500 focus:ring-1 focus:ring-brand-500; }
+  .field { @apply block w-full rounded-ui border border-ink-300 px-3 py-2 text-sm focus:border-brand-500 focus:ring-1 focus:ring-brand-500; }
   .label { @apply mb-1 block text-sm font-medium text-ink-700; }
 }

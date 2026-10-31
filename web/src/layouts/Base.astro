@@ -24,6 +24,7 @@ const fullTitle = title.includes("Grabnar") ? title : `${title} â€“ Grabnar GebÃ
 <!doctype html>
 <html lang="de" class="h-full">
   <head>
+    <link rel="preload" href="/fonts/manrope-800.woff2" as="font" type="font/woff2" crossorigin />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <Seo title={fullTitle} description={description} image={image ?? settings.site.default_og_image} path={path} noindex={noindex} jsonLd={jsonLd} />

@@ -47,10 +47,12 @@ Dateien brauchen dessen Laufzeit zum Rendern, lesbar sind sie als HTML mit Inlin
 **Aufbau von Richtung B, Farben aus den Markenvorgaben** (nicht Marineblau/Gelb des ersten Entwurfs):
 
 - Dunkle Abschnitte (Header, Hero, Merkmale, „Wo wir reinigen“, Footer): Logo-Blau `#2D78BC` (`brand-500`).
-- Akzent: im Entwurf zuletzt von Felix auf **`#005A96`** gestellt, Schrift darauf `#DDE9F4` – vorher
-  Logo-Hellblau `#8BC1E5`. ⬜ Mit Felix klären, welcher Akzent gilt (`#005A96` ist nicht in `global.css`).
-- Überschriften-Schrift: im Entwurf zuletzt **Manrope** gewählt. ⬜ Mit Felix bestätigen
-  (bisherige Entscheidung: Arial überall, `docs/02-konzept.md`). Fließtext bleibt Arial. Eine
+- Akzent: **`#005A96`** (✅ Felix, 31.10.2026, nach Hero-Vergleich), Schrift darauf Weiß oder `#DDE9F4`.
+  Logo-Hellblau `#8BC1E5` bleibt Teil der Markenskala, ist aber nicht der Akzent.
+- Überschriften-Schrift: **Manrope 800** (✅ Felix, 31.10.2026; ersetzt „Arial überall“ aus
+  `docs/02-konzept.md` für Überschriften).
+- Hero: Motto als kleines Zitat, darüber/darunter die Headline „Reinigung, Dienste und Handwerk aus
+  einer Hand“ (✅ Felix, 31.10.2026) – Hero-Block bekommt dafür ein Motto-Feld. Fließtext bleibt Arial. Eine
   Zusatzschrift selbst hosten (`web/public/fonts/`, nur benötigte Schnitte, `font-display: swap`),
   nie Google Fonts per Link (Datenschutz).
 
