@@ -73,6 +73,17 @@
   :focus-visible { @apply outline-3 outline-offset-2 outline-brand-500; }
   /* Dark surfaces (brand-500, accent-600) mark themselves with .on-dark: white focus ring */
   .on-dark :focus-visible { @apply outline-white; }
+  /* Light panels inside dark surfaces (header dropdowns, mobile menu) need the blue ring again */
+  .on-dark .bg-white :focus-visible { @apply outline-brand-500; }
+  a, button, summary { -webkit-tap-highlight-color: transparent; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 }
 
 @layer components {

@@ -72,10 +72,10 @@ const enquiry = svc ? withService("/kontakt/", page.title) : "";
         <a href="/karriere/" class="inline-flex min-h-11 items-center gap-2 border-2 border-white/60 px-3 text-sm font-bold uppercase tracking-wide hover:bg-white/10"><Icon name="arrow" class="h-4 w-4 rotate-180" /> Karriere</a>
         <h1 class="h1 mt-6 max-w-4xl">{job.title}</h1>
         <dl class="mt-8 flex flex-wrap gap-x-10 gap-y-3 border-t border-white/40 pt-6">
-          <div><dt class="block text-sm font-bold uppercase tracking-wide text-accent-100">Ort: </dt><dd class="text-lg font-semibold">{job.location}</dd></div>
-          <div><dt class="block text-sm font-bold uppercase tracking-wide text-accent-100">Art: </dt><dd class="text-lg font-semibold">{job.employment_type_label}</dd></div>
-          <div><dt class="block text-sm font-bold uppercase tracking-wide text-accent-100">Beginn: </dt><dd class="text-lg font-semibold">{job.start_date}</dd></div>
-          {job.salary_note && <div><dt class="block text-sm font-bold uppercase tracking-wide text-accent-100">Vergütung: </dt><dd class="text-lg font-semibold">{job.salary_note}</dd></div>}
+          <div><dt class="block text-sm font-bold uppercase tracking-wide text-white">Ort: </dt><dd class="text-lg font-semibold">{job.location}</dd></div>
+          <div><dt class="block text-sm font-bold uppercase tracking-wide text-white">Art: </dt><dd class="text-lg font-semibold">{job.employment_type_label}</dd></div>
+          <div><dt class="block text-sm font-bold uppercase tracking-wide text-white">Beginn: </dt><dd class="text-lg font-semibold">{job.start_date}</dd></div>
+          {job.salary_note && <div><dt class="block text-sm font-bold uppercase tracking-wide text-white">Vergütung: </dt><dd class="text-lg font-semibold">{job.salary_note}</dd></div>}
         </dl>
       </div>
     </div>

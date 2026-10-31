@@ -85,6 +85,34 @@ Achtung im Entwurf: Bei Akzent `#005A96` stehen auf Akzentflächen noch dunkle S
 Leistungsseite: Kopf auf Blau mit Kategorie-Marke, Versal-Titel, Kurztext, Button und Foto;
 Fakten-Leiste; Einleitung zweispaltig; Objektliste als Raster auf Blau; „Passt auch dazu“; Abschlussband.
 
+## Umsetzung (Branch `feat/design-rework`, 31.10.–01.11.2026)
+
+Weitere Entscheidungen während der Umsetzung:
+
+- **Seitenbreite** 1280 px (`container-x` = `max-w-7xl`); Header-Telefonnummer ausgeschrieben erst ab
+  1360 px (Breakpoint `wide`), darunter Symbol-Button; Navigation bis 1024 px ohne Überlauf.
+- **Logo hell** als eigene Website-Einstellung `logo_inverse` (Header und Footer auf Blau).
+- **Neue Felder/Blöcke:** Hero `motto`; Block „Fakten-Leiste“ (`facts`, `{anzahl}` = Zahl der
+  veröffentlichten Leistungen); Call-to-Action mit `style` = Abschlussband mit Telefonnummer
+  (`contact`) oder Karriere-Hinweis (`career`), Telefonnummer kommt aus den Kontakt-Einstellungen;
+  Leistungsseite liefert `category` (Kategorie-Marke im Kopf).
+- **Foto-Ersatz:** `BrandPattern.astro` zeichnet die Logo-Türme, wenn kein Bild gesetzt ist.
+- **Ecken** 2 px (`rounded-ui`), Karten ohne Schatten; lange Listen (ab 6 Einträgen) im Fließtext als Raster.
+- **Bewegung:** nur Farb-/kleine Positionsübergänge; `prefers-reduced-motion` schaltet Übergänge und
+  weiches Scrollen ab.
+- **Vorschau-Banner** anthrazit statt Hellblau (`accent-400` entfällt).
+- **Stock-Fotos** (Pexels/Unsplash, frei, ohne Namensnennung) als Übergang, Quelle steht im Bildtitel
+  der Mediathek; ersetzen, sobald eigene Fotos da sind. Keine Personen frontal, keine fremden Logos,
+  keine Privatwohnungen.
+
+In Produktion nach dem Deploy im Admin nachtragen (falls `import_legacy` dort schon lief): Motto und
+Headline im Hero, Fakten-Leiste und Karriere-Hinweis auf der Startseite, „Logo hell“, Titelbilder.
+
+Audit (produktionsnah, 01.11.2026): alle 8 Seiten a11y/bp/seo 100, axe 0; Performance 100, Startseite
+98 (LCP 2,5 s durch das 232 KB große Hero-Foto mobil).
+
+Vorher/Nachher: `docs/design/ausgangsstand/` ↔ `docs/design/nachher/` (1440 und 390 px).
+
 ## Leitplanken (gelten unverändert)
 
 - Block-Vertrag (`CLAUDE.md`): neue Blöcke/Varianten immer in `cms/blocks/`, `web/src/lib/types.ts`
