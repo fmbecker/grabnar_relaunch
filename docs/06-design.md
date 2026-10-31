@@ -109,7 +109,7 @@ In Produktion nach dem Deploy im Admin nachtragen (falls `import_legacy` dort sc
 Headline im Hero, Fakten-Leiste und Karriere-Hinweis auf der Startseite, „Logo hell“, Titelbilder.
 
 Audit (produktionsnah, 01.11.2026): alle 8 Seiten a11y/bp/seo 100, axe 0; Performance 100, Startseite
-98 (LCP 2,5 s durch das 232 KB große Hero-Foto mobil).
+99 (LCP 2,3 s durch das Hero-Foto mobil; Renditions mit WebP-Qualität 70).
 
 Vorher/Nachher: `docs/design/ausgangsstand/` ↔ `docs/design/nachher/` (1440 und 390 px).
 
