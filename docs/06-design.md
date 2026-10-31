@@ -12,6 +12,8 @@ Felix' Eindruck der aktuellen Seite: „spießig, bieder, visuell noch nicht raf
 3. Flache Typografie: Arial in allen Größen.
 4. Eintönige Farbe: fast nur Markenblau auf Weiß, kein Hell-Dunkel-Wechsel der Abschnitte.
 
+**Brief für die Rework-Sitzung (Design-Skill im Terminal): `docs/design/brief-rework.md`.**
+
 ## Ausgangspunkt: das bestehende einfache Design
 
 Das aktuell umgesetzte Frontend ist der Startpunkt der Überarbeitung (sauberer, funktionierender Code,
