@@ -1,27 +1,29 @@
 ---
 import type { Navigation, Settings } from "@/lib/types";
 import { EVENT, umami } from "@/lib/analytics";
+import BrandPattern from "@/components/ui/BrandPattern.astro";
 interface Props { nav: Navigation; settings: Settings }
 const { nav, settings } = Astro.props;
 const { contact, site } = settings;
-const logo = site.logo_inverse;
+// Light footer so the original (blue, transparent) logo keeps its colours.
+const logo = site.logo;
 ---
-<footer data-track-area="footer" class="on-dark mt-auto bg-brand-500 text-white">
-  <div class="container-x grid gap-12 py-section-sm lg:grid-cols-12 lg:gap-10">
+<footer data-track-area="footer" class="relative mt-auto overflow-hidden border-t-4 border-brand-500 bg-ink-50 text-ink-900">
+  {site.footer_pattern && <BrandPattern tone="light" seed={3} width={2400} class="pointer-events-none absolute inset-x-0 bottom-0 h-full w-full opacity-30" />}
+  <div class="container-x relative grid gap-12 py-section-sm lg:grid-cols-12 lg:gap-10">
     <div class="lg:col-span-6">
-      {logo ? (
-        <img src={logo.url} srcset={`${logo.url} 1x, ${logo.url2x} 2x`} alt="" width={logo.width} height={logo.height} loading="lazy" class="h-14 w-auto" />
-      ) : null}
-      <p class="mt-6 font-display text-subtitle font-extrabold">{contact.company_name}</p>
-      {site.footer_text && <p class="mt-3 max-w-md">{site.footer_text}</p>}
-      <a href={`tel:${contact.phone.replace(/\s/g, "")}`} class="mt-8 inline-block font-display text-title font-extrabold hover:underline decoration-4 underline-offset-8">{contact.phone}</a>
+      {logo && (
+        <img src={logo.url} srcset={`${logo.url} 1x, ${logo.url2x} 2x`} alt="" width={logo.width} height={logo.height} loading="lazy" class="mb-6 h-14 w-auto" />
+      )}
+      <p class="font-display text-subtitle font-extrabold">{contact.company_name}</p>
+      {site.footer_text && <p class="mt-3 max-w-md text-ink-700">{site.footer_text}</p>}
       {site.certificate && (
         <div>
           <a
             href={site.certificate.document_url || "/unternehmen/"}
             target={site.certificate.document_url ? "_blank" : undefined}
             rel={site.certificate.document_url ? "noopener" : undefined}
-            class="mt-8 inline-flex items-center gap-3 rounded-ui bg-white p-2 pr-4 text-sm font-bold text-ink-900 hover:bg-brand-50"
+            class="mt-8 inline-flex items-center gap-3 rounded-ui border border-ink-100 bg-white p-2 pr-4 text-sm font-bold text-ink-900 hover:border-brand-500 hover:text-brand-700"
           >
             <img
               src={site.certificate.seal.url}
@@ -39,25 +41,25 @@ const logo = site.logo_inverse;
     </div>
     <div class="lg:col-span-3">
       <h2 class="font-display text-lg font-extrabold">Kontakt</h2>
-      <address class="mt-3 not-italic leading-relaxed">
+      <address class="mt-3 not-italic leading-relaxed text-ink-700">
         {contact.street}<br />{contact.postal_code} {contact.city}<br />
-        <a href={`mailto:${contact.email}`} class="underline-offset-4 hover:underline">{contact.email}</a>
+        <a href={`mailto:${contact.email}`} class="text-brand-700 underline-offset-4 hover:underline">{contact.email}</a>
       </address>
-      {contact.opening_hours.length > 0 && <ul class="mt-3">{contact.opening_hours.map((l) => <li>{l}</li>)}</ul>}
+      {contact.opening_hours.length > 0 && <ul class="mt-3 text-ink-700">{contact.opening_hours.map((l) => <li>{l}</li>)}</ul>}
     </div>
     <div class="lg:col-span-3">
       <h2 class="font-display text-lg font-extrabold">Navigation</h2>
       <ul class="mt-2">
-        {nav.items.map((i) => <li><a href={i.href} {...umami(EVENT.nav, { item: i.title, menu: "footer" })} class="inline-flex min-h-11 items-center underline-offset-4 hover:underline lg:min-h-9">{i.title}</a></li>)}
+        {nav.items.map((i) => <li><a href={i.href} {...umami(EVENT.nav, { item: i.title, menu: "footer" })} class="inline-flex min-h-11 items-center text-ink-700 underline-offset-4 hover:text-brand-700 hover:underline lg:min-h-9">{i.title}</a></li>)}
       </ul>
     </div>
   </div>
-  <div class="bg-brand-600">
-    <div class="container-x flex flex-col gap-2 py-4 text-sm sm:flex-row sm:items-center sm:justify-between">
+  <div class="relative border-t border-ink-100">
+    <div class="container-x flex flex-col gap-2 py-4 text-sm text-ink-700 sm:flex-row sm:items-center sm:justify-between">
       <p>© {new Date().getFullYear()} {contact.company_name}</p>
       <ul class="flex flex-wrap gap-x-5">
-        {site.footer_links.map((l) => <li><a href={l.href} class="inline-flex min-h-11 items-center underline-offset-4 hover:underline" rel={l.external ? "noopener" : undefined}>{l.label}</a></li>)}
-        {site.social_links.map((s) => <li><a href={s.url} class="inline-flex min-h-11 items-center capitalize underline-offset-4 hover:underline" rel="noopener" target="_blank">{s.platform}</a></li>)}
+        {site.footer_links.map((l) => <li><a href={l.href} class="inline-flex min-h-11 items-center underline-offset-4 hover:text-brand-700 hover:underline" rel={l.external ? "noopener" : undefined}>{l.label}</a></li>)}
+        {site.social_links.map((s) => <li><a href={s.url} class="inline-flex min-h-11 items-center capitalize underline-offset-4 hover:text-brand-700 hover:underline" rel="noopener" target="_blank">{s.platform}</a></li>)}
       </ul>
     </div>
   </div>

@@ -107,6 +107,8 @@ export interface CtaValue {
   link: ApiLink;
   /** "contact" = closing band with phone number, "career" = careers teaser */
   style: "contact" | "career";
+  /** Dimmed tower pattern behind the text */
+  pattern: boolean;
   /** From the contact settings (added by the API). */
   phone: string;
 }
@@ -295,6 +297,8 @@ export interface SiteSettings {
   logo_inverse: LogoImage | null;
   tagline: string;
   footer_text: string;
+  /** Dimmed tower pattern behind the footer */
+  footer_pattern: boolean;
   default_og_image: ApiImage | null;
   footer_links: { label: string; href: string; external: boolean }[];
   social_links: { platform: string; url: string }[];

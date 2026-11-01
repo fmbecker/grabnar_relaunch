@@ -22,7 +22,7 @@ const enquiry = svc ? withService("/kontakt/", page.title) : "";
 {home && (
   <>
     <Hero value={home.hero[0].value} />
-    <BlockRenderer blocks={home.body} contact={settings.contact} sourcePath={path} />
+    <BlockRenderer blocks={home.body} contact={settings.contact} sourcePath={path} ctaPhone={false} />
   </>
 )}
 

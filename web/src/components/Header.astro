@@ -6,13 +6,14 @@ interface Props { nav: Navigation; site: SiteSettings; phone: string; currentPat
 const { nav, site, phone, currentPath } = Astro.props;
 const isActive = (href: string) => href !== "/" && currentPath.startsWith(href);
 const tel = `tel:${phone.replace(/[^\d+]/g, "")}`;
-const logo = site.logo_inverse ?? site.logo;
+// White bar so the original (blue, transparent) logo keeps its colours.
+const logo = site.logo;
 // National format reads faster in the region: "+49 (0) 711 …" -> "0711 …"
 const phoneShort = phone.replace(/^\+49\s*\(0\)\s*(\d+)\s*/, "0$1 ");
 ---
-<header data-track-area="header" class="on-dark sticky top-0 z-40 bg-brand-500 text-white">
+<header data-track-area="header" class="sticky top-0 z-40 border-b border-ink-100 bg-white text-ink-900">
   <div class="container-x flex h-20 items-center justify-between gap-4 xl:gap-6">
-    <a href="/" class="flex shrink-0 items-center gap-2 font-bold text-white" {...umami(EVENT.nav, { item: "Logo", menu: "header" })}>
+    <a href="/" class="flex shrink-0 items-center gap-2 font-bold text-brand-700" {...umami(EVENT.nav, { item: "Logo", menu: "header" })}>
       {logo ? (
         <img src={logo.url} srcset={`${logo.url} 1x, ${logo.url2x} 2x`} alt="M. B. Grabnar GmbH – Startseite" class="h-12 w-auto sm:h-14" width={logo.width} height={logo.height} />
       ) : (
@@ -25,7 +26,7 @@ const phoneShort = phone.replace(/^\+49\s*\(0\)\s*(\d+)\s*/, "0$1 ");
       <ul class="flex items-center gap-0 text-sm font-bold xl:gap-1 xl:text-[0.9375rem]">
         {nav.items.map((item) => (
           <li class="group relative">
-            <a href={item.href} {...umami(EVENT.nav, { item: item.title, level: 1, menu: "desktop" })} class:list={["flex min-h-11 items-center gap-1 whitespace-nowrap rounded-ui px-1.5 py-2 underline-offset-[6px] decoration-2 hover:bg-white/10 xl:px-2.5", isActive(item.href) && "underline"]} aria-current={currentPath === item.href ? "page" : undefined}>
+            <a href={item.href} {...umami(EVENT.nav, { item: item.title, level: 1, menu: "desktop" })} class:list={["flex min-h-11 items-center gap-1 whitespace-nowrap rounded-ui px-1.5 py-2 underline-offset-[6px] decoration-2 hover:bg-brand-50 hover:text-brand-700 xl:px-2.5", isActive(item.href) && "text-brand-700 underline"]} aria-current={currentPath === item.href ? "page" : undefined}>
               {item.title}
               {item.children && item.children.length > 0 && <svg class="h-3 w-3" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5" /></svg>}
             </a>
@@ -48,7 +49,7 @@ const phoneShort = phone.replace(/^\+49\s*\(0\)\s*(\d+)\s*/, "0$1 ");
     <div class="flex items-center gap-2 lg:hidden">
     <a href={tel} class="btn-primary px-3" aria-label={`Anrufen: ${phone}`}><Icon name="phone" class="h-5 w-5" /></a>
     <details class="relative" data-track-toggle="mobile-menu-open" data-track-area="mobile-menu">
-      <summary class="btn-secondary-on-dark min-h-11 cursor-pointer list-none rounded-ui px-4 py-2 font-bold">Menü</summary>
+      <summary class="btn-secondary min-h-11 cursor-pointer list-none rounded-ui px-4 py-2 font-bold">Menü</summary>
       <ul class="absolute right-0 mt-2 max-h-[75vh] w-72 overflow-y-auto rounded-ui bg-white p-2 text-ink-900 shadow-xl">
         {nav.items.map((item) =>
           item.children && item.children.length > 0 ? (
