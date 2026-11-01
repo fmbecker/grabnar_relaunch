@@ -68,6 +68,12 @@ class LinkBlock(blocks.StructBlock):
 
 
 class HeroBlock(blocks.StructBlock):
+    motto = blocks.CharBlock(
+        label=_("Motto"),
+        required=False,
+        max_length=160,
+        help_text=_("Kurzes Zitat über der Überschrift, ohne Anführungszeichen."),
+    )
     headline = blocks.CharBlock(label=_("Überschrift"), max_length=120)
     subline = blocks.TextBlock(label=_("Unterzeile"), required=False, max_length=300)
     image = ApiImageChooserBlock(label=_("Bild"), required=False)
@@ -228,10 +234,28 @@ class CtaBlock(blocks.StructBlock):
     heading = blocks.CharBlock(label=_("Überschrift"), max_length=120)
     text = blocks.TextBlock(label=_("Text"), required=False, max_length=300)
     link = LinkBlock(label=_("Button"))
+    style = blocks.ChoiceBlock(
+        label=_("Darstellung"),
+        choices=[
+            ("contact", _("Abschlussband mit Telefonnummer")),
+            ("career", _("Karriere-Hinweis")),
+        ],
+        default="contact",
+    )
 
     class Meta:
         icon = "pick"
         label = _("Call-to-Action")
+
+    def get_api_representation(self, value, context=None):
+        from wagtail.models import Site
+
+        from site_settings.models import ContactSettings
+
+        data = super().get_api_representation(value, context)
+        site = Site.objects.filter(is_default_site=True).first()
+        data["phone"] = ContactSettings.for_site(site).phone if site else ""
+        return data
 
 
 class ContactFormBlock(blocks.StructBlock):
@@ -332,9 +356,41 @@ class CertificateBlock(blocks.StructBlock):
         }
 
 
+class FactsBlock(blocks.StructBlock):
+    """Bar of short facts below the hero (Meisterbetrieb · ISO 9001 · …).
+    "{anzahl}" in an item is replaced by the number of published service pages."""
+
+    COUNT_PLACEHOLDER = "{anzahl}"
+
+    items = blocks.ListBlock(
+        blocks.CharBlock(max_length=40),
+        label=_("Fakten"),
+        min_num=2,
+        max_num=6,
+        help_text=_(
+            "Kurze Stichworte. „{anzahl}“ wird durch die Zahl der veröffentlichten "
+            "Leistungsseiten ersetzt, z. B. „{anzahl} Leistungen“."
+        ),
+    )
+
+    class Meta:
+        icon = "list-ul"
+        label = _("Fakten-Leiste")
+
+    def get_api_representation(self, value, context=None):
+        items = list(value["items"])
+        if any(self.COUNT_PLACEHOLDER in item for item in items):
+            from services.models import ServicePage
+
+            count = str(ServicePage.objects.live().public().count())
+            items = [item.replace(self.COUNT_PLACEHOLDER, count) for item in items]
+        return {"items": items}
+
+
 class BodyStreamBlock(blocks.StreamBlock):
     """The body of every page type. HeroBlock is a separate field on HomePage."""
 
+    facts = FactsBlock()
     rich_text = RichTextBlock()
     text_image = TextImageBlock()
     service_grid = ServiceGridBlock()

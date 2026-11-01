@@ -1,14 +1,15 @@
 ---
 /** CertificateBlock: the ISO seal from the site settings. Renders nothing until a seal is uploaded. */
 import type { CertificateValue } from "@/lib/types";
+import Icon from "@/components/ui/Icon.astro";
 interface Props { value: CertificateValue }
 const { value } = Astro.props;
 const seal = value.seal;
 ---
 {seal && (
-  <section class="section">
+  <section class="section-sm">
     <div class="container-x">
-      <div class="flex flex-col items-center gap-6 rounded-xl border border-ink-100 bg-white p-8 text-center sm:flex-row sm:text-left">
+      <div class="grid items-center gap-8 border-y-4 border-brand-500 py-10 sm:grid-cols-[auto_1fr] sm:gap-12">
         <img
           src={seal.url}
           srcset={`${seal.url} 1x, ${seal.url2x} 2x`}
@@ -16,13 +17,13 @@ const seal = value.seal;
           height={seal.height}
           alt={seal.alt}
           loading="lazy"
-          class="h-32 w-auto shrink-0 sm:h-40"
+          class="h-32 w-auto sm:h-40"
         />
         <div>
           {value.heading && <h2 class="h2">{value.heading}</h2>}
-          {value.text && <p class="mt-2 max-w-2xl text-ink-700">{value.text}</p>}
+          {value.text && <p class="lead mt-3 max-w-2xl text-ink-700">{value.text}</p>}
           {value.document_url && (
-            <p class="mt-4"><a class="btn-link" href={value.document_url} target="_blank" rel="noopener">Zertifikat ansehen (PDF)</a></p>
+            <a class="btn-secondary mt-6" href={value.document_url} target="_blank" rel="noopener">Zertifikat ansehen (PDF) <Icon name="arrow" class="h-4 w-4" /></a>
           )}
         </div>
       </div>

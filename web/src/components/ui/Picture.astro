@@ -24,6 +24,7 @@ const srcset = [r.thumb, r.card, r.wide, r.hero]
   height={main.height}
   alt={image.alt}
   loading={loading}
-  decoding="async"
+  fetchpriority={loading === "eager" ? "high" : undefined}
+  decoding={loading === "eager" ? "sync" : "async"}
   class={cls}
 />

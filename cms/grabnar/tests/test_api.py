@@ -31,7 +31,13 @@ def test_navigation_has_categories_with_children(client):
 
 def test_home_shows_categories(client):
     page = client.get("/api/v2/pages/", {"type": "home.HomePage", "fields": "*"}).json()["items"][0]
-    assert page["hero"][0]["value"]["headline"].startswith("Zusammenkommen")
+    assert page["hero"][0]["value"]["motto"].startswith("Zusammenkommen")
+    assert page["hero"][0]["value"]["headline"].startswith("Reinigung")
+    assert page["body"][0]["type"] == "facts"
+    assert "22 Leistungen" in page["body"][0]["value"]["items"]  # {anzahl} = live service pages
+    ctas = [b["value"] for b in page["body"] if b["type"] == "cta"]
+    assert [c["style"] for c in ctas] == ["career", "contact"]
+    assert ctas[-1]["phone"]  # closing band shows the phone number from the settings
     grid = next(b for b in page["body"] if b["type"] == "service_grid")["value"]
     assert grid["kind"] == "categories" and len(grid["services"]) == 4
     assert grid["services"][0]["children"][0]["href"].startswith("/gebaeudereinigung/")
@@ -45,6 +51,7 @@ def test_service_page_content_and_list(client):
     assert page["meta"]["html_url"].endswith("/services/wachdienste/")
     assert "<li>Citystreifen</li>" in page["body"][0]["value"]
     assert page["teaser"] and len(page["related"]) == 2
+    assert page["category"] == {"title": "Services", "href": "/services/"}
 
 
 def test_category_grid_lists_its_services(client):

@@ -9,7 +9,7 @@ const imgFirst = value.image_position === "left";
 <section class="section">
   <div class="container-x grid items-center gap-10 lg:grid-cols-2">
     <div class={imgFirst ? "lg:order-1" : "lg:order-2"}>
-      <Picture image={value.image} variant="card" class="w-full rounded-lg object-cover shadow-sm" />
+      <Picture image={value.image} variant="card" class="aspect-[4/3] w-full object-cover" />
     </div>
     <div class={imgFirst ? "lg:order-2" : "lg:order-1"}>
       {value.heading && <h2 class="h2 mb-4">{value.heading}</h2>}

@@ -1,14 +1,37 @@
 ---
 import type { CtaValue } from "@/lib/types";
 import LinkButton from "@/components/ui/LinkButton.astro";
+import BrandPattern from "@/components/ui/BrandPattern.astro";
 interface Props { value: CtaValue; service?: string }
 const { value, service } = Astro.props;
+// Phone tracking is added automatically for tel: links (Analytics.astro).
+const tel = value.phone ? `tel:${value.phone.replace(/\s/g, "")}` : "";
 ---
-<section class="section">
-  <div class="container-x">
-    <div class="flex flex-col items-start gap-6 rounded-xl bg-brand-50 p-8 sm:flex-row sm:items-center sm:justify-between sm:p-10">
-      <div><h2 class="h2">{value.heading}</h2>{value.text && <p class="mt-2 text-ink-700">{value.text}</p>}</div>
-      <LinkButton block="cta" link={value.link} service={service} class="shrink-0" />
+{value.style === "career" ? (
+  <section class="section bg-brand-50">
+    <div class="container-x grid items-center gap-10 lg:grid-cols-12">
+      <div class="lg:col-span-7">
+        <h2 class="h2">{value.heading}</h2>
+        {value.text && <p class="lead mt-4 max-w-[46ch] text-ink-700">{value.text}</p>}
+        <LinkButton block="cta" link={value.link} service={service} class="mt-8" />
+      </div>
+      <BrandPattern tone="light" seed={2} class="hidden aspect-[4/3] w-full lg:col-span-5 lg:block" />
     </div>
-  </div>
-</section>
+  </section>
+) : (
+  <section class="band-accent on-dark bg-accent-600 text-white">
+    <div class="container-x py-section">
+      <div class="max-w-3xl">
+        <h2 class="h2">{value.heading}</h2>
+        {value.text && <p class="lead mt-4 max-w-[46ch] text-accent-100">{value.text}</p>}
+        <LinkButton block="cta" link={value.link} service={service} class="mt-8" />
+      </div>
+      {tel && (
+        <div class="mt-12 border-t border-white/40 pt-8">
+          <p class="text-sm font-bold uppercase tracking-wide text-accent-100">Oder direkt anrufen</p>
+          <a href={tel} class="mt-2 inline-block font-display text-[clamp(2rem,0.9rem+5vw,5.5rem)] font-extrabold leading-none sm:whitespace-nowrap decoration-4 underline-offset-8 hover:underline">{value.phone}</a>
+        </div>
+      )}
+    </div>
+  </section>
+)}

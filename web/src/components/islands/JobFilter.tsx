@@ -48,17 +48,17 @@ export default function JobFilter({ jobs }: Props) {
       {visible.length === 0 ? (
         <p className="text-ink-700">Keine Stellen für diese Auswahl.</p>
       ) : (
-        <ul className="grid gap-4">
+        <ul className="border-t-4 border-brand-500">
           {visible.map((j) => (
             <li key={j.id}>
-              <a href={j.href} {...umami(EVENT.jobOpen, { job: j.title })} className="flex items-center justify-between rounded-lg border border-ink-100 bg-white p-5 hover:border-brand-300">
+              <a href={j.href} {...umami(EVENT.jobOpen, { job: j.title })} className="group flex items-center justify-between gap-6 border-b border-ink-100 bg-white px-1 py-6 hover:bg-brand-50 sm:px-4">
                 <div>
-                  <h3 className="h3">{j.title}</h3>
-                  <p className="mt-1 text-sm text-ink-500">
+                  <h3 className="h3 group-hover:text-brand-700">{j.title}</h3>
+                  <p className="mt-2 text-ink-700">
                     {j.location} · {j.employment_type_label} · {j.start_date}
                   </p>
                 </div>
-                <span aria-hidden="true" className="text-brand-600">
+                <span aria-hidden="true" className="grid h-11 w-11 shrink-0 place-items-center bg-brand-500 text-xl text-white">
                   →
                 </span>
               </a>

@@ -82,6 +82,15 @@ class SiteSettings(BaseSiteSetting, ClusterableModel):
         on_delete=models.SET_NULL,
         related_name="+",
     )
+    # White logo for blue surfaces (header, hero, footer); falls back to the regular logo.
+    logo_inverse = models.ForeignKey(
+        "wagtailimages.Image",
+        verbose_name=_("Logo hell (auf Blau)"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
     tagline = models.CharField(_("Claim"), max_length=120, blank=True)
     footer_text = models.TextField(_("Footer-Text"), blank=True, max_length=400)
     default_og_image = models.ForeignKey(
@@ -152,7 +161,13 @@ class SiteSettings(BaseSiteSetting, ClusterableModel):
 
     panels = [
         MultiFieldPanel(
-            [FieldPanel("logo"), FieldPanel("tagline"), FieldPanel("default_og_image")], _("Marke")
+            [
+                FieldPanel("logo"),
+                FieldPanel("logo_inverse"),
+                FieldPanel("tagline"),
+                FieldPanel("default_og_image"),
+            ],
+            _("Marke"),
         ),
         FieldPanel("footer_text"),
         InlinePanel("footer_links", label=_("Footer-Links")),
@@ -184,6 +199,7 @@ class SiteSettings(BaseSiteSetting, ClusterableModel):
     def to_api(self) -> dict:
         return {
             "logo": logo_api_representation(self.logo),
+            "logo_inverse": logo_api_representation(self.logo_inverse),
             "tagline": self.tagline,
             "footer_text": self.footer_text,
             "default_og_image": image_api_representation(self.default_og_image),

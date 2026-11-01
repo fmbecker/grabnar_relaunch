@@ -47,10 +47,12 @@ Dateien brauchen dessen Laufzeit zum Rendern, lesbar sind sie als HTML mit Inlin
 **Aufbau von Richtung B, Farben aus den Markenvorgaben** (nicht Marineblau/Gelb des ersten Entwurfs):
 
 - Dunkle Abschnitte (Header, Hero, Merkmale, „Wo wir reinigen“, Footer): Logo-Blau `#2D78BC` (`brand-500`).
-- Akzent: im Entwurf zuletzt von Felix auf **`#005A96`** gestellt, Schrift darauf `#DDE9F4` – vorher
-  Logo-Hellblau `#8BC1E5`. ⬜ Mit Felix klären, welcher Akzent gilt (`#005A96` ist nicht in `global.css`).
-- Überschriften-Schrift: im Entwurf zuletzt **Manrope** gewählt. ⬜ Mit Felix bestätigen
-  (bisherige Entscheidung: Arial überall, `docs/02-konzept.md`). Fließtext bleibt Arial. Eine
+- Akzent: **`#005A96`** (✅ Felix, 31.10.2026, nach Hero-Vergleich), Schrift darauf Weiß oder `#DDE9F4`.
+  Logo-Hellblau `#8BC1E5` bleibt Teil der Markenskala, ist aber nicht der Akzent.
+- Überschriften-Schrift: **Manrope 800** (✅ Felix, 31.10.2026; ersetzt „Arial überall“ aus
+  `docs/02-konzept.md` für Überschriften).
+- Hero: Motto als kleines Zitat, darüber/darunter die Headline „Reinigung, Dienste und Handwerk aus
+  einer Hand“ (✅ Felix, 31.10.2026) – Hero-Block bekommt dafür ein Motto-Feld. Fließtext bleibt Arial. Eine
   Zusatzschrift selbst hosten (`web/public/fonts/`, nur benötigte Schnitte, `font-display: swap`),
   nie Google Fonts per Link (Datenschutz).
 
@@ -82,6 +84,34 @@ Achtung im Entwurf: Bei Akzent `#005A96` stehen auf Akzentflächen noch dunkle S
 
 Leistungsseite: Kopf auf Blau mit Kategorie-Marke, Versal-Titel, Kurztext, Button und Foto;
 Fakten-Leiste; Einleitung zweispaltig; Objektliste als Raster auf Blau; „Passt auch dazu“; Abschlussband.
+
+## Umsetzung (Branch `feat/design-rework`, 31.10.–01.11.2026)
+
+Weitere Entscheidungen während der Umsetzung:
+
+- **Seitenbreite** 1280 px (`container-x` = `max-w-7xl`); Header-Telefonnummer ausgeschrieben erst ab
+  1360 px (Breakpoint `wide`), darunter Symbol-Button; Navigation bis 1024 px ohne Überlauf.
+- **Logo hell** als eigene Website-Einstellung `logo_inverse` (Header und Footer auf Blau).
+- **Neue Felder/Blöcke:** Hero `motto`; Block „Fakten-Leiste“ (`facts`, `{anzahl}` = Zahl der
+  veröffentlichten Leistungen); Call-to-Action mit `style` = Abschlussband mit Telefonnummer
+  (`contact`) oder Karriere-Hinweis (`career`), Telefonnummer kommt aus den Kontakt-Einstellungen;
+  Leistungsseite liefert `category` (Kategorie-Marke im Kopf).
+- **Foto-Ersatz:** `BrandPattern.astro` zeichnet die Logo-Türme, wenn kein Bild gesetzt ist.
+- **Ecken** 2 px (`rounded-ui`), Karten ohne Schatten; lange Listen (ab 6 Einträgen) im Fließtext als Raster.
+- **Bewegung:** nur Farb-/kleine Positionsübergänge; `prefers-reduced-motion` schaltet Übergänge und
+  weiches Scrollen ab.
+- **Vorschau-Banner** anthrazit statt Hellblau (`accent-400` entfällt).
+- **Stock-Fotos** (Pexels/Unsplash, frei, ohne Namensnennung) als Übergang, Quelle steht im Bildtitel
+  der Mediathek; ersetzen, sobald eigene Fotos da sind. Keine Personen frontal, keine fremden Logos,
+  keine Privatwohnungen.
+
+In Produktion nach dem Deploy im Admin nachtragen (falls `import_legacy` dort schon lief): Motto und
+Headline im Hero, Fakten-Leiste und Karriere-Hinweis auf der Startseite, „Logo hell“, Titelbilder.
+
+Audit (produktionsnah, 01.11.2026): alle 8 Seiten a11y/bp/seo 100, axe 0; Performance 100, Startseite
+99 (LCP 2,3 s durch das Hero-Foto mobil; Renditions mit WebP-Qualität 70).
+
+Vorher/Nachher: `docs/design/ausgangsstand/` ↔ `docs/design/nachher/` (1440 und 390 px).
 
 ## Leitplanken (gelten unverändert)
 

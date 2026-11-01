@@ -1,14 +1,22 @@
 ---
 import Base from "@/layouts/Base.astro";
+import BrandPattern from "@/components/ui/BrandPattern.astro";
 import { getNavigation, getSettings } from "@/lib/wagtail";
 const [settings, nav] = await Promise.all([getSettings(), getNavigation()]);
 ---
 <Base settings={settings} nav={nav} title="Seite nicht gefunden" path="/404/" noindex>
-  <section class="section"><div class="container-x text-center">
-    <h1 class="h1">Seite nicht gefunden</h1>
-    <p class="mt-4 text-ink-700">Die Adresse existiert nicht mehr oder wurde verschoben.</p>
-    <a href="/" class="btn-primary mt-8">Zur Startseite</a>
-  </div></section>
+  <section class="on-dark relative isolate overflow-hidden bg-brand-500 text-white">
+    <BrandPattern tone="dark" seed={3} class="absolute inset-x-0 bottom-0 -z-10 h-2/3 w-full" />
+    <div class="container-x py-section">
+      <p class="font-display text-[clamp(5rem,3rem+10vw,12rem)] font-extrabold leading-none text-white/30" aria-hidden="true">404</p>
+      <h1 class="h1 mt-4">Seite nicht gefunden</h1>
+      <p class="lead mt-5 max-w-[46ch]">Die Adresse existiert nicht mehr oder wurde verschoben.</p>
+      <div class="mt-8 flex flex-wrap gap-4">
+        <a href="/" class="btn-primary">Zur Startseite</a>
+        <a href="/kontakt/" class="btn-secondary-on-dark btn-secondary">Kontakt</a>
+      </div>
+    </div>
+  </section>
   <script>
     import { EVENT, track } from "@/lib/analytics";
     // Which old or mistyped addresses still get visits (no query string, only the referring host).

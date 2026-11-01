@@ -109,7 +109,7 @@ Die Skala steht in `web/src/styles/global.css` (`@theme`). Das Bootstrap-Blau `#
 
 **Logo:** `docs/assets/logo-mbgrabnar.png` (917 × 539, transparent, Original vom Server). `import_legacy` übernimmt es in die Mediathek und setzt es in den Website-Einstellungen; das Frontend nutzt unbeschnittene Renditions (`height-80`/`height-160`, 1x/2x). Favicon und Touch-Icon (`web/public/`) zeigen die drei Gebäude-Türme aus dem Logo. ⬜ Vektorversion (SVG) bei der Firma anfragen bzw. nachbauen und abnehmen lassen.
 
-**Typografie:** Arial (entschieden 30.10.2026, wie auf der Altseite). Keine Webfonts: `--font-sans: Arial, "Helvetica Neue", Helvetica, sans-serif` in `web/src/styles/global.css`.
+**Typografie:** Fließtext Arial (entschieden 30.10.2026); Überschriften Manrope 800, selbst gehostet (31.10.2026, siehe `docs/06-design.md`).
 
 **Weiteres:**
 - Bildsprache: echte Fotos von Team und Objekten statt Stock (die Altseite nutzt fast nur Unsplash).

@@ -1,6 +1,7 @@
 ---
 /** Maps StreamField blocks to components. Keep in sync with cms/blocks/blocks.py. */
 import type { Block, ContactSettings, JobSummary } from "@/lib/types";
+import Facts from "./Facts.astro";
 import RichText from "./RichText.astro";
 import TextImage from "./TextImage.astro";
 import ServiceGrid from "./ServiceGrid.astro";
@@ -27,6 +28,7 @@ const { blocks, contact, sourcePath, job, service } = Astro.props;
 ---
 {blocks.map((b) => {
   switch (b.type) {
+    case "facts": return <Facts value={b.value} />;
     case "rich_text": return <RichText value={b.value} />;
     case "text_image": return <TextImage value={b.value} service={service} />;
     case "service_grid": return <ServiceGrid value={b.value} />;
@@ -35,7 +37,7 @@ const { blocks, contact, sourcePath, job, service } = Astro.props;
     case "testimonial": return <Testimonial value={b.value} />;
     case "faq": return <Faq value={b.value} />;
     case "cta": return <Cta value={b.value} service={service} />;
-    case "contact_form": return <ContactForm value={b.value} sourcePath={sourcePath} job={job} />;
+    case "contact_form": return <ContactForm value={b.value} sourcePath={sourcePath} job={job} contact={contact} />;
     case "job_list": return <JobList value={b.value} />;
     case "map": return <Map value={b.value} contact={contact} />;
     case "gallery": return <Gallery value={b.value} />;

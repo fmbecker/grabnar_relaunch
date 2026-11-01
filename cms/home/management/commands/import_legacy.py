@@ -317,12 +317,15 @@ class Command(BaseCommand):
         return lead, html[: m.start()] + new_p + html[m.end() :]
 
     @staticmethod
-    def import_logo(source: Path) -> Image | None:
-        """docs/assets/logo-mbgrabnar.png -> Wagtail image (reused if already imported)."""
-        path = source / "assets" / "logo-mbgrabnar.png"
+    def import_logo(
+        source: Path,
+        filename: str = "logo-mbgrabnar.png",
+        title: str = "Logo M. B. Grabnar GmbH",
+    ) -> Image | None:
+        """docs/assets/<filename> -> Wagtail image (reused if already imported)."""
+        path = source / "assets" / filename
         if not path.is_file():
             return None
-        title = "Logo M. B. Grabnar GmbH"
         existing = Image.objects.filter(title=title).first()
         if existing:
             return existing
@@ -389,7 +392,8 @@ class Command(BaseCommand):
                 (
                     "hero",
                     {
-                        "headline": motto,
+                        "motto": motto.rstrip("."),
+                        "headline": "Reinigung, Dienste und Handwerk aus einer Hand",
                         "subline": (
                             "Ihr Meisterbetrieb für Gebäudereinigung, Gebäudedienste und "
                             "Handwerkerleistungen in Stuttgart und der Region."
@@ -654,6 +658,18 @@ class Command(BaseCommand):
         ]
         home.body = [
             (
+                "facts",
+                {
+                    "items": [
+                        "Meisterbetrieb",
+                        "ISO 9001",
+                        "ISO 14001",
+                        "{anzahl} Leistungen",
+                        "Stuttgart & Region",
+                    ]
+                },
+            ),
+            (
                 "service_grid",
                 {
                     "heading": "Unsere Leistungen",
@@ -671,6 +687,20 @@ class Command(BaseCommand):
                     "features": [
                         {"icon": i, "title": t, "text": x} for i, t, x, _src in FEATURES[:3]
                     ],
+                },
+            ),
+            (
+                "cta",
+                {
+                    "heading": "Arbeiten bei M. B. Grabnar",
+                    "text": jobs.intro,
+                    "link": {
+                        "label": "Offene Stellen ansehen",
+                        "page": jobs,
+                        "url": "",
+                        "style": "secondary",
+                    },
+                    "style": "career",
                 },
             ),
             cta("Maßgeschneidertes Gebäudemanagement für Ihr Objekt"),
@@ -696,6 +726,9 @@ class Command(BaseCommand):
             "in Stuttgart."
         )
         ss.logo = self.import_logo(source)
+        ss.logo_inverse = self.import_logo(
+            source, "logo-mbgrabnar-weiss.png", "Logo M. B. Grabnar GmbH (weiß)"
+        )
         ss.save()
         ss.footer_links.all().delete()
         for page in legal_pages:

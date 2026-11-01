@@ -2,6 +2,7 @@
 import type { ServiceGridValue } from "@/lib/types";
 import Icon from "@/components/ui/Icon.astro";
 import Picture from "@/components/ui/Picture.astro";
+import BrandPattern from "@/components/ui/BrandPattern.astro";
 import { EVENT, umami } from "@/lib/analytics";
 interface Props {
   value: ServiceGridValue;
@@ -10,52 +11,79 @@ interface Props {
 }
 const { value, list = "category" } = Astro.props;
 const isCategories = value.kind === "categories";
+const pad = (n: number) => String(n + 1).padStart(2, "0");
 ---
-<section class="section bg-ink-50">
-  <div class="container-x">
-    {value.heading && <h2 class="h2">{value.heading}</h2>}
-    {value.intro && <p class="mt-3 max-w-2xl text-ink-700">{value.intro}</p>}
+{isCategories ? (
+  <section class="section bg-white">
+    <div class="container-x">
+      <div class="max-w-3xl">
+        {value.heading && <h2 class="h2">{value.heading}</h2>}
+        {value.intro && <p class="lead mt-4 text-ink-700">{value.intro}</p>}
+      </div>
 
-    {isCategories ? (
-      <ul class="mt-10 grid gap-6 md:grid-cols-2">
-        {value.services.map((c) => (
-          <li class="flex flex-col overflow-hidden rounded-lg border border-ink-100 bg-white shadow-sm">
-            {c.image && <a href={c.href} tabindex="-1" aria-hidden="true" {...umami(EVENT.category, { category: c.title, target: "overview" })}><Picture image={c.image} variant="wide" sizes="(min-width: 768px) 50vw, 100vw" class="aspect-[16/7] w-full object-cover" /></a>}
-            <div class="flex flex-1 flex-col p-6">
-              <div class="flex items-center gap-3">
-                <span class="rounded-md bg-brand-600 p-2 text-white"><Icon name={c.icon} class="h-6 w-6" /></span>
-                <h3 class="text-xl font-bold"><a href={c.href} class="hover:text-brand-700" {...umami(EVENT.category, { category: c.title, target: "overview" })}>{c.title}</a></h3>
+      <ul class="mt-12 space-y-16 lg:mt-16 lg:space-y-24">
+        {value.services.map((c, i) => {
+          const flip = i % 2 === 1;
+          const overview = umami(EVENT.category, { category: c.title, target: "overview" });
+          return (
+            <li class="grid items-center gap-8 lg:grid-cols-12 lg:gap-12">
+              <a href={c.href} tabindex="-1" aria-hidden="true" {...overview}
+                class:list={["block overflow-hidden bg-brand-50 lg:col-span-6", flip && "lg:order-2 lg:col-start-7"]}>
+                {c.image
+                  ? <Picture image={c.image} variant="wide" sizes="(min-width: 1024px) 50vw, 100vw" class="aspect-[4/3] w-full object-cover transition-transform duration-500 hover:scale-[1.02] motion-reduce:transition-none motion-reduce:hover:scale-100" />
+                  : <BrandPattern tone="light" seed={i} class="aspect-[4/3] w-full" />}
+              </a>
+              <div class:list={["lg:col-span-6", flip && "lg:order-1 lg:col-start-1 lg:row-start-1"]}>
+                <p class="font-display text-lg font-extrabold text-accent-600" aria-hidden="true">{pad(i)}</p>
+                <h3 class="h2 mt-2">
+                  <a href={c.href} class="hover:text-brand-700 hover:underline decoration-2 underline-offset-4" {...overview}>{c.title}</a>
+                </h3>
+                {c.children && c.children.length > 0 ? (
+                  <ul class="mt-6 grid border-t border-ink-100 sm:grid-cols-2 sm:gap-x-8">
+                    {c.children.map((s) => (
+                      <li class="border-b border-ink-100">
+                        <a href={s.href} class="group flex min-h-11 items-center justify-between gap-3 py-2.5 text-ink-900 hover:text-brand-700" {...umami(EVENT.category, { category: c.title, target: "service", service: s.title })}>
+                          {s.title}
+                          <Icon name="arrow" class="h-4 w-4 shrink-0 text-brand-500 transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none" />
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  c.teaser && <p class="mt-4 text-ink-700">{c.teaser}</p>
+                )}
+                <a href={c.href} class="btn-secondary mt-8" {...overview}>Zu {c.title} <Icon name="arrow" class="h-4 w-4" /></a>
               </div>
-              {c.children && c.children.length > 0 && (
-                <ul class="mt-3 grid gap-x-6 text-sm sm:grid-cols-2">
-                  {c.children.map((s) => (
-                    <li><a href={s.href} class="inline-block py-1 text-ink-700 hover:text-brand-700 hover:underline" {...umami(EVENT.category, { category: c.title, target: "service", service: s.title })}>{s.title}</a></li>
-                  ))}
-                </ul>
-              )}
-              <a href={c.href} class="btn-link mt-auto pt-5 text-sm" {...umami(EVENT.category, { category: c.title, target: "overview" })}>Alle Leistungen <Icon name="arrow" class="h-4 w-4" /></a>
-            </div>
-          </li>
-        ))}
+            </li>
+          );
+        })}
       </ul>
-    ) : (
+    </div>
+  </section>
+) : (
+  <section class="section bg-ink-50">
+    <div class="container-x">
+      {value.heading && <h2 class="h2">{value.heading}</h2>}
+      {value.intro && <p class="lead mt-4 max-w-2xl text-ink-700">{value.intro}</p>}
       <ul class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {value.services.map((s) => (
+        {value.services.map((s, i) => (
           <li>
-            <a href={s.href} {...umami(EVENT.service, { service: s.title, list })} class="group flex h-full flex-col overflow-hidden rounded-lg border border-ink-100 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-              {s.image && <Picture image={s.image} variant="card" sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" class="aspect-[4/3] w-full object-cover" />}
-              <div class="flex flex-1 flex-col p-5">
-                <div class="flex items-center gap-3">
-                  <span class="rounded-md bg-brand-50 p-2 text-brand-700"><Icon name={s.icon} class="h-5 w-5" /></span>
-                  <h3 class="h3 group-hover:text-brand-700">{s.title}</h3>
-                </div>
-                <p class="mt-3 text-sm text-ink-700">{s.teaser}</p>
-                <span class="btn-link mt-auto pt-4 text-sm">Mehr erfahren <Icon name="arrow" class="h-4 w-4" /></span>
+            <a href={s.href} {...umami(EVENT.service, { service: s.title, list })} class="group flex h-full flex-col border border-ink-100 bg-white transition-colors hover:border-brand-500 motion-reduce:transition-none">
+              <div class="relative overflow-hidden bg-brand-50">
+                {s.image
+                  ? <Picture image={s.image} variant="card" sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" class="aspect-[3/2] w-full object-cover" />
+                  : <BrandPattern tone="light" seed={i} class="aspect-[3/2] w-full" />}
+                <span class="absolute bottom-0 left-0 bg-brand-500 p-2.5 text-white"><Icon name={s.icon} class="h-5 w-5" /></span>
+              </div>
+              <div class="flex flex-1 flex-col border-t-4 border-transparent p-6 group-hover:border-brand-500">
+                <h3 class="h4 uppercase group-hover:text-brand-700">{s.title}</h3>
+                {s.teaser && <p class="mt-3 text-ink-700">{s.teaser}</p>}
+                <span class="mt-auto inline-flex items-center gap-2 pt-5 font-semibold text-brand-700">Mehr erfahren <Icon name="arrow" class="h-4 w-4 transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none" /></span>
               </div>
             </a>
           </li>
         ))}
       </ul>
-    )}
-  </div>
-</section>
+    </div>
+  </section>
+)}

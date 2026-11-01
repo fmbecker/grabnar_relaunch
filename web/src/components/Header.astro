@@ -6,12 +6,15 @@ interface Props { nav: Navigation; site: SiteSettings; phone: string; currentPat
 const { nav, site, phone, currentPath } = Astro.props;
 const isActive = (href: string) => href !== "/" && currentPath.startsWith(href);
 const tel = `tel:${phone.replace(/[^\d+]/g, "")}`;
+const logo = site.logo_inverse ?? site.logo;
+// National format reads faster in the region: "+49 (0) 711 …" -> "0711 …"
+const phoneShort = phone.replace(/^\+49\s*\(0\)\s*(\d+)\s*/, "0$1 ");
 ---
-<header data-track-area="header" class="sticky top-0 z-40 border-b border-ink-100 bg-white/95 backdrop-blur">
-  <div class="container-x flex h-20 items-center justify-between gap-6">
-    <a href="/" class="flex shrink-0 items-center gap-2 font-bold text-brand-700" {...umami(EVENT.nav, { item: "Logo", menu: "header" })}>
-      {site.logo ? (
-        <img src={site.logo.url} srcset={`${site.logo.url} 1x, ${site.logo.url2x} 2x`} alt="M. B. Grabnar GmbH – Startseite" class="h-14 w-auto" width={site.logo.width} height={site.logo.height} />
+<header data-track-area="header" class="on-dark sticky top-0 z-40 bg-brand-500 text-white">
+  <div class="container-x flex h-20 items-center justify-between gap-4 xl:gap-6">
+    <a href="/" class="flex shrink-0 items-center gap-2 font-bold text-white" {...umami(EVENT.nav, { item: "Logo", menu: "header" })}>
+      {logo ? (
+        <img src={logo.url} srcset={`${logo.url} 1x, ${logo.url2x} 2x`} alt="M. B. Grabnar GmbH – Startseite" class="h-12 w-auto sm:h-14" width={logo.width} height={logo.height} />
       ) : (
         <span class="text-lg">M. B. Grabnar</span>
       )}
@@ -19,17 +22,17 @@ const tel = `tel:${phone.replace(/[^\d+]/g, "")}`;
 
     <!-- Desktop: hover/focus dropdowns, no JS -->
     <nav aria-label="Hauptnavigation" class="hidden lg:block">
-      <ul class="flex items-center gap-0.5 text-sm font-medium xl:gap-1">
+      <ul class="flex items-center gap-0 text-sm font-bold xl:gap-1 xl:text-[0.9375rem]">
         {nav.items.map((item) => (
           <li class="group relative">
-            <a href={item.href} {...umami(EVENT.nav, { item: item.title, level: 1, menu: "desktop" })} class:list={["flex items-center gap-1 whitespace-nowrap rounded-md px-2.5 py-2 hover:bg-ink-50 hover:text-brand-700", isActive(item.href) && "text-brand-700"]} aria-current={currentPath === item.href ? "page" : undefined}>
+            <a href={item.href} {...umami(EVENT.nav, { item: item.title, level: 1, menu: "desktop" })} class:list={["flex min-h-11 items-center gap-1 whitespace-nowrap rounded-ui px-1.5 py-2 underline-offset-[6px] decoration-2 hover:bg-white/10 xl:px-2.5", isActive(item.href) && "underline"]} aria-current={currentPath === item.href ? "page" : undefined}>
               {item.title}
               {item.children && item.children.length > 0 && <svg class="h-3 w-3" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5" /></svg>}
             </a>
             {item.children && item.children.length > 0 && (
-              <ul class="invisible absolute left-0 top-full z-50 w-64 rounded-md border border-ink-100 bg-white p-2 opacity-0 shadow-lg transition group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
+              <ul class="invisible absolute left-0 top-full z-50 w-64 rounded-ui bg-white p-2 text-ink-900 font-normal opacity-0 shadow-xl transition group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
                 {item.children.map((c) => (
-                  <li><a href={c.href} {...umami(EVENT.nav, { item: c.title, parent: item.title, level: 2, menu: "desktop" })} class:list={["block rounded px-3 py-2 hover:bg-ink-50 hover:text-brand-700", currentPath === c.href && "text-brand-700"]}>{c.title}</a></li>
+                  <li><a href={c.href} {...umami(EVENT.nav, { item: c.title, parent: item.title, level: 2, menu: "desktop" })} class:list={["block rounded-ui px-3 py-2 hover:bg-brand-50 hover:text-brand-700", currentPath === c.href && "font-bold text-brand-700"]}>{c.title}</a></li>
                 ))}
               </ul>
             )}
@@ -37,14 +40,16 @@ const tel = `tel:${phone.replace(/[^\d+]/g, "")}`;
         ))}
       </ul>
     </nav>
-    <!-- Phone: icon only while the menu needs the space, full number on very wide screens -->
-    <a href={tel} class="btn-primary hidden px-3 xl:inline-flex 2xl:hidden" aria-label={`Anrufen: ${phone}`} title={phone}><Icon name="phone" class="h-4 w-4" /></a>
-    <a href={tel} class="btn-primary hidden whitespace-nowrap 2xl:inline-flex"><Icon name="phone" class="h-4 w-4" />{phone}</a>
+    <!-- Phone: icon only while the menu needs the space, number from the `wide` breakpoint (1360px) -->
+    <a href={tel} class="btn-primary hidden px-3 lg:inline-flex wide:hidden" aria-label={`Anrufen: ${phone}`} title={phone}><Icon name="phone" class="h-5 w-5" /></a>
+    <a href={tel} class="btn-primary hidden whitespace-nowrap font-display font-extrabold wide:inline-flex"><Icon name="phone" class="h-4 w-4" />{phoneShort}</a>
 
     <!-- Mobile: details/summary, categories expandable -->
-    <details class="relative lg:hidden" data-track-toggle="mobile-menu-open" data-track-area="mobile-menu">
-      <summary class="btn-secondary cursor-pointer list-none px-3 py-2" aria-label="Menü öffnen">Menü</summary>
-      <ul class="absolute right-0 mt-2 max-h-[75vh] w-72 overflow-y-auto rounded-md border border-ink-100 bg-white p-2 shadow-lg">
+    <div class="flex items-center gap-2 lg:hidden">
+    <a href={tel} class="btn-primary px-3" aria-label={`Anrufen: ${phone}`}><Icon name="phone" class="h-5 w-5" /></a>
+    <details class="relative" data-track-toggle="mobile-menu-open" data-track-area="mobile-menu">
+      <summary class="btn-secondary-on-dark min-h-11 cursor-pointer list-none rounded-ui px-4 py-2 font-bold">Menü</summary>
+      <ul class="absolute right-0 mt-2 max-h-[75vh] w-72 overflow-y-auto rounded-ui bg-white p-2 text-ink-900 shadow-xl">
         {nav.items.map((item) =>
           item.children && item.children.length > 0 ? (
             <li>
@@ -63,5 +68,6 @@ const tel = `tel:${phone.replace(/[^\d+]/g, "")}`;
         <li class="mt-2 border-t border-ink-100 pt-2"><a href={tel} class="block px-3 py-2 font-semibold text-brand-700">{phone}</a></li>
       </ul>
     </details>
+    </div>
   </div>
 </header>

@@ -52,6 +52,8 @@ export interface JobSummary {
 // ---- Blocks ---------------------------------------------------------------
 
 export interface HeroValue {
+  /** Short quote above the headline (without quotation marks); "" = none. */
+  motto: string;
   headline: string;
   subline: string;
   image: ApiImage | null;
@@ -79,6 +81,11 @@ export interface FeatureListValue {
   features: { icon: string; title: string; text: string }[];
 }
 
+/** FactsBlock: "{anzahl}" is already replaced by the API. */
+export interface FactsValue {
+  items: string[];
+}
+
 export interface StatsValue {
   stats: { value: string; label: string }[];
 }
@@ -98,6 +105,10 @@ export interface CtaValue {
   heading: string;
   text: string;
   link: ApiLink;
+  /** "contact" = closing band with phone number, "career" = careers teaser */
+  style: "contact" | "career";
+  /** From the contact settings (added by the API). */
+  phone: string;
 }
 
 export interface ContactFormValue {
@@ -125,6 +136,7 @@ export interface GalleryValue {
 }
 
 export type Block =
+  | { type: "facts"; id: string; value: FactsValue }
   | { type: "rich_text"; id: string; value: string }
   | { type: "text_image"; id: string; value: TextImageValue }
   | { type: "service_grid"; id: string; value: ServiceGridValue }
@@ -199,6 +211,8 @@ export interface ServicePageData extends BasePageData {
   hero_image: ApiImage | null;
   body: Block[];
   related: ServiceSummary[];
+  /** Parent category (ServiceIndexPage). */
+  category: { title: string; href: string } | null;
 }
 
 export interface JobPageData extends BasePageData {
@@ -263,6 +277,8 @@ export interface AnalyticsSettings {
 
 export interface SiteSettings {
   logo: LogoImage | null;
+  /** White logo for blue surfaces (null = not uploaded; fall back to `logo`). */
+  logo_inverse: LogoImage | null;
   tagline: string;
   footer_text: string;
   default_og_image: ApiImage | null;
