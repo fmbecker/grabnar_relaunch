@@ -245,6 +245,12 @@ class CtaBlock(blocks.StructBlock):
         ],
         default="contact",
     )
+    pattern = blocks.BooleanBlock(
+        label=_("Turm-Muster im Hintergrund"),
+        required=False,
+        default=False,
+        help_text=_("Zeigt die Türme aus dem Logo stark abgedimmt hinter dem Text."),
+    )
 
     class Meta:
         icon = "pick"

@@ -93,6 +93,11 @@ class SiteSettings(BaseSiteSetting, ClusterableModel):
     )
     tagline = models.CharField(_("Claim"), max_length=120, blank=True)
     footer_text = models.TextField(_("Footer-Text"), blank=True, max_length=400)
+    footer_pattern = models.BooleanField(
+        _("Turm-Muster im Footer"),
+        default=False,
+        help_text=_("Zeigt die Türme aus dem Logo stark abgedimmt im Footer-Hintergrund."),
+    )
     default_og_image = models.ForeignKey(
         "wagtailimages.Image",
         verbose_name=_("Standard-Social-Media-Bild"),
@@ -170,6 +175,7 @@ class SiteSettings(BaseSiteSetting, ClusterableModel):
             _("Marke"),
         ),
         FieldPanel("footer_text"),
+        FieldPanel("footer_pattern"),
         InlinePanel("footer_links", label=_("Footer-Links")),
         InlinePanel("social_links", label=_("Social-Media-Links")),
         MultiFieldPanel(
@@ -202,6 +208,7 @@ class SiteSettings(BaseSiteSetting, ClusterableModel):
             "logo_inverse": logo_api_representation(self.logo_inverse),
             "tagline": self.tagline,
             "footer_text": self.footer_text,
+            "footer_pattern": self.footer_pattern,
             "default_og_image": image_api_representation(self.default_og_image),
             "footer_links": [
                 {
