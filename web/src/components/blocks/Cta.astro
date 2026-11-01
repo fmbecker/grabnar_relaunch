@@ -2,10 +2,10 @@
 import type { CtaValue } from "@/lib/types";
 import LinkButton from "@/components/ui/LinkButton.astro";
 import BrandPattern from "@/components/ui/BrandPattern.astro";
-interface Props { value: CtaValue; service?: string }
-const { value, service } = Astro.props;
+interface Props { value: CtaValue; service?: string; showPhone?: boolean }
+const { value, service, showPhone = true } = Astro.props;
 // Phone tracking is added automatically for tel: links (Analytics.astro).
-const tel = value.phone ? `tel:${value.phone.replace(/\s/g, "")}` : "";
+const tel = showPhone && value.phone ? `tel:${value.phone.replace(/\s/g, "")}` : "";
 ---
 {value.style === "career" ? (
   <section class="section bg-brand-50">
@@ -19,8 +19,9 @@ const tel = value.phone ? `tel:${value.phone.replace(/\s/g, "")}` : "";
     </div>
   </section>
 ) : (
-  <section class="band-accent on-dark bg-accent-600 text-white">
-    <div class="container-x py-section">
+  <section class="band-accent on-dark relative overflow-hidden bg-accent-600 text-white">
+    {value.pattern && <BrandPattern seed={1} width={2400} class="pointer-events-none absolute inset-x-0 bottom-0 h-full w-full opacity-30" />}
+    <div class="container-x relative py-section">
       <div class="max-w-3xl">
         <h2 class="h2">{value.heading}</h2>
         {value.text && <p class="lead mt-4 max-w-[46ch] text-accent-100">{value.text}</p>}

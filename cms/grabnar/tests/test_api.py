@@ -38,6 +38,7 @@ def test_home_shows_categories(client):
     ctas = [b["value"] for b in page["body"] if b["type"] == "cta"]
     assert [c["style"] for c in ctas] == ["career", "contact"]
     assert ctas[-1]["phone"]  # closing band shows the phone number from the settings
+    assert ctas[-1]["pattern"] is False  # tower pattern is opt-in per block
     grid = next(b for b in page["body"] if b["type"] == "service_grid")["value"]
     assert grid["kind"] == "categories" and len(grid["services"]) == 4
     assert grid["services"][0]["children"][0]["href"].startswith("/gebaeudereinigung/")
@@ -69,7 +70,9 @@ def test_category_grid_lists_its_services(client):
 
 
 def test_settings_and_redirects(client):
-    contact = client.get("/api/v2/settings/").json()["contact"]
+    settings = client.get("/api/v2/settings/").json()
+    contact = settings["contact"]
+    assert settings["site"]["footer_pattern"] is False
     assert contact["street"] == "Julius-Hölder-Straße 4" and contact["postal_code"] == "70597"
     items = client.get("/api/v2/redirects/").json()["items"]
     assert len(items) == 28

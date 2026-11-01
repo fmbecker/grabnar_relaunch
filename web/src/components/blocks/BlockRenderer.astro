@@ -24,8 +24,10 @@ interface Props {
   job?: Pick<JobSummary, "id" | "title">;
   /** Title of the service page being rendered (CTA links carry it to the contact form). */
   service?: string;
+  /** false = closing CTA without its phone number (the home page shows it in the header already). */
+  ctaPhone?: boolean;
 }
-const { blocks, contact, sourcePath, job, service } = Astro.props;
+const { blocks, contact, sourcePath, job, service, ctaPhone = true } = Astro.props;
 ---
 {blocks.map((b) => {
   switch (b.type) {
@@ -37,7 +39,7 @@ const { blocks, contact, sourcePath, job, service } = Astro.props;
     case "stats": return <Stats value={b.value} />;
     case "testimonial": return <Testimonial value={b.value} />;
     case "faq": return <Faq value={b.value} />;
-    case "cta": return <Cta value={b.value} service={service} />;
+    case "cta": return <Cta value={b.value} service={service} showPhone={ctaPhone} />;
     case "contact_form": return <ContactForm value={b.value} sourcePath={sourcePath} job={job} contact={contact} />;
     case "job_list": return <JobList value={b.value} />;
     case "job_embed": return <JobEmbed value={b.value} />;

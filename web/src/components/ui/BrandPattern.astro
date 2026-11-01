@@ -6,10 +6,12 @@ interface Props {
   tone?: "dark" | "light";
   /** Varies the skyline so neighbouring placeholders differ */
   seed?: number;
+  /** viewBox width at height 600: 800 = 4:3 placeholder, 2400 = 4:1 background band */
+  width?: number;
   class?: string;
 }
-const { tone = "dark", seed = 0, class: cls = "" } = Astro.props;
-const W = 800;
+const { tone = "dark", seed = 0, width = 800, class: cls = "" } = Astro.props;
+const W = width;
 const H = 600;
 const base = 540;
 // Width/height pairs taken loosely from the logo (middle tower tallest), rotated by seed.
