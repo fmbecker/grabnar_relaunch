@@ -3,7 +3,7 @@
 ## Ziele des Relaunchs
 
 1. **Anfragen von Gewerbekunden** erzeugen – klare Leistungsdarstellung, sichtbarer Kontakt-CTA auf jeder Seite.
-2. **Bewerbungen** erleichtern – eigene Karriereseite mit Stellen aus dem CMS, kurzes Bewerbungsformular (Name, Kontakt, Wunschstelle, optional Lebenslauf-Upload).
+2. **Bewerbungen** erleichtern – Karriereseite mit den Stellenangeboten aus dem Bewerberportal Europersonal (wie auf der Altseite eingebettet, Entscheidung Felix 01.11.2026) und darunter das eigene Formular für Initiativbewerbungen (Name, Kontakt, Wunschstelle, optional Lebenslauf-Upload). Eigene Stellenseiten aus dem CMS (`JobPage`, Block „Stellenliste“) bleiben technisch verfügbar, werden aber derzeit nicht genutzt.
 3. **Wartbarkeit** – Redakteure pflegen Inhalte in Wagtail, Felix wartet zwei klar getrennte Systeme ohne Framework-Lock-in.
 4. **Performance & SEO** – statische Seiten, Lighthouse ≥ 95, saubere Meta-Daten, strukturierte Daten (`LocalBusiness`, `JobPosting`).
 

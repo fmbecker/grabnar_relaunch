@@ -11,7 +11,7 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 - [ ] 👤 Empfängeradresse des Kontaktformulars klären (aktuell `mail@aivii.de`)
 - [x] Seitenbaum v2 freigegeben (4 Kategorien auf oberster Ebene, `docs/02-konzept.md`)
 - [x] 🤖 `ServiceIndexPage` = Leistungskategorie (Icon, Kurzbeschreibung, Titelbild), `ServiceGridBlock` mit Quelle Kategorien/Kategorie/manuell, Navigation mit Dropdown (Desktop) bzw. aufklappbar (Mobil)
-- [x] 🤖 `manage.py import_legacy`: baut den kompletten Seitenbaum aus `docs/content-export/` (4 Kategorien, 22 Leistungen, Kontakt, Karriere, Impressum/Datenschutz/AGB), Kontaktdaten und 28 Redirects aus `docs/redirects.csv`. `seed_dev` = `import_legacy` + Platzhalterbilder + Beispiel-Stellen
+- [x] 🤖 `manage.py import_legacy`: baut den kompletten Seitenbaum aus `docs/content-export/` (4 Kategorien, 22 Leistungen, Kontakt, Karriere, Impressum/Datenschutz/AGB), Kontaktdaten und 28 Redirects aus `docs/redirects.csv`. `seed_dev` = `import_legacy` + Platzhalterbilder (Beispiel-Stellen nur mit `--demo-jobs`)
 - [x] Entscheidung Hosting: alles auf dem bestehenden Linode-VPS, Nginx vor statischem Frontend + Wagtail-Docker, kein DNS-Wechsel (siehe `docs/03-technik.md`)
 - [ ] 👤 Linode-Bestandsaufnahme: OS-Version, Nginx-Config der Altseite, certbot-Status, freier Speicher/RAM, ob Docker installiert ist → `docs/01-ist-analyse.md`
 - [x] Logo (`docs/assets/logo-mbgrabnar.png`) und Markenfarben (`#2D78BC`, `#8BC1E5`) von der Altseite übernommen
@@ -66,7 +66,9 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 - [x] 👤 Alle 24 Neutexte inkl. Maurerarbeiten und geänderter Baureinigung von der Firma freigegeben (Vergleichsseite, 30.10.2026)
 - [ ] 👤 Optional: Gründungsjahr, Mitarbeiterzahl, Team-Fotos für „Unternehmen“
 - [ ] 👤 Bilder einpflegen (Wagtail-Admin)
-- [ ] 👤 Impressum / Datenschutz / AGB rechtlich prüfen. Datenschutz muss neue Formulare (Bewerbung mit Upload, Speicherfrist 180 Tage) und ggf. Umami abdecken; Impressum: Feld „Vertretungsberechtigt“ ist in der Altseite leer
+- [x] 🤖 Stellenangebote wie auf der Altseite aus dem Bewerberportal Europersonal: Block „Stellenangebote (externes Portal)“ (`job_embed`) auf `/karriere/`, Zwei-Klick-Lösung (Rahmen lädt erst nach Klick, Hinweis mit Link zur Datenschutzerklärung), nur freigegebene Anbieter (`JOB_EMBED_ALLOWED_HOSTS`); Initiativbewerbung darunter bleibt (01.11.2026)
+- [ ] 👤 Europersonal-Adresse prüfen (übernommen von der Altseite: `grabnar.europersonal.com/karriere/m-b-grabnar-…`) und Höhe des Rahmens im Admin anpassen, falls die Liste abgeschnitten wird
+- [ ] 👤 Impressum / Datenschutz / AGB rechtlich prüfen. Datenschutz muss neue Formulare (Bewerbung mit Upload, Speicherfrist 180 Tage), Umami und das eingebettete Bewerberportal Europersonal abdecken; Impressum: Feld „Vertretungsberechtigt“ ist in der Altseite leer
 - [x] 🤖 Lighthouse (mobil) + axe-core (WCAG 2.1/2.2 AA) für 8 Seitentypen: überall 100/100/100/100, 0 axe-Verstöße (29.10.2026). Behoben: Touch-Ziele in Kategorie-Kacheln, Kontrast Kartenplatzhalter, Überschriften-Reihenfolge der Alttexte, fehlende Meta-Beschreibungen. Läuft als Job `audit` in `web.yml`, lokal: `web/scripts/audit.mjs` + `web/scripts/serve-prod.mjs`
 - [ ] 🤖 Karte in `Map.astro`: selbst gehostetes Leaflet mit OSM-Tiles (aktuell nur Adresse + OSM-Link)
 - [x] Schrift: Arial (Entscheidung Felix 30.10.2026), keine Webfonts nötig
@@ -98,4 +100,4 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 
 - Referenzen-Seite mit Logos
 - News/Blog (`ArticlePage`)
-- Stellenanzeigen automatisch an Google for Jobs via JSON-LD (bereits in Phase 2 angelegt) – Indexierung prüfen
+- Stellenanzeigen automatisch an Google for Jobs via JSON-LD (für eigene `JobPage`s angelegt; entfällt, solange die Stellen bei Europersonal liegen – dort klären, ob das Portal Google for Jobs bedient)

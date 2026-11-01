@@ -7,6 +7,9 @@ Keep the three in sync when changing anything.
 
 from __future__ import annotations
 
+from urllib.parse import urlsplit
+
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from wagtail import blocks
@@ -303,6 +306,63 @@ class JobListBlock(blocks.StructBlock):
         }
 
 
+def _default_job_embed_url() -> str:
+    return settings.JOB_EMBED_DEFAULT_URL
+
+
+class JobEmbedBlock(blocks.StructBlock):
+    """Job ads from an external applicant portal (Europersonal), embedded as an iframe.
+
+    Privacy: the iframe is not part of the static HTML. Visitors first see a notice and load the
+    portal with a click (two-click solution), so no request goes to the provider without consent.
+    Only hosts in settings.JOB_EMBED_ALLOWED_HOSTS are accepted.
+    """
+
+    heading = blocks.CharBlock(
+        label=_("Überschrift"), required=False, max_length=120, default="Offene Stellen"
+    )
+    intro = blocks.TextBlock(label=_("Einleitung"), required=False, max_length=400)
+    provider = blocks.CharBlock(
+        label=_("Anbieter (für den Datenschutzhinweis)"), max_length=60, default="Europersonal"
+    )
+    url = blocks.URLBlock(
+        label=_("Adresse des Stellenportals"),
+        default=_default_job_embed_url,
+        help_text=_("Nur https und freigegebene Anbieter (JOB_EMBED_ALLOWED_HOSTS)."),
+    )
+    height = blocks.IntegerBlock(
+        label=_("Höhe des Rahmens in Pixel"), default=1700, min_value=400, max_value=4000
+    )
+
+    class Meta:
+        icon = "group"
+        label = _("Stellenangebote (externes Portal)")
+
+    def clean(self, value):
+        value = super().clean(value)
+        parts = urlsplit(value.get("url") or "")
+        if parts.scheme != "https" or parts.hostname not in settings.JOB_EMBED_ALLOWED_HOSTS:
+            allowed = ", ".join(settings.JOB_EMBED_ALLOWED_HOSTS)
+            raise blocks.StructBlockValidationError(
+                block_errors={
+                    "url": ValidationError(
+                        _("Nur https-Adressen dieser Anbieter: %(hosts)s") % {"hosts": allowed}
+                    )
+                }
+            )
+        return value
+
+    def get_api_representation(self, value, context=None):
+        return {
+            "heading": value.get("heading") or "",
+            "intro": value.get("intro") or "",
+            "provider": value.get("provider") or "",
+            "url": value.get("url") or "",
+            "host": urlsplit(value.get("url") or "").hostname or "",
+            "height": value.get("height") or 1700,
+        }
+
+
 class MapBlock(blocks.StructBlock):
     heading = blocks.CharBlock(label=_("Überschrift"), required=False, max_length=120)
     zoom = blocks.IntegerBlock(label=_("Zoomstufe"), default=14, min_value=5, max_value=18)
@@ -401,9 +461,14 @@ class BodyStreamBlock(blocks.StreamBlock):
     cta = CtaBlock()
     contact_form = ContactFormBlock()
     job_list = JobListBlock()
+    job_embed = JobEmbedBlock()
     map = MapBlock()
     gallery = GalleryBlock()
     certificate = CertificateBlock()
 
     class Meta:
-        block_counts = {"contact_form": {"max_num": 1}, "job_list": {"max_num": 1}}
+        block_counts = {
+            "contact_form": {"max_num": 1},
+            "job_list": {"max_num": 1},
+            "job_embed": {"max_num": 1},
+        }

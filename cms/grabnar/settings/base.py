@@ -183,3 +183,13 @@ FORMS_ALLOWED_UPLOAD_TYPES = {
 }
 # Applications are personal data: purge after this many days (management command).
 FORMS_APPLICATION_RETENTION_DAYS = 180
+
+# --- Third-party job portal ---------------------------------------------------
+
+# Hosts the block "Stellenangebote (externes Portal)" may embed (https only). The job ads and the
+# application process live with the provider; the website loads the iframe only after a click.
+JOB_EMBED_ALLOWED_HOSTS = env.list("JOB_EMBED_ALLOWED_HOSTS", default=["grabnar.europersonal.com"])
+JOB_EMBED_DEFAULT_URL = (
+    "https://grabnar.europersonal.com/karriere/"
+    "m-b-grabnar-gebaeudereinigungs-und-handwerker-service-gmbh"
+)

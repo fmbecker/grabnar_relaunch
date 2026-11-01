@@ -586,14 +586,17 @@ class Command(BaseCommand):
             intro="Werden Sie Teil unseres Teams – aktuelle Stellenangebote der M. B. Grabnar GmbH.",
             body=[
                 (
-                    "job_list",
+                    # Job ads stay with the applicant portal, as on the old site (iframe).
+                    "job_embed",
                     {
                         "heading": "Offene Stellen",
-                        "show_filter": True,
-                        "empty_text": (
-                            "Derzeit sind keine Stellen ausgeschrieben. "
-                            "Initiativbewerbungen sind jederzeit willkommen."
+                        "intro": (
+                            "Unsere aktuellen Stellenangebote und die Online-Bewerbung finden Sie "
+                            "in unserem Bewerberportal."
                         ),
+                        "provider": "Europersonal",
+                        "url": settings.JOB_EMBED_DEFAULT_URL,
+                        "height": 1700,
                     },
                 ),
                 (

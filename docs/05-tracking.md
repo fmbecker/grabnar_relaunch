@@ -54,6 +54,7 @@ Namen, E-Mail-Adressen, Telefonnummern oder Formulartexte – nur Seiten-, Leist
 | `job-filter` | Filter in der Stellenliste | `field`, `value` | `islands/JobFilter.tsx` |
 | `job-open` | Stelle aus der Liste geöffnet | `job` | `blocks/JobList.astro`, `islands/JobFilter.tsx` |
 | `job-apply-click` | „Jetzt bewerben“ auf einer Stellenseite | `job` | `PageContent.astro` |
+| `job-portal-load` | Externes Stellenportal per Klick geladen (Zwei-Klick-Lösung) | `provider` | `blocks/JobEmbed.astro` |
 | `page-not-found` | 404-Seite angezeigt | `path`, `referrer` (nur Hostname) | `pages/404.astro` |
 
 **Leistung bis ins Formular:** Aktions-Buttons auf Leistungsseiten, die auf `/kontakt/` zeigen,
@@ -74,7 +75,9 @@ kein Dokument), `job-apply-click` (gleiche Technik wie `job-open`) und `applicat
 
 - **Ziele (Goal-Report):** `lead` (Kontakte gesamt), `inquiry-sent` (Anfragen), `application-sent` (Bewerbungen).
 - **Funnel „Anfrage“:** Leistungsseite → `cta-click` → `/kontakt/` → `form-start` → `inquiry-sent`.
-- **Funnel „Bewerbung“:** `/karriere/` → `job-open` → `job-apply-click` → `application-sent`.
+- **Funnel „Stellenportal“:** `/karriere/` → `job-portal-load`. Was im eingebetteten Portal passiert
+  (Stelle ansehen, Bewerbung absenden), sieht Umami nicht – das liefert nur Europersonal.
+- **Funnel „Initiativbewerbung“:** `/karriere/` → `form-start` → `application-sent`.
 - **Journey-Report:** Ende = `lead` – welche Wege führen tatsächlich zu einem Kontakt.
 - **Breakdown:** `lead` nach `channel` und `service`; `inquiry-sent` nach `service` (welche Leistung bringt Anfragen).
 - **Filter:** Für Kundenkennzahlen `/karriere/` ausschließen, sonst zählen Bewerber mit.
@@ -94,8 +97,8 @@ Einträge bleiben erhalten. Nach Änderungen an `reports.json` einfach erneut au
 Inhalt:
 - **5 Ziele:** Kontakte gesamt (`lead`), Anfragen (`inquiry-sent`), Bewerbungen (`application-sent`),
   Anrufe (`phone-click`), Kontaktseite besucht (`/kontakt/`)
-- **7 Funnels** (Zeitfenster 60 Minuten): Anfrage (Button → `/kontakt/` → `form-start` → `inquiry-sent`),
-  Bewerbung (`/karriere/` → `job-open` → `job-apply-click` → `application-sent`),
+- **8 Funnels** (Zeitfenster 60 Minuten): Anfrage (Button → `/kontakt/` → `form-start` → `inquiry-sent`),
+  Stellenportal (`/karriere/` → `job-portal-load`), Initiativbewerbung (`/karriere/` → `form-start` → `application-sent`),
   Startseite → Kategorie → Kontakt, und je Leistungskategorie `/<kategorie>/*` → `lead`
 - **4 Segmente:** Kunden (ohne Karriere), Bewerber (Karriere), Mobil, Desktop
 

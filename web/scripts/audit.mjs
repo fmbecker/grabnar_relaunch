@@ -37,7 +37,6 @@ export const PAGES = [
   "/gebaeudereinigung/unterhaltsreinigung/",
   "/unternehmen/",
   "/karriere/",
-  "/karriere/beispiel-objektleitung/",
   "/kontakt/",
   "/impressum/",
 ];

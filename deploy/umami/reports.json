@@ -22,14 +22,24 @@
       }
     },
     {
-      "name": "Bewerbung: Karriere → Stelle → gesendet",
-      "description": "Karriereseite bis zur gesendeten Bewerbung",
+      "name": "Karriere → Stellenportal geladen",
+      "description": "Karriereseite, Klick auf „Stellenangebote anzeigen“ (Bewerbungen im Portal selbst sind für Umami nicht sichtbar)",
       "parameters": {
         "window": 60,
         "steps": [
           { "type": "path", "value": "/karriere/" },
-          { "type": "event", "value": "job-open" },
-          { "type": "event", "value": "job-apply-click" },
+          { "type": "event", "value": "job-portal-load" }
+        ]
+      }
+    },
+    {
+      "name": "Initiativbewerbung: Karriere → Formular → gesendet",
+      "description": "Karriereseite bis zur gesendeten Initiativbewerbung",
+      "parameters": {
+        "window": 60,
+        "steps": [
+          { "type": "path", "value": "/karriere/" },
+          { "type": "event", "value": "form-start" },
           { "type": "event", "value": "application-sent" }
         ]
       }

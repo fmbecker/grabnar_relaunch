@@ -1,0 +1,69 @@
+---
+/**
+ * JobEmbedBlock: job ads from the external applicant portal (Europersonal), as on the old site.
+ *
+ * Two-click privacy: the iframe sits inside a <template>, so the browser does not contact the
+ * provider until the visitor clicks "Stellenangebote anzeigen". The choice is not stored
+ * (no cookie/localStorage, §25 TDDDG) – every page view starts with the notice again.
+ * Without JavaScript the "neuer Tab" link still leads to the portal.
+ */
+import type { JobEmbedValue } from "@/lib/types";
+import Icon from "@/components/ui/Icon.astro";
+import { EVENT, umami } from "@/lib/analytics";
+interface Props { value: JobEmbedValue }
+const { value } = Astro.props;
+const provider = value.provider || value.host;
+const title = `Stellenangebote der M. B. Grabnar GmbH (${provider})`;
+---
+<section class="section" id="stellen">
+  <div class="container-x">
+    {value.heading && <h2 class="h2">{value.heading}</h2>}
+    {value.intro && <p class="lead mt-4 max-w-3xl text-ink-700">{value.intro}</p>}
+
+    <div class="mt-8" data-job-embed>
+      <div class="border-t-4 border-brand-500 bg-brand-50 px-6 py-8 sm:px-10 sm:py-10" data-job-embed-notice>
+        <h3 class="h3">Stellenangebote im Bewerberportal</h3>
+        <p class="mt-3 max-w-3xl text-ink-700">
+          Unsere Stellenangebote stellt {provider} für uns bereit. Wenn Sie sie hier anzeigen, lädt Ihr
+          Browser Inhalte von <strong class="font-semibold text-ink-900">{value.host}</strong>; dabei werden
+          Daten wie Ihre IP-Adresse an den Anbieter übertragen. Mehr dazu in unserer{" "}
+          <a class="underline underline-offset-4 hover:text-brand-700" href="/datenschutz/">Datenschutzerklärung</a>.
+        </p>
+        <button type="button" class="btn-primary mt-6" data-job-embed-load {...umami(EVENT.jobPortal, { provider })}>
+          Stellenangebote anzeigen <Icon name="arrow" class="h-4 w-4" />
+        </button>
+      </div>
+      <template data-job-embed-frame>
+        <iframe
+          src={value.url}
+          title={title}
+          class="block w-full border-0 bg-white"
+          style={`height: ${value.height}px`}
+          loading="lazy"
+          referrerpolicy="strict-origin-when-cross-origin"
+        ></iframe>
+      </template>
+      <p class="mt-4">
+        <a class="btn-link" href={value.url} target="_blank" rel="noopener">
+          Bewerberportal in neuem Tab öffnen<span class="sr-only"> (externe Seite)</span>
+        </a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>("[data-job-embed]")) {
+    const button = root.querySelector<HTMLButtonElement>("[data-job-embed-load]");
+    const notice = root.querySelector<HTMLElement>("[data-job-embed-notice]");
+    const frame = root.querySelector<HTMLTemplateElement>("[data-job-embed-frame]");
+    button?.addEventListener("click", () => {
+      if (!frame || !notice) return;
+      const iframe = frame.content.firstElementChild?.cloneNode(true) as HTMLIFrameElement | undefined;
+      if (!iframe) return;
+      iframe.loading = "eager";
+      notice.replaceWith(iframe);
+      iframe.focus();
+    });
+  }
+</script>

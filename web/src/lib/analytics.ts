@@ -55,6 +55,8 @@ export const EVENT = {
   jobOpen: "job-open",
   /** "Jetzt bewerben" on a job page. data: job */
   jobApply: "job-apply-click",
+  /** External job portal loaded after the visitor's click (two-click embed). data: provider */
+  jobPortal: "job-portal-load",
   /** 404 page shown. data: path, referrer */
   notFound: "page-not-found",
 } as const;

@@ -125,6 +125,19 @@ export interface JobListValue {
   jobs: JobSummary[];
 }
 
+/** JobEmbedBlock (cms/blocks/blocks.py): job ads from the external applicant portal (iframe after a click). */
+export interface JobEmbedValue {
+  heading: string;
+  intro: string;
+  /** Provider name for the privacy notice, e.g. "Europersonal". */
+  provider: string;
+  /** https URL, host checked against JOB_EMBED_ALLOWED_HOSTS in the CMS. */
+  url: string;
+  host: string;
+  /** iframe height in px (400–4000). */
+  height: number;
+}
+
 export interface MapValue {
   heading: string;
   zoom: number;
@@ -147,6 +160,7 @@ export type Block =
   | { type: "cta"; id: string; value: CtaValue }
   | { type: "contact_form"; id: string; value: ContactFormValue }
   | { type: "job_list"; id: string; value: JobListValue }
+  | { type: "job_embed"; id: string; value: JobEmbedValue }
   | { type: "map"; id: string; value: MapValue }
   | { type: "gallery"; id: string; value: GalleryValue }
   | { type: "certificate"; id: string; value: CertificateValue };

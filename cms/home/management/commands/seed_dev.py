@@ -3,9 +3,13 @@
 
 Runs import_legacy (real pages, settings, redirects) and then adds what the
 old site does not have yet, so every block/page type can be developed:
-placeholder images, example job ads, an optional admin user.
+placeholder images, an optional admin user and, on request, example job ads.
 
-Usage: uv run manage.py seed_dev [--superuser]
+The live job ads come from the external applicant portal (block job_embed on /karriere/);
+the own job pages (JobPage, block job_list) stay available but are unused for now.
+--demo-jobs creates three example JobPages to develop those templates.
+
+Usage: uv run manage.py seed_dev [--superuser] [--demo-jobs]
 """
 
 from __future__ import annotations
@@ -48,13 +52,16 @@ def placeholder_image(title: str, color: tuple[int, int, int]) -> Image:
 
 
 class Command(BaseCommand):
-    help = "import_legacy + demo images/jobs for frontend development."
+    help = "import_legacy + demo images (and optional demo jobs) for frontend development."
 
     def add_arguments(self, parser):
         parser.add_argument("--superuser", action="store_true", help="create admin/admin")
+        parser.add_argument(
+            "--demo-jobs", action="store_true", help="create three example JobPages"
+        )
 
     @transaction.atomic
-    def handle(self, *args, superuser: bool, **options):
+    def handle(self, *args, superuser: bool, demo_jobs: bool = False, **options):
         call_command("import_legacy", stdout=self.stdout)
 
         palette = [(31, 82, 138), (18, 63, 107), (63, 134, 196), (15, 50, 84)]
@@ -66,7 +73,7 @@ class Command(BaseCommand):
                 svc.save_revision().publish()
 
         index = JobIndexPage.objects.first()
-        for slug, title, location, etype in DEMO_JOBS:
+        for slug, title, location, etype in DEMO_JOBS if demo_jobs else []:
             job = JobPage(
                 title=title,
                 slug=slug,
@@ -86,4 +93,8 @@ class Command(BaseCommand):
             if not User.objects.filter(username="admin").exists():
                 User.objects.create_superuser("admin", "admin@example.com", "admin")
                 self.stdout.write("Superuser admin/admin created (dev only!)")
-        self.stdout.write(self.style.SUCCESS("Demo-Bilder und Beispiel-Stellen ergänzt."))
+        self.stdout.write(
+            self.style.SUCCESS(
+                "Demo-Bilder ergänzt" + (" und Beispiel-Stellen angelegt." if demo_jobs else ".")
+            )
+        )

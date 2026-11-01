@@ -80,10 +80,38 @@ def test_settings_and_redirects(client):
     } in items
 
 
-def test_job_list_block(client):
+def test_karriere_embeds_job_portal(client):
     data = client.get("/api/v2/pages/", {"type": "jobs.JobIndexPage", "fields": "body"}).json()
-    jobs = next(b for b in data["items"][0]["body"] if b["type"] == "job_list")["value"]["jobs"]
+    body = data["items"][0]["body"]
+    assert [b["type"] for b in body] == ["job_embed", "contact_form"]
+    embed = body[0]["value"]
+    assert embed["host"] == "grabnar.europersonal.com"
+    assert embed["url"].startswith("https://") and embed["height"] == 1700
+    assert body[1]["value"]["variant"] == "application"
+
+
+def test_job_embed_only_allowed_hosts():
+    from wagtail.blocks import StructBlockValidationError
+
+    from blocks.blocks import JobEmbedBlock
+
+    block = JobEmbedBlock()
+    ok = block.to_python({"url": "https://grabnar.europersonal.com/karriere/x", "height": 900})
+    assert block.clean(ok)["height"] == 900
+    for url in ("http://grabnar.europersonal.com/karriere/x", "https://example.com/jobs"):
+        with pytest.raises(StructBlockValidationError):
+            block.clean(block.to_python({"url": url, "height": 900}))
+
+
+def test_job_list_block_with_demo_jobs(client):
+
+    from blocks.blocks import JobListBlock
+    from jobs.models import JobPage
+
+    call_command("seed_dev", "--demo-jobs", verbosity=0)
+    jobs = JobListBlock().get_api_representation(JobListBlock().to_python({}))["jobs"]
     assert len(jobs) == 3 and jobs[0]["employment_type_label"]
+    assert JobPage.objects.live().count() == 3
 
 
 def test_contact_form_spam_and_success(client):
