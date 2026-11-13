@@ -28,10 +28,13 @@ const enquiry = svc ? withService("/kontakt/", page.title) : "";
 
 {std && (
   <>
-    <div class="on-dark bg-brand-500 text-white">
-      <div class="container-x py-14 sm:py-20">
-        <h1 class="h1 max-w-4xl">{page.title}</h1>
-        {std.intro && <p class="lead mt-5 max-w-[46ch]">{std.intro}</p>}
+    <div class="panel-wrap pt-3 sm:pt-5">
+      <div class="panel on-dark relative isolate bg-deep-900 text-white">
+        <BrandPattern seed={page.id} width={2400} class="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-full w-full opacity-50" />
+        <div class="panel-pad lg:py-20">
+          <h1 class="h1 max-w-4xl">{page.title}</h1>
+          {std.intro && <p class="lead mt-5 max-w-[46ch] text-deep-100">{std.intro}</p>}
+        </div>
       </div>
     </div>
     <BlockRenderer blocks={std.body} contact={settings.contact} sourcePath={path} />
@@ -40,19 +43,19 @@ const enquiry = svc ? withService("/kontakt/", page.title) : "";
 
 {svc && (
   <>
-    <div class="on-dark overflow-hidden bg-brand-500 text-white">
-      <div class="container-x grid lg:grid-cols-12 lg:gap-12">
-        <div class="py-14 sm:py-20 lg:col-span-7">
+    <div class="panel-wrap pt-3 sm:pt-5">
+      <div class="panel on-dark grid bg-deep-900 text-white lg:grid-cols-12">
+        <div class="panel-pad lg:col-span-7">
           {parent && (
-            <a href={parent.href} class="inline-flex min-h-11 items-center gap-2 border-2 border-white/60 px-3 text-sm font-bold uppercase tracking-wide hover:bg-white/10" {...umami(EVENT.category, { category: parent.title, target: "overview" })}>
+            <a href={parent.href} class="back-link" {...umami(EVENT.category, { category: parent.title, target: "overview" })}>
               <Icon name="arrow" class="h-4 w-4 rotate-180" /> {parent.title}
             </a>
           )}
           <h1 class="h1 mt-6">{page.title}</h1>
-          <p class="lead mt-5 max-w-[46ch]">{svc.teaser}</p>
-          <a href={enquiry} class="btn-primary mt-8" {...umami(EVENT.cta, { block: "page-header", label: "Angebot anfragen", target: target(enquiry), service: page.title })}>{page.title} anfragen</a>
+          <p class="lead mt-5 max-w-[46ch] text-deep-100">{svc.teaser}</p>
+          <a href={enquiry} class="btn-primary mt-8 min-h-14 px-7" {...umami(EVENT.cta, { block: "page-header", label: "Angebot anfragen", target: target(enquiry), service: page.title })}>{page.title} anfragen</a>
         </div>
-        <div class="relative -mx-4 h-56 bg-brand-600 [clip-path:polygon(0_22%,100%_0,100%_100%,0_100%)] sm:-mx-6 sm:h-72 lg:col-span-5 lg:mx-0 lg:mr-[calc(50%-50vw)] lg:h-auto lg:min-h-[26rem] lg:[clip-path:polygon(18%_0,100%_0,100%_100%,0_100%)]">
+        <div class="relative m-3 mt-0 h-56 overflow-hidden rounded-card bg-deep-800 sm:m-4 sm:mt-0 sm:h-72 lg:col-span-5 lg:m-4 lg:ml-0 lg:h-auto lg:min-h-[26rem]">
           {svc.hero_image
             ? <Picture image={svc.hero_image} variant="hero" loading="eager" sizes="(min-width: 1024px) 45vw, 100vw" class="absolute inset-0 h-full w-full object-cover" />
             : <BrandPattern tone="dark" seed={page.id} class="absolute inset-0 h-full w-full" />}
@@ -67,15 +70,15 @@ const enquiry = svc ? withService("/kontakt/", page.title) : "";
 
 {job && (
   <>
-    <div class="on-dark bg-brand-500 text-white">
-      <div class="container-x py-14 sm:py-20">
-        <a href="/karriere/" class="inline-flex min-h-11 items-center gap-2 border-2 border-white/60 px-3 text-sm font-bold uppercase tracking-wide hover:bg-white/10"><Icon name="arrow" class="h-4 w-4 rotate-180" /> Karriere</a>
+    <div class="panel-wrap pt-3 sm:pt-5">
+      <div class="panel panel-pad on-dark bg-deep-900 text-white">
+        <a href="/karriere/" class="back-link"><Icon name="arrow" class="h-4 w-4 rotate-180" /> Karriere</a>
         <h1 class="h1 mt-6 max-w-4xl">{job.title}</h1>
-        <dl class="mt-8 flex flex-wrap gap-x-10 gap-y-3 border-t border-white/40 pt-6">
-          <div><dt class="block text-sm font-bold uppercase tracking-wide text-white">Ort: </dt><dd class="text-lg font-semibold">{job.location}</dd></div>
-          <div><dt class="block text-sm font-bold uppercase tracking-wide text-white">Art: </dt><dd class="text-lg font-semibold">{job.employment_type_label}</dd></div>
-          <div><dt class="block text-sm font-bold uppercase tracking-wide text-white">Beginn: </dt><dd class="text-lg font-semibold">{job.start_date}</dd></div>
-          {job.salary_note && <div><dt class="block text-sm font-bold uppercase tracking-wide text-white">Vergütung: </dt><dd class="text-lg font-semibold">{job.salary_note}</dd></div>}
+        <dl class="mt-8 flex flex-wrap gap-x-10 gap-y-3 border-t border-white/15 pt-6">
+          <div><dt class="eyebrow block">Ort: </dt><dd class="text-lg font-bold">{job.location}</dd></div>
+          <div><dt class="eyebrow block">Art: </dt><dd class="text-lg font-bold">{job.employment_type_label}</dd></div>
+          <div><dt class="eyebrow block">Beginn: </dt><dd class="text-lg font-bold">{job.start_date}</dd></div>
+          {job.salary_note && <div><dt class="eyebrow block">Vergütung: </dt><dd class="text-lg font-bold">{job.salary_note}</dd></div>}
         </dl>
       </div>
     </div>
@@ -87,7 +90,7 @@ const enquiry = svc ? withService("/kontakt/", page.title) : "";
           <h2>Das bringen Sie mit</h2><div set:html={job.requirements} />
           {job.benefits && <><h2>Wir bieten</h2><div set:html={job.benefits} /></>}
         </div>
-        <aside class="self-start border-t-4 border-brand-500 bg-ink-50 p-6 lg:sticky lg:top-24" data-track-area="job-sidebar">
+        <aside class="card self-start p-7 lg:sticky lg:top-28" data-track-area="job-sidebar">
           <h2 class="h3">Fragen zur Stelle?</h2>
           <p class="mt-2 text-ink-700">Rufen Sie uns an:</p><p><a class="mt-1 block font-display text-subtitle font-extrabold text-brand-700 hover:underline" href={`tel:${settings.contact.phone.replace(/\s/g, "")}`}>{settings.contact.phone}</a></p>
           {job.show_apply_form && <a href="#formular" class="btn-primary mt-4 w-full" {...umami(EVENT.jobApply, { job: job.title })}>Jetzt bewerben</a>}
@@ -95,10 +98,12 @@ const enquiry = svc ? withService("/kontakt/", page.title) : "";
       </div>
     </section>
     {job.show_apply_form && (
-      <section class="section bg-ink-50" id="formular">
+      <section class="section pt-0" id="formular">
         <div class="container-x max-w-3xl">
           <h2 class="h2 mb-8">Bewerbung: {job.title}</h2>
+          <div class="card p-6 sm:p-10">
           <ContactFormIsland client:visible variant="application" successMessage="Vielen Dank für Ihre Bewerbung! Wir melden uns zeitnah." sourcePath={path} job={{ id: job.id, title: job.title }} apiUrl={import.meta.env.PUBLIC_FORMS_API_URL} />
+          </div>
         </div>
       </section>
     )}

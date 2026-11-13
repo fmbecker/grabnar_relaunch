@@ -14,45 +14,46 @@ const isCategories = value.kind === "categories";
 const pad = (n: number) => String(n + 1).padStart(2, "0");
 ---
 {isCategories ? (
-  <section class="section bg-white">
-    <div class="container-x">
-      <div class="max-w-3xl">
+  <section class="section">
+    <div class="panel-wrap">
+      <div class="container-x !px-0">
         {value.heading && <h2 class="h2">{value.heading}</h2>}
-        {value.intro && <p class="lead mt-4 text-ink-700">{value.intro}</p>}
+        {value.intro && <p class="lead mt-4 max-w-2xl text-ink-700">{value.intro}</p>}
       </div>
 
-      <ul class="mt-12 space-y-16 lg:mt-16 lg:space-y-24">
+      <!-- Numbered picture cards; every single service stays a link (chips) -->
+      <ul class="mx-auto mt-10 grid max-w-[87rem] gap-5 md:grid-cols-2 lg:mt-12">
         {value.services.map((c, i) => {
-          const flip = i % 2 === 1;
           const overview = umami(EVENT.category, { category: c.title, target: "overview" });
           return (
-            <li class="grid items-center gap-8 lg:grid-cols-12 lg:gap-12">
-              <a href={c.href} tabindex="-1" aria-hidden="true" {...overview}
-                class:list={["block overflow-hidden bg-brand-50 lg:col-span-6", flip && "lg:order-2 lg:col-start-7"]}>
+            <li class="card group/card flex flex-col overflow-hidden transition-shadow duration-300 hover:shadow-card-hover motion-reduce:transition-none lg:flex-row">
+              <a href={c.href} tabindex="-1" aria-hidden="true" {...overview} class="relative block shrink-0 overflow-hidden bg-brand-50 lg:w-[38%]">
                 {c.image
-                  ? <Picture image={c.image} variant="wide" sizes="(min-width: 1024px) 50vw, 100vw" class="aspect-[4/3] w-full object-cover transition-transform duration-500 hover:scale-[1.02] motion-reduce:transition-none motion-reduce:hover:scale-100" />
-                  : <BrandPattern tone="light" seed={i} class="aspect-[4/3] w-full" />}
+                  ? <Picture image={c.image} variant="wide" sizes="(min-width: 1024px) 22vw, (min-width: 768px) 50vw, 100vw" class="aspect-[16/10] h-full w-full object-cover transition-transform duration-500 group-hover/card:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover/card:scale-100 lg:aspect-auto" />
+                  : <BrandPattern tone="light" seed={i} class="aspect-[16/10] h-full w-full lg:aspect-auto" />}
+                <span class="absolute left-4 top-4 grid h-12 w-12 place-items-center rounded-full bg-white text-[0.9375rem] font-extrabold text-brand-600 shadow-card">{pad(i)}</span>
               </a>
-              <div class:list={["lg:col-span-6", flip && "lg:order-1 lg:col-start-1 lg:row-start-1"]}>
-                <p class="font-display text-lg font-extrabold text-accent-600" aria-hidden="true">{pad(i)}</p>
-                <h3 class="h2 mt-2">
-                  <a href={c.href} class="hover:text-brand-700 hover:underline decoration-2 underline-offset-4" {...overview}>{c.title}</a>
+              <div class="flex flex-1 flex-col p-6 sm:p-7">
+                <h3 class="h3">
+                  <a href={c.href} class="decoration-2 underline-offset-4 hover:text-brand-700 hover:underline" {...overview}>{c.title}</a>
                 </h3>
                 {c.children && c.children.length > 0 ? (
-                  <ul class="mt-6 grid border-t border-ink-100 sm:grid-cols-2 sm:gap-x-8">
+                  <ul class="mt-4 flex flex-wrap gap-2">
                     {c.children.map((s) => (
-                      <li class="border-b border-ink-100">
-                        <a href={s.href} class="group flex min-h-11 items-center justify-between gap-3 py-2.5 text-ink-900 hover:text-brand-700" {...umami(EVENT.category, { category: c.title, target: "service", service: s.title })}>
+                      <li>
+                        <a href={s.href} class="inline-flex min-h-11 items-center rounded-full bg-brand-50 px-4 text-sm font-bold text-ink-900 transition-colors hover:bg-brand-600 hover:text-white" {...umami(EVENT.category, { category: c.title, target: "service", service: s.title })}>
                           {s.title}
-                          <Icon name="arrow" class="h-4 w-4 shrink-0 text-brand-500 transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none" />
                         </a>
                       </li>
                     ))}
                   </ul>
                 ) : (
-                  c.teaser && <p class="mt-4 text-ink-700">{c.teaser}</p>
+                  c.teaser && <p class="mt-3 text-ink-700">{c.teaser}</p>
                 )}
-                <a href={c.href} class="btn-secondary mt-8" {...overview}>Zu {c.title} <Icon name="arrow" class="h-4 w-4" /></a>
+                <a href={c.href} class="mt-auto flex min-h-12 items-center justify-between gap-3 pt-6 font-extrabold hover:text-brand-700" {...overview}>
+                  <span>Zu {c.title}</span>
+                  <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-600 text-white transition-transform group-hover/card:translate-x-0.5 motion-reduce:transition-none"><Icon name="arrow" class="h-4 w-4" /></span>
+                </a>
               </div>
             </li>
           );
@@ -61,24 +62,24 @@ const pad = (n: number) => String(n + 1).padStart(2, "0");
     </div>
   </section>
 ) : (
-  <section class="section bg-ink-50">
+  <section class="section">
     <div class="container-x">
       {value.heading && <h2 class="h2">{value.heading}</h2>}
       {value.intro && <p class="lead mt-4 max-w-2xl text-ink-700">{value.intro}</p>}
-      <ul class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <ul class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {value.services.map((s, i) => (
           <li>
-            <a href={s.href} {...umami(EVENT.service, { service: s.title, list })} class="group flex h-full flex-col border border-ink-100 bg-white transition-colors hover:border-brand-500 motion-reduce:transition-none">
+            <a href={s.href} {...umami(EVENT.service, { service: s.title, list })} class="card group flex h-full flex-col overflow-hidden transition-shadow duration-300 hover:shadow-card-hover motion-reduce:transition-none">
               <div class="relative overflow-hidden bg-brand-50">
                 {s.image
-                  ? <Picture image={s.image} variant="card" sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" class="aspect-[3/2] w-full object-cover" />
+                  ? <Picture image={s.image} variant="card" sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" class="aspect-[3/2] w-full object-cover transition-transform duration-500 group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100" />
                   : <BrandPattern tone="light" seed={i} class="aspect-[3/2] w-full" />}
-                <span class="absolute bottom-0 left-0 bg-brand-500 p-2.5 text-white"><Icon name={s.icon} class="h-5 w-5" /></span>
+                <span class="absolute left-4 top-4 grid h-12 w-12 place-items-center rounded-full bg-white text-brand-600 shadow-card"><Icon name={s.icon} class="h-5 w-5" /></span>
               </div>
-              <div class="flex flex-1 flex-col border-t-4 border-transparent p-6 group-hover:border-brand-500">
-                <h3 class="h4 uppercase group-hover:text-brand-700">{s.title}</h3>
-                {s.teaser && <p class="mt-3 text-ink-700">{s.teaser}</p>}
-                <span class="mt-auto inline-flex items-center gap-2 pt-5 font-semibold text-brand-700">Mehr erfahren <Icon name="arrow" class="h-4 w-4 transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none" /></span>
+              <div class="flex flex-1 flex-col p-6">
+                <h3 class="h4 text-xl group-hover:text-brand-700">{s.title}</h3>
+                {s.teaser && <p class="mt-2.5 text-ink-700">{s.teaser}</p>}
+                <span class="mt-auto inline-flex items-center gap-2 pt-5 font-extrabold text-brand-600">Mehr erfahren <Icon name="arrow" class="h-4 w-4 transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none" /></span>
               </div>
             </a>
           </li>

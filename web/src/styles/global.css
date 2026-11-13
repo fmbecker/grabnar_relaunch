@@ -1,44 +1,51 @@
 @import "tailwindcss";
 
-/* Headline face, self-hosted (no external requests). Latin subset, weight 800 only. */
+/* Manrope for headlines and body, self-hosted (no external requests). Variable font, Latin subset. */
 @font-face {
   font-family: "Manrope";
-  src: url("/fonts/manrope-800.woff2") format("woff2");
-  font-weight: 800;
+  src: url("/fonts/manrope-variable.woff2") format("woff2");
+  font-weight: 200 800;
   font-style: normal;
   font-display: swap;
 }
 
 /* Design tokens – derived from the M. B. Grabnar logo (docs/assets/logo-mbgrabnar.png).
    Brand: #2D78BC (brand-500, "M B GRABNAR"), light: #8BC1E5 (brand-300, towers + subline).
-   Contrast (WCAG): white on brand-500 = 4.64:1 (AA), ink on brand-300 = 8.2:1.
-   Accent #005A96 (accent-600): white 7.23:1, brand-100 5.87:1; never as text/line on brand-500 (1.56:1).
-   Decisions: docs/06-design.md. */
+   Look "D" (docs/06-design.md): light ground, white rounded cards, dark panels in deep-900,
+   brand-600 for buttons and the closing panel.
+   Contrast (WCAG): white on brand-600 = 5.9:1, white on deep-900 = 14.5:1, deep-100 on deep-900 = 9.6:1,
+   brand-300 on deep-900 = 7.6:1. brand-500 is for icons and lines only (4.3:1 on the ground colour). */
 @theme {
-  --font-sans: Arial, "Helvetica Neue", Helvetica, sans-serif;
+  --font-sans: "Manrope", Arial, "Helvetica Neue", Helvetica, sans-serif;
   --font-display: "Manrope", Arial, "Helvetica Neue", Helvetica, sans-serif;
 
   /* Type scale: few sizes doing the visible work – very large display, body, small */
-  --text-display: clamp(2rem, 1.1rem + 4.4vw, 4.75rem);
-  --text-display--line-height: 1;
-  --text-display--letter-spacing: -0.02em;
-  --text-title: clamp(1.75rem, 1.2rem + 2.4vw, 3.25rem);
-  --text-title--line-height: 1.04;
-  --text-title--letter-spacing: -0.015em;
-  --text-subtitle: clamp(1.25rem, 1.1rem + 0.6vw, 1.625rem);
-  --text-subtitle--line-height: 1.1;
-  --text-lead: clamp(1.125rem, 1rem + 0.4vw, 1.25rem);
+  --text-display: clamp(2.25rem, 1.2rem + 4.6vw, 4.875rem);
+  --text-display--line-height: 1.02;
+  --text-display--letter-spacing: -0.035em;
+  --text-title: clamp(1.875rem, 1.3rem + 2.4vw, 3.25rem);
+  --text-title--line-height: 1.06;
+  --text-title--letter-spacing: -0.03em;
+  --text-subtitle: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
+  --text-subtitle--line-height: 1.2;
+  --text-subtitle--letter-spacing: -0.015em;
+  --text-lead: clamp(1.0625rem, 1rem + 0.4vw, 1.25rem);
   --text-lead--line-height: 1.55;
 
   /* Header shows the full phone number from here (logo + 7 nav items + number) */
   --breakpoint-wide: 85rem;
 
   /* Section rhythm */
-  --spacing-section: clamp(4rem, 2.5rem + 6vw, 8rem);
-  --spacing-section-sm: clamp(2.5rem, 2rem + 2vw, 4rem);
+  --spacing-section: clamp(3.5rem, 2.25rem + 5vw, 7rem);
+  --spacing-section-sm: clamp(2rem, 1.5rem + 2vw, 3.5rem);
 
-  /* Shapes: near-square corners everywhere, decided once */
-  --radius-ui: 2px;
+  /* Shapes: soft and round. ui = fields and menus, card = cards and photos, panel = large surfaces */
+  --radius-ui: 0.875rem;
+  --radius-card: 1.75rem;
+  --radius-panel: clamp(1.5rem, 1rem + 2vw, 2.25rem);
+
+  --shadow-card: 0 1px 2px rgb(15 42 68 / 0.06), 0 12px 32px rgb(15 42 68 / 0.06);
+  --shadow-card-hover: 0 2px 4px rgb(15 42 68 / 0.08), 0 20px 44px rgb(15 42 68 / 0.12);
 
   --color-brand-50: #eef4fa;
   --color-brand-100: #dde9f4;
@@ -52,26 +59,24 @@
   --color-brand-900: #153859;
   --color-brand-950: #102c48;
 
-  /* Accent = deep blue #005A96 (buttons, phone, fact bar). Text on it: white or accent-100. */
-  --color-accent-100: #dde9f4;
-  --color-accent-300: #b4d7ee;
-  --color-accent-600: #005a96;
-  --color-accent-700: #004a7c;
-  --color-accent-800: #003b63;
+  /* Deep blue for dark panels (hero, page headers, feature list). Text on it: white or deep-100. */
+  --color-deep-100: #c5d6e6;
+  --color-deep-800: #1b3d5f;
+  --color-deep-900: #0f2a44;
 
-  --color-ink-900: #1f2328;
-  --color-ink-700: #39424c;
-  --color-ink-500: #6b7280;
-  --color-ink-300: #d4d4d5;
-  --color-ink-100: #eef0f2;
-  --color-ink-50: #f7f8fa;
+  --color-ink-900: #0f2a44;
+  --color-ink-700: #3c4f63;
+  --color-ink-500: #5b6b7c;
+  --color-ink-300: #cdd8e3;
+  --color-ink-100: #e3e9f0;
+  --color-ink-50: #f4f7fa;
 }
 
 @layer base {
   html { scroll-behavior: smooth; }
-  body { @apply bg-white text-ink-900 antialiased; }
+  body { @apply bg-ink-50 font-medium text-ink-900 antialiased; }
   :focus-visible { @apply outline-3 outline-offset-2 outline-brand-500; }
-  /* Dark surfaces (brand-500, accent-600) mark themselves with .on-dark: white focus ring */
+  /* Dark surfaces (deep-900, brand-600) mark themselves with .on-dark: white focus ring */
   .on-dark :focus-visible { @apply outline-white; }
   /* Light panels inside dark surfaces (header dropdowns, mobile menu) need the blue ring again */
   .on-dark .bg-white :focus-visible { @apply outline-brand-500; }
@@ -90,45 +95,55 @@
   .container-x { @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8; }
   .section { @apply py-section; }
   .section-sm { @apply py-section-sm; }
-  /* Headlines: Manrope 800, capitals only for h1/h2 (never body or long labels) */
-  /* Long German compounds in capitals: allow hyphenation instead of overflow (html lang=de) */
+  /* Large rounded surface with a gutter to the viewport: hero, page headers, feature list, closing band */
+  .panel-wrap { @apply px-3 sm:px-6; }
+  .panel { @apply mx-auto w-full max-w-[87rem] overflow-hidden rounded-panel; }
+  .panel-pad { @apply p-6 sm:p-10 lg:p-16; }
+  .card { @apply rounded-card bg-white shadow-card; }
+  /* Small uppercase label above headlines (the only capitals left) */
+  .eyebrow { @apply text-sm font-extrabold uppercase tracking-[0.08em] text-brand-600; }
+  .on-dark .eyebrow { @apply text-brand-300; }
+  /* Headlines: Manrope 800, sentence case, tight tracking */
+  /* Long German compounds: allow hyphenation instead of overflow (html lang=de) */
   .h1, .h2, .h3 { hyphens: auto; overflow-wrap: break-word; }
-  .h1 { @apply font-display text-display font-extrabold uppercase text-balance; }
-  .h2 { @apply font-display text-title font-extrabold uppercase text-balance; }
+  .h1 { @apply font-display text-display font-extrabold text-balance; }
+  .h2 { @apply font-display text-title font-extrabold text-balance; }
   .h3 { @apply font-display text-subtitle font-extrabold text-balance; }
-  .h4 { @apply text-lg font-bold; }
+  .h4 { @apply text-lg font-extrabold tracking-tight; }
   .lead { @apply text-lead; }
   .btn-primary, .btn-secondary {
-    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-ui px-6 py-3 text-base font-bold transition-colors duration-150;
+    @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 py-3 text-base font-extrabold transition-colors duration-150;
   }
-  .btn-primary { @apply bg-accent-600 text-white hover:bg-accent-700 active:bg-accent-800; }
-  .btn-secondary { @apply border-2 border-brand-500 text-brand-700 hover:bg-brand-50 active:bg-brand-100; }
-  /* On brand-500 surfaces */
-  .btn-secondary-on-dark { @apply border-2 border-white text-white hover:bg-white/10 active:bg-white/20; }
-  /* Primary button on the accent band: inverted so it stays visible */
-  .band-accent .btn-primary { @apply bg-white text-accent-700 hover:bg-accent-100 active:bg-accent-100; }
-  .btn-link { @apply inline-flex items-center gap-1 font-semibold text-brand-600 underline-offset-4 hover:underline; }
+  .btn-primary { @apply bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800; }
+  .btn-secondary { @apply border-[1.5px] border-ink-300 bg-white text-ink-900 hover:border-brand-500 hover:text-brand-700 active:bg-brand-50; }
+  /* On dark panels: primary turns white so it stays the strongest element, secondary becomes an outline */
+  .on-dark .btn-primary { @apply bg-white text-deep-900 hover:bg-brand-100 active:bg-brand-200; }
+  .btn-secondary-on-dark, .on-dark .btn-secondary, .on-dark .btn-primary.btn-secondary-on-dark { @apply border-[1.5px] border-white/60 bg-transparent text-white hover:border-white hover:bg-white/10 hover:text-white active:bg-white/20; }
+  .btn-link { @apply inline-flex items-center gap-1 font-bold text-brand-600 underline-offset-4 hover:underline; }
+  /* Pill-shaped back link in page headers */
+  .back-link { @apply inline-flex min-h-11 items-center gap-2 rounded-full bg-white/10 px-4 text-sm font-bold hover:bg-white/20; }
   .prose-site { @apply max-w-none leading-relaxed text-ink-700; }
   .prose-site h2 { @apply mt-10 mb-4 font-display text-subtitle font-extrabold text-ink-900; }
-  .prose-site h3 { @apply mt-8 mb-2 text-lg font-bold text-ink-900; }
+  .prose-site > :first-child, .prose-site > div > :first-child { @apply mt-0; }
+  .prose-site h3 { @apply mt-8 mb-2 text-lg font-extrabold text-ink-900; }
   .prose-site p { @apply mb-4; }
   .prose-site ul { @apply mb-4; }
   .prose-site ol { @apply mb-4 list-decimal pl-6; }
-  .prose-site a { @apply text-brand-600 underline underline-offset-2; }
+  .prose-site a { @apply font-semibold text-brand-600 underline underline-offset-2; }
   /* Service lists ("Unsere Dienstleistungen im Einzelnen"): checkmarks, two columns when long */
   .prose-site ul { @apply list-none pl-0; }
   .prose-site ul > li { @apply relative mb-1.5 break-inside-avoid pl-7; }
   .prose-site ul > li::before {
     content: "";
     @apply absolute left-0 top-[0.35em] h-4 w-4 rounded-full bg-brand-100;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 8.5l2.2 2.2 4.8-5' fill='none' stroke='%232d78bc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 8.5l2.2 2.2 4.8-5' fill='none' stroke='%232768a3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
     background-size: 100% 100%;
   }
   /* Long lists (objects, single services) become a grid of tiles */
-  .prose-site ul:has(> li:nth-child(6)) { @apply grid gap-px border border-ink-100 bg-ink-100 sm:grid-cols-2; }
-  .prose-site ul:has(> li:nth-child(6)) > li { @apply mb-0 bg-white py-3 pr-4 pl-11; }
+  .prose-site ul:has(> li:nth-child(6)) { @apply grid gap-px overflow-hidden rounded-card border border-ink-100 bg-ink-100 shadow-card sm:grid-cols-2; }
+  .prose-site ul:has(> li:nth-child(6)) > li { @apply mb-0 bg-white py-3.5 pr-4 pl-12; }
   .prose-site ul:has(> li:nth-child(6)) > li:last-child:nth-child(odd) { @apply sm:col-span-2; }
-  .prose-site ul:has(> li:nth-child(6)) > li::before { @apply left-4 top-[1.05em]; }
-  .field { @apply block min-h-11 w-full rounded-ui border border-ink-300 bg-white px-3 py-2.5 text-base focus:border-brand-500 focus:ring-1 focus:ring-brand-500; }
+  .prose-site ul:has(> li:nth-child(6)) > li::before { @apply left-5 top-[1.15em]; }
+  .field { @apply block min-h-12 w-full rounded-ui border border-ink-300 bg-white px-4 py-2.5 text-base focus:border-brand-500 focus:ring-1 focus:ring-brand-500; }
   .label { @apply mb-1.5 block text-sm font-bold text-ink-900; }
 }

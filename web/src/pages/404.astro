@@ -5,17 +5,19 @@ import { getNavigation, getSettings } from "@/lib/wagtail";
 const [settings, nav] = await Promise.all([getSettings(), getNavigation()]);
 ---
 <Base settings={settings} nav={nav} title="Seite nicht gefunden" path="/404/" noindex>
-  <section class="on-dark relative isolate overflow-hidden bg-brand-500 text-white">
+  <section class="panel-wrap py-3 sm:py-5">
+  <div class="panel on-dark relative isolate bg-deep-900 text-white">
     <BrandPattern tone="dark" seed={3} class="absolute inset-x-0 bottom-0 -z-10 h-2/3 w-full" />
-    <div class="container-x py-section">
-      <p class="font-display text-[clamp(5rem,3rem+10vw,12rem)] font-extrabold leading-none text-white/30" aria-hidden="true">404</p>
+    <div class="panel-pad lg:py-24">
+      <p class="font-display text-[clamp(5rem,3rem+10vw,12rem)] font-extrabold leading-none text-white/25" aria-hidden="true">404</p>
       <h1 class="h1 mt-4">Seite nicht gefunden</h1>
-      <p class="lead mt-5 max-w-[46ch]">Die Adresse existiert nicht mehr oder wurde verschoben.</p>
+      <p class="lead mt-5 max-w-[46ch] text-deep-100">Die Adresse existiert nicht mehr oder wurde verschoben.</p>
       <div class="mt-8 flex flex-wrap gap-4">
         <a href="/" class="btn-primary">Zur Startseite</a>
         <a href="/kontakt/" class="btn-secondary-on-dark btn-secondary">Kontakt</a>
       </div>
     </div>
+  </div>
   </section>
   <script>
     import { EVENT, track } from "@/lib/analytics";

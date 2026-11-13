@@ -2,37 +2,48 @@
 import type { CtaValue } from "@/lib/types";
 import LinkButton from "@/components/ui/LinkButton.astro";
 import BrandPattern from "@/components/ui/BrandPattern.astro";
+import Icon from "@/components/ui/Icon.astro";
 interface Props { value: CtaValue; service?: string; showPhone?: boolean }
 const { value, service, showPhone = true } = Astro.props;
 // Phone tracking is added automatically for tel: links (Analytics.astro).
+// Keep the company name on one line in the large headline
+const heading = value.heading.replace(/M\. ?B\. Grabnar/g, "M.\u00a0B.\u00a0Grabnar");
 const tel = showPhone && value.phone ? `tel:${value.phone.replace(/\s/g, "")}` : "";
 ---
 {value.style === "career" ? (
-  <section class="section bg-brand-50">
-    <div class="container-x grid items-center gap-10 lg:grid-cols-12">
-      <div class="lg:col-span-7">
-        <h2 class="h2">{value.heading}</h2>
-        {value.text && <p class="lead mt-4 max-w-[46ch] text-ink-700">{value.text}</p>}
-        <LinkButton block="cta" link={value.link} service={service} class="mt-8" />
+  <section class="panel-wrap section-sm">
+    <div class="mx-auto grid max-w-[87rem] gap-5 lg:grid-cols-2">
+      <div class="panel panel-pad flex flex-col justify-between gap-8 bg-brand-100 lg:min-h-[24rem]">
+        <div>
+          <p class="eyebrow text-brand-700">Karriere</p>
+          <h2 class="h2 mt-3">{heading}</h2>
+          {value.text && <p class="lead mt-4 max-w-[46ch] text-ink-700">{value.text}</p>}
+        </div>
+        <div><LinkButton block="cta" link={value.link} service={service} class="!bg-deep-900 !text-white hover:!bg-deep-800" /></div>
       </div>
-      <BrandPattern tone="light" seed={2} class="hidden aspect-[4/3] w-full lg:col-span-5 lg:block" />
+      <div class="panel relative hidden bg-brand-50 lg:block">
+        <BrandPattern tone="light" seed={2} class="absolute inset-0 h-full w-full" />
+      </div>
     </div>
   </section>
 ) : (
-  <section class="band-accent on-dark relative overflow-hidden bg-accent-600 text-white">
-    {value.pattern && <BrandPattern seed={1} width={2400} class="pointer-events-none absolute inset-x-0 bottom-0 h-full w-full opacity-30" />}
-    <div class="container-x relative py-section">
-      <div class="max-w-3xl">
-        <h2 class="h2">{value.heading}</h2>
-        {value.text && <p class="lead mt-4 max-w-[46ch] text-accent-100">{value.text}</p>}
-        <LinkButton block="cta" link={value.link} service={service} class="mt-8" />
-      </div>
-      {tel && (
-        <div class="mt-12 border-t border-white/40 pt-8">
-          <p class="text-sm font-bold uppercase tracking-wide text-accent-100">Oder direkt anrufen</p>
-          <a href={tel} class="mt-2 inline-block font-display text-[clamp(2rem,0.9rem+5vw,5.5rem)] font-extrabold leading-none sm:whitespace-nowrap decoration-4 underline-offset-8 hover:underline">{value.phone}</a>
+  <section class="panel-wrap section-sm">
+    <div class="panel on-dark relative isolate bg-brand-600 text-white">
+      {value.pattern && <BrandPattern seed={1} width={2400} class="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-full w-full opacity-40" />}
+      <div class="panel-pad flex flex-wrap items-end justify-between gap-x-16 gap-y-10">
+        <div class="max-w-3xl flex-1 basis-[26rem]">
+          <h2 class="h2">{heading}</h2>
+          {value.text && <p class="lead mt-4 max-w-[46ch] text-white">{value.text}</p>}
         </div>
-      )}
+        <div class="flex flex-col items-start gap-3">
+          {tel && (
+            <a href={tel} class="inline-flex min-h-16 items-center gap-3 rounded-full bg-white px-6 text-[clamp(1.25rem,0.9rem+1.6vw,2rem)] font-extrabold tracking-tight text-deep-900 hover:bg-brand-100 sm:whitespace-nowrap sm:px-8">
+              <Icon name="phone" class="h-6 w-6 shrink-0 text-brand-600" />{value.phone}
+            </a>
+          )}
+          <LinkButton block="cta" link={value.link} service={service} class={tel ? "btn-secondary-on-dark min-h-14 px-7" : "min-h-14 px-7"} />
+        </div>
+      </div>
     </div>
   </section>
 )}

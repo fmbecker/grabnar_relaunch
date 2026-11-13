@@ -128,3 +128,37 @@ Vorher/Nachher: `docs/design/ausgangsstand/` ↔ `docs/design/nachher/` (1440 un
     cd cms && uv run manage.py seed_dev --superuser && uv run manage.py runserver
     cd web && pnpm dev                       # http://localhost:4321
     # produktionsnah + Audit: siehe docs/03-technik.md „Qualitätsprüfung“
+
+## Richtung D · Hell, rund, fotogeführt (Branch `feat/design-modern`, 13.11.2026)
+
+Anlass: Felix' Eindruck nach dem Rework – Technik und Struktur passen, das Design wirkt noch altbacken.
+Vorbilder: kosecleaning.be (nummerierte Bildkarten, klare Abschnittsfolge) und officepride.com
+(vollflächiger Hero mit Foto/Video, Karten, wiederholte Kontakt-Buttons). Entwurf: Design-Artefakt
+„Grabnar Startseite – moderner Entwurf“ auf claude.ai. **Noch nicht abgenommen** – der Branch ist ein
+Vorschlag; die Punkte unten ersetzen die Entscheidungen vom 31.10. erst nach Felix' Freigabe.
+
+| Thema | Bisher (Richtung B) | Richtung D |
+|---|---|---|
+| Schrift | Überschriften Manrope 800, Fließtext Arial | Manrope für alles (`web/public/fonts/manrope-variable.woff2`, variabel 200–800, Latin, selbst gehostet) |
+| Überschriften | Versalien | normale Groß-/Kleinschreibung, enge Laufweite; Versalien nur noch in kleinen Labels (`.eyebrow`) |
+| Dunkle Flächen | Logo-Blau `#2D78BC`, Akzent `#005A96` | Tiefblau `#0F2A44` (`deep-900`) für Hero, Seitenköpfe, Merkmale; `brand-600` `#2768A3` für Buttons und Abschlussband |
+| Grund | Weiß, Abschnitte vollflächig | heller Grund `#F4F7FA` (`ink-50`), Inhalte als weiße Karten und große abgerundete Flächen (`.panel`, `.card`) |
+| Ecken, Schatten | 2 px, keine Schatten | `--radius-ui` 14 px, `--radius-card` 28 px, `--radius-panel` bis 36 px, Buttons als Pillen, weicher Schatten (`--shadow-card`) |
+| Hero | Text links, schräg angeschnittenes Foto rechts | eine große Bühne: Foto vollflächig mit dunklem Verlauf, Text unten links; ohne Foto die Logo-Türme |
+| Fakten-Leiste | Band in Akzentblau | Reihe weißer Chips mit Haken direkt unter dem Hero |
+| Leistungsbereiche | Bild-Text-Reihen im Wechsel, Leistungen als Linkliste | nummerierte Bildkarten (2 Spalten), Leistungen als Chips – jede Leistung bleibt ein Link |
+| Merkmale | Raster auf Logo-Blau | Liste mit Symbolflächen auf Tiefblau |
+| Abschlussband | Band mit sehr großer Telefonnummer | abgerundete Fläche, Telefonnummer als weiße Pille, Kontakt-Button daneben |
+
+Unverändert: Header und Footer bleiben hell (Entscheidung „helle Rahmen“), Inhalte, Seitenbaum, CMS-Modelle,
+Block-Vertrag (keine neuen Blöcke oder Felder), Tracking.
+
+Prüfungen (13.11.2026, lokal mit Seed-Daten): `pnpm lint`, `pnpm check`, `pnpm build`, `pnpm check:tracking`
+grün; `node scripts/audit.mjs` auf 7 Seiten 100/100/100/100, axe 0. Tracking-Attribute im gebauten HTML
+(`data-umami-event*`, `data-track-*`, `tel:`/`mailto:`-Links) Seite für Seite identisch zu `main`
+(2454 Elemente mit Ereignis auf 34 HTML-Seiten).
+
+Screenshots: `docs/design/modern/` (Seed-Daten, Platzhalterbilder sind einfarbige Flächen).
+
+Offen: echte Fotos (größter Hebel, vor allem Hero und Bereichskarten); optional ein Bildfeld für den
+Merkmale-Block (bräuchte Block-Vertrag: `cms/blocks/blocks.py`, `web/src/lib/types.ts`, `FeatureList.astro`).

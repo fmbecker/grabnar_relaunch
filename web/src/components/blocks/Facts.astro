@@ -1,10 +1,15 @@
 ---
 import type { FactsValue } from "@/lib/types";
+import Icon from "@/components/ui/Icon.astro";
 interface Props { value: FactsValue }
 const { value } = Astro.props;
 ---
-<section aria-label="Auf einen Blick" class="on-dark bg-accent-600 text-white">
-  <ul class="container-x flex flex-wrap gap-x-8 gap-y-3 md:justify-between py-5 font-display text-base font-extrabold uppercase tracking-wide sm:py-6 sm:text-lg">
-    {value.items.map((item) => <li>{item}</li>)}
+<section aria-label="Auf einen Blick" class="panel-wrap pt-3 sm:pt-4">
+  <ul class="mx-auto grid max-w-[87rem] grid-cols-2 gap-2 sm:gap-3 md:flex md:flex-wrap">
+    {value.items.map((item) => (
+      <li class="card flex min-h-14 flex-1 items-center gap-2.5 rounded-2xl px-4 py-3 text-sm font-extrabold sm:text-base md:px-5 last:odd:col-span-2">
+        <Icon name="check" class="h-5 w-5 shrink-0 text-brand-500" />{item}
+      </li>
+    ))}
   </ul>
 </section>

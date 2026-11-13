@@ -14,11 +14,11 @@ const { value } = Astro.props;
     ) : value.show_filter ? (
       <JobFilter client:idle jobs={value.jobs} />
     ) : (
-      <ul class="border-t-4 border-brand-500">
+      <ul class="grid gap-3">
         {value.jobs.map((j) => (
-          <li><a href={j.href} {...umami(EVENT.jobOpen, { job: j.title })} class="group flex items-center justify-between gap-6 border-b border-ink-100 bg-white px-1 py-6 hover:bg-brand-50 sm:px-4">
+          <li><a href={j.href} {...umami(EVENT.jobOpen, { job: j.title })} class="card group flex items-center justify-between gap-6 rounded-2xl p-5 transition-shadow hover:shadow-card-hover motion-reduce:transition-none sm:p-6">
             <div><h3 class="h3 group-hover:text-brand-700">{j.title}</h3><p class="mt-2 text-ink-700">{j.location} · {j.employment_type_label} · {j.start_date}</p></div>
-            <span class="grid h-11 w-11 shrink-0 place-items-center bg-brand-500 text-white"><Icon name="arrow" class="h-5 w-5" /></span>
+            <span class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-brand-600 text-white"><Icon name="arrow" class="h-5 w-5" /></span>
           </a></li>
         ))}
       </ul>

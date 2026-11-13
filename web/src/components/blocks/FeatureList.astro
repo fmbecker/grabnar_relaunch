@@ -1,20 +1,30 @@
 ---
 import type { FeatureListValue } from "@/lib/types";
 import Icon from "@/components/ui/Icon.astro";
+import BrandPattern from "@/components/ui/BrandPattern.astro";
 interface Props { value: FeatureListValue }
 const { value } = Astro.props;
+// Keep the company name on one line in the large headline
+const heading = value.heading?.replace(/M\. ?B\. Grabnar/g, "M.\u00a0B.\u00a0Grabnar");
 ---
-<section class="section on-dark bg-brand-500 text-white">
-  <div class="container-x">
-    {value.heading && <h2 class="h2 max-w-3xl">{value.heading}</h2>}
-    <ul class="mt-12 grid gap-px border-y border-white/30 bg-white/30 md:grid-cols-3">
-      {value.features.map((f) => (
-        <li class="bg-brand-500 py-8 md:px-8 md:[&:nth-child(3n+1)]:pl-0">
-          <Icon name={f.icon} class="h-8 w-8" />
-          <h3 class="h3 mt-5">{f.title}</h3>
-          <p class="mt-3 text-white">{f.text}</p>
-        </li>
-      ))}
-    </ul>
+<section class="panel-wrap section-sm">
+  <div class="panel on-dark relative isolate bg-deep-900 text-white">
+    <BrandPattern seed={5} width={2400} class="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-3/4 w-full opacity-40" />
+    <div class="panel-pad grid gap-10 lg:grid-cols-12 lg:gap-16">
+      <div class="lg:col-span-5">
+        {heading && <h2 class="h2">{heading}</h2>}
+      </div>
+      <ul class="lg:col-span-7">
+        {value.features.map((f) => (
+          <li class="flex gap-5 border-t border-white/15 py-6 last:border-b">
+            <span class="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-brand-300/15 text-brand-300"><Icon name={f.icon} class="h-6 w-6" /></span>
+            <div>
+              <h3 class="h4 text-xl">{f.title}</h3>
+              <p class="mt-1.5 text-deep-100">{f.text}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
   </div>
 </section>

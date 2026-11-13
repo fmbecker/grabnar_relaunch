@@ -4,8 +4,8 @@ interface Props { value: TestimonialValue }
 const { value } = Astro.props;
 ---
 <section class="section">
-  <figure class="container-x max-w-3xl text-center">
+  <figure class="card container-x max-w-3xl p-8 text-center sm:p-12">
     <blockquote class="text-xl font-medium leading-relaxed text-ink-900 sm:text-2xl">„{value.quote}“</blockquote>
-    <figcaption class="mt-6 text-sm text-ink-500"><span class="font-semibold text-ink-900">{value.name}</span>{value.company && <span> · {value.company}</span>}</figcaption>
+    <figcaption class="mt-6 text-sm text-ink-700"><span class="font-extrabold text-ink-900">{value.name}</span>{value.company && <span> · {value.company}</span>}</figcaption>
   </figure>
 </section>

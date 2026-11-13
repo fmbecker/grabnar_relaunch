@@ -11,7 +11,7 @@ const logo = site.logo;
 // National format reads faster in the region: "+49 (0) 711 …" -> "0711 …"
 const phoneShort = phone.replace(/^\+49\s*\(0\)\s*(\d+)\s*/, "0$1 ");
 ---
-<header data-track-area="header" class="sticky top-0 z-40 border-b border-ink-100 bg-white text-ink-900">
+<header data-track-area="header" class="sticky top-0 z-40 border-b border-ink-100 bg-white/95 text-ink-900 backdrop-blur">
   <div class="container-x flex h-20 items-center justify-between gap-4 xl:gap-6">
     <a href="/" class="flex shrink-0 items-center gap-2 font-bold text-brand-700" {...umami(EVENT.nav, { item: "Logo", menu: "header" })}>
       {logo ? (
@@ -26,14 +26,14 @@ const phoneShort = phone.replace(/^\+49\s*\(0\)\s*(\d+)\s*/, "0$1 ");
       <ul class="flex items-center gap-0 text-sm font-bold xl:gap-1 xl:text-[0.9375rem]">
         {nav.items.map((item) => (
           <li class="group relative">
-            <a href={item.href} {...umami(EVENT.nav, { item: item.title, level: 1, menu: "desktop" })} class:list={["flex min-h-11 items-center gap-1 whitespace-nowrap rounded-ui px-1.5 py-2 underline-offset-[6px] decoration-2 hover:bg-brand-50 hover:text-brand-700 xl:px-2.5", isActive(item.href) && "text-brand-700 underline"]} aria-current={currentPath === item.href ? "page" : undefined}>
+            <a href={item.href} {...umami(EVENT.nav, { item: item.title, level: 1, menu: "desktop" })} class:list={["flex min-h-11 items-center gap-1 whitespace-nowrap rounded-full px-2 py-2 transition-colors hover:bg-brand-50 hover:text-brand-700 xl:px-3.5", isActive(item.href) && "bg-brand-50 text-brand-700"]} aria-current={currentPath === item.href ? "page" : undefined}>
               {item.title}
               {item.children && item.children.length > 0 && <svg class="h-3 w-3" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5" /></svg>}
             </a>
             {item.children && item.children.length > 0 && (
-              <ul class="invisible absolute left-0 top-full z-50 w-64 rounded-ui bg-white p-2 text-ink-900 font-normal opacity-0 shadow-xl transition group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
+              <ul class="invisible absolute left-0 top-full z-50 w-72 rounded-2xl border border-ink-100 bg-white p-2 font-semibold text-ink-900 opacity-0 shadow-card-hover transition group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
                 {item.children.map((c) => (
-                  <li><a href={c.href} {...umami(EVENT.nav, { item: c.title, parent: item.title, level: 2, menu: "desktop" })} class:list={["block rounded-ui px-3 py-2 hover:bg-brand-50 hover:text-brand-700", currentPath === c.href && "font-bold text-brand-700"]}>{c.title}</a></li>
+                  <li><a href={c.href} {...umami(EVENT.nav, { item: c.title, parent: item.title, level: 2, menu: "desktop" })} class:list={["block rounded-xl px-3.5 py-2.5 hover:bg-brand-50 hover:text-brand-700", currentPath === c.href && "bg-brand-50 font-extrabold text-brand-700"]}>{c.title}</a></li>
                 ))}
               </ul>
             )}
@@ -43,30 +43,30 @@ const phoneShort = phone.replace(/^\+49\s*\(0\)\s*(\d+)\s*/, "0$1 ");
     </nav>
     <!-- Phone: icon only while the menu needs the space, number from the `wide` breakpoint (1360px) -->
     <a href={tel} class="btn-primary hidden px-3 lg:inline-flex wide:hidden" aria-label={`Anrufen: ${phone}`} title={phone}><Icon name="phone" class="h-5 w-5" /></a>
-    <a href={tel} class="btn-primary hidden whitespace-nowrap font-display font-extrabold wide:inline-flex"><Icon name="phone" class="h-4 w-4" />{phoneShort}</a>
+    <a href={tel} class="btn-primary hidden whitespace-nowrap wide:inline-flex"><Icon name="phone" class="h-4 w-4" />{phoneShort}</a>
 
     <!-- Mobile: details/summary, categories expandable -->
     <div class="flex items-center gap-2 lg:hidden">
     <a href={tel} class="btn-primary px-3" aria-label={`Anrufen: ${phone}`}><Icon name="phone" class="h-5 w-5" /></a>
     <details class="relative" data-track-toggle="mobile-menu-open" data-track-area="mobile-menu">
-      <summary class="btn-secondary min-h-11 cursor-pointer list-none rounded-ui px-4 py-2 font-bold">Menü</summary>
-      <ul class="absolute right-0 mt-2 max-h-[75vh] w-72 overflow-y-auto rounded-ui bg-white p-2 text-ink-900 shadow-xl">
+      <summary class="btn-secondary cursor-pointer list-none px-5">Menü</summary>
+      <ul class="absolute right-0 mt-2 max-h-[75vh] w-80 max-w-[calc(100vw-1.5rem)] overflow-y-auto rounded-2xl border border-ink-100 bg-white p-2 text-ink-900 shadow-card-hover">
         {nav.items.map((item) =>
           item.children && item.children.length > 0 ? (
             <li>
               <details>
-                <summary class="flex cursor-pointer list-none items-center justify-between rounded px-3 py-2 font-medium hover:bg-ink-50">{item.title}<span aria-hidden="true">+</span></summary>
+                <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between rounded-xl px-3.5 py-2 font-bold hover:bg-brand-50">{item.title}<span aria-hidden="true">+</span></summary>
                 <ul class="mb-1 ml-3 border-l border-ink-100 pl-2 text-sm">
-                  <li><a href={item.href} {...umami(EVENT.nav, { item: item.title, level: 1, menu: "mobile" })} class="block rounded px-3 py-1.5 font-semibold text-brand-700">Übersicht</a></li>
-                  {item.children.map((c) => <li><a href={c.href} {...umami(EVENT.nav, { item: c.title, parent: item.title, level: 2, menu: "mobile" })} class="block rounded px-3 py-1.5 hover:bg-ink-50">{c.title}</a></li>)}
+                  <li><a href={item.href} {...umami(EVENT.nav, { item: item.title, level: 1, menu: "mobile" })} class="flex min-h-11 items-center rounded-xl px-3.5 font-bold text-brand-700 hover:bg-brand-50">Übersicht</a></li>
+                  {item.children.map((c) => <li><a href={c.href} {...umami(EVENT.nav, { item: c.title, parent: item.title, level: 2, menu: "mobile" })} class="flex min-h-11 items-center rounded-xl px-3.5 font-semibold hover:bg-brand-50">{c.title}</a></li>)}
                 </ul>
               </details>
             </li>
           ) : (
-            <li><a href={item.href} {...umami(EVENT.nav, { item: item.title, level: 1, menu: "mobile" })} class="block rounded px-3 py-2 font-medium hover:bg-ink-50">{item.title}</a></li>
+            <li><a href={item.href} {...umami(EVENT.nav, { item: item.title, level: 1, menu: "mobile" })} class="flex min-h-11 items-center rounded-xl px-3.5 font-bold hover:bg-brand-50">{item.title}</a></li>
           ),
         )}
-        <li class="mt-2 border-t border-ink-100 pt-2"><a href={tel} class="block px-3 py-2 font-semibold text-brand-700">{phone}</a></li>
+        <li class="mt-2 border-t border-ink-100 pt-2"><a href={tel} class="flex min-h-11 items-center px-3.5 font-extrabold text-brand-700">{phone}</a></li>
       </ul>
     </details>
     </div>
