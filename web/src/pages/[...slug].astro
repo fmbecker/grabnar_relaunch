@@ -1,5 +1,5 @@
 ---
-import { isHomePage, isJobPage, isServicePage, type PageData } from "@/lib/types";
+import { isHomePage, isJobPage, isServiceIndexPage, isServicePage, type PageData } from "@/lib/types";
 import { getAllPages, getNavigation, getSettings, normalizePage, pathFromHtmlUrl } from "@/lib/wagtail";
 import { jobPosting, localBusiness } from "@/lib/jsonld";
 import Base from "@/layouts/Base.astro";
@@ -29,7 +29,7 @@ const fallbackText = (p: PageData): string =>
 const description = page.meta.search_description || fallbackText(page);
 
 const image =
-  page.og_image ?? (isServicePage(page) ? page.hero_image : null) ?? (isHomePage(page) ? page.hero[0].value.image : null);
+  page.og_image ?? (isServicePage(page) || isServiceIndexPage(page) ? page.hero_image : null) ?? (isHomePage(page) ? page.hero[0].value.image : null);
 ---
 <Base
   settings={settings}

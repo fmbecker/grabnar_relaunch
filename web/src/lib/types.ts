@@ -215,7 +215,18 @@ export interface HomePageData extends BasePageData {
 }
 
 export interface StandardPageData extends BasePageData {
-  meta: PageMeta & { type: "home.StandardPage" | "services.ServiceIndexPage" | "jobs.JobIndexPage" };
+  meta: PageMeta & { type: "home.StandardPage" | "jobs.JobIndexPage" };
+  intro: string;
+  body: Block[];
+}
+
+/** Service category (cms/services/models.py: ServiceIndexPage). Rendered like a standard page, plus an optional header image. */
+export interface ServiceIndexPageData extends BasePageData {
+  meta: PageMeta & { type: "services.ServiceIndexPage" };
+  icon: string;
+  teaser: string;
+  /** "Titelbild" in the CMS: shown in the page header and on the category tile. */
+  hero_image: ApiImage | null;
   intro: string;
   body: Block[];
 }
@@ -247,7 +258,7 @@ export interface JobPageData extends BasePageData {
   first_published_at: string | null;
 }
 
-export type PageData = HomePageData | StandardPageData | ServicePageData | JobPageData;
+export type PageData = HomePageData | StandardPageData | ServiceIndexPageData | ServicePageData | JobPageData;
 
 // ---- Settings / navigation -----------------------------------------------
 
@@ -335,8 +346,8 @@ export interface RedirectItem {
 
 export const isHomePage = (p: PageData): p is HomePageData => p.meta.type === "home.HomePage";
 export const isStandardPage = (p: PageData): p is StandardPageData =>
-  p.meta.type === "home.StandardPage" ||
-  p.meta.type === "services.ServiceIndexPage" ||
-  p.meta.type === "jobs.JobIndexPage";
+  p.meta.type === "home.StandardPage" || p.meta.type === "jobs.JobIndexPage";
+export const isServiceIndexPage = (p: PageData): p is ServiceIndexPageData =>
+  p.meta.type === "services.ServiceIndexPage";
 export const isServicePage = (p: PageData): p is ServicePageData => p.meta.type === "services.ServicePage";
 export const isJobPage = (p: PageData): p is JobPageData => p.meta.type === "jobs.JobPage";
