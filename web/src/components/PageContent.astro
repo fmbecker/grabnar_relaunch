@@ -38,7 +38,7 @@ const enquiry = svc ? withService("/kontakt/", page.title) : "";
             <h1 class="h1">{page.title}</h1>
             {std.intro && <p class="lead mt-5 max-w-[46ch]">{std.intro}</p>}
           </div>
-          <div class="relative -mx-4 h-56 bg-brand-600 [clip-path:polygon(0_22%,100%_0,100%_100%,0_100%)] sm:-mx-6 sm:h-72 lg:col-span-5 lg:mx-0 lg:mr-[calc(50%-50vw)] lg:h-auto lg:min-h-[20rem] lg:[clip-path:polygon(18%_0,100%_0,100%_100%,0_100%)]">
+          <div class="relative -mx-4 h-56 [mask-image:linear-gradient(173deg,transparent_4%,black_42%)] sm:-mx-6 sm:h-72 lg:col-span-5 lg:mx-0 lg:mr-[calc(50%-50vw)] lg:h-auto lg:min-h-[20rem] lg:[mask-image:linear-gradient(104deg,transparent_5%,black_48%)]">
             <Picture image={headImage} variant="hero" loading="eager" sizes="(min-width: 1024px) 45vw, 100vw" class="absolute inset-0 h-full w-full object-cover" />
           </div>
         </div>
@@ -69,7 +69,7 @@ const enquiry = svc ? withService("/kontakt/", page.title) : "";
           <p class="lead mt-5 max-w-[46ch]">{svc.teaser}</p>
           <a href={enquiry} class="btn-primary mt-8" {...umami(EVENT.cta, { block: "page-header", label: "Angebot anfragen", target: target(enquiry), service: page.title })}>{page.title} anfragen</a>
         </div>
-        <div class="relative -mx-4 h-56 bg-brand-600 [clip-path:polygon(0_22%,100%_0,100%_100%,0_100%)] sm:-mx-6 sm:h-72 lg:col-span-5 lg:mx-0 lg:mr-[calc(50%-50vw)] lg:h-auto lg:min-h-[26rem] lg:[clip-path:polygon(18%_0,100%_0,100%_100%,0_100%)]">
+        <div class="relative -mx-4 h-56 [mask-image:linear-gradient(173deg,transparent_4%,black_42%)] sm:-mx-6 sm:h-72 lg:col-span-5 lg:mx-0 lg:mr-[calc(50%-50vw)] lg:h-auto lg:min-h-[26rem] lg:[mask-image:linear-gradient(104deg,transparent_5%,black_48%)]">
           {svc.hero_image
             ? <Picture image={svc.hero_image} variant="hero" loading="eager" sizes="(min-width: 1024px) 45vw, 100vw" class="absolute inset-0 h-full w-full object-cover" />
             : <BrandPattern tone="dark" seed={page.id} class="absolute inset-0 h-full w-full" />}
