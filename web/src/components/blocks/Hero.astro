@@ -22,8 +22,9 @@ const { value } = Astro.props;
         </div>
       )}
     </div>
-    <!-- Picture: cut at an angle like the logo's roofs; drawn towers until the company's photos arrive -->
-    <div class="relative -mx-4 h-64 bg-brand-600 [clip-path:polygon(0_18%,100%_0,100%_100%,0_100%)] sm:-mx-6 sm:h-80 lg:col-span-5 lg:mx-0 lg:h-auto lg:min-h-[34rem] lg:[clip-path:polygon(16%_0,100%_0,100%_100%,0_100%)]">
+    <!-- Picture: fades into the blue at an angle like the logo's roofs (mobile: towards the top, desktop: towards
+         the left; 173deg/98deg keep the former slant of the cut edge). Drawn towers until the company's photos arrive -->
+    <div class="relative -mx-4 h-64 [mask-image:linear-gradient(173deg,transparent_4%,black_42%)] sm:-mx-6 sm:h-80 lg:col-span-5 lg:mx-0 lg:h-auto lg:min-h-[34rem] lg:[mask-image:linear-gradient(98deg,transparent_6%,black_50%)]">
       {value.image ? (
         <Picture image={value.image} variant="hero" loading="eager" sizes="(min-width: 1024px) 42vw, 100vw" class="absolute inset-0 h-full w-full object-cover" />
       ) : (
