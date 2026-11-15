@@ -17,8 +17,8 @@ Das Frontend bekommt Bilder ausschließlich als Wagtail-Renditions (`cms/blocks/
 
 | Rendition | Zuschnitt | Verwendet in |
 |---|---|---|
-| `hero` | 2000 × 1000 (2:1) | `web/src/components/blocks/Hero.astro` |
-| `wide` | 1600 × 900 (16:9) | Bereichskarten in `web/src/components/blocks/ServiceGrid.astro`, Kopf der Leistungsseite in `web/src/components/PageContent.astro` |
+| `hero` | 2000 × 1000 (2:1) | `web/src/components/blocks/Hero.astro`, Kopf der Leistungsseite in `web/src/components/PageContent.astro` |
+| `wide` | 1600 × 900 (16:9) | Bereichskarten in `web/src/components/blocks/ServiceGrid.astro` |
 | `card` | 800 × 600 (4:3) | Leistungskarten, `TextImage.astro`, Galerie |
 | `thumb` | 400 × 300 | kleine Vorschauen, `srcset` |
 
