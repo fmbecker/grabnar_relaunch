@@ -441,8 +441,10 @@ def test_certificate_seal(client):
         assert cert["label"] == "Zertifiziert nach ISO 9001 und ISO 14001"
         assert cert["seal"]["height"] == 64 and cert["seal"]["url2x"]
         assert cert["seal"]["alt"] == cert["label"] and cert["document_url"] == ""
+        assert cert["url"] == "https://www.certipedia.com/companies/184678?locale=de"
         block = unternehmen_block()
         assert block["seal"]["height"] == 160 and block["heading"].startswith("Zertifiziert")
+        assert block["url"] == cert["url"]
     finally:
         ss.certificate_seal = None
         ss.save()

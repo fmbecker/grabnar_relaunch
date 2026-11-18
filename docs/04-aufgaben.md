@@ -62,6 +62,7 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 - [x] 🤖 Seite „Unternehmen“ (`/unternehmen/`): Leitgedanke + Firmentext, 6 Merkmale („Was uns auszeichnet“) ausschließlich aus Aussagen der Altseite (Quellen in `import_legacy.FEATURES`), Leistungsbereiche, CTA
 - [x] 👤 Rückfragen der Firma beantwortet (30.10.2026): ISO 9001 + ISO 14001, AÜG-Erlaubnis, Bewachungserlaubnis (nicht nennen), Maurerarbeiten ergänzen, Versiegelung ohne Einschränkung, IfSG-Paragraf korrekt, keine Privatkunden – eingearbeitet, siehe `docs/02-konzept.md`
 - [x] 🤖 Platz für das ISO-Siegel vorbereitet: Website-Einstellungen → „Zertifizierung“ (Siegel, Text, optional PDF), erscheint automatisch im Footer und im Block „Zertifikat“ auf „Unternehmen“
+- [x] 🤖 Jedes Siegel verlinkt auf das Zertifikat: Feld „Link zum Zertifikat“ unter Website-Einstellungen → Zertifizierung (Vorgabe: Certipedia-Eintrag `https://www.certipedia.com/companies/184678?locale=de`; leer = PDF, sonst „Unternehmen“)
 - [ ] 👤 Kombiniertes Siegel ISO 9001/14001 (SVG oder PNG, transparent) im Admin hochladen: Einstellungen → Website-Einstellungen → Zertifizierung; optional das Zertifikat als PDF
 - [x] 👤 Alle 24 Neutexte inkl. Maurerarbeiten und geänderter Baureinigung von der Firma freigegeben (Vergleichsseite, 30.10.2026)
 - [ ] 👤 Optional: Gründungsjahr, Mitarbeiterzahl, Team-Fotos für „Unternehmen“

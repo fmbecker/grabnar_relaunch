@@ -1,29 +1,46 @@
 ---
-/** CertificateBlock: the ISO seal from the site settings. Renders nothing until a seal is uploaded. */
+/** CertificateBlock: the ISO seal from the site settings, linked to the certificate set there
+ *  (Certipedia, else the PDF). Renders nothing until a seal is uploaded. */
 import type { CertificateValue } from "@/lib/types";
 import Icon from "@/components/ui/Icon.astro";
 interface Props { value: CertificateValue }
 const { value } = Astro.props;
 const seal = value.seal;
+const href = value.url || value.document_url;
+const label = value.url ? "Zertifikat ansehen" : "Zertifikat ansehen (PDF)";
 ---
 {seal && (
   <section class="section-sm">
     <div class="container-x">
       <div class="grid items-center gap-8 border-y-4 border-brand-500 py-10 sm:grid-cols-[auto_1fr] sm:gap-12">
-        <img
-          src={seal.url}
-          srcset={`${seal.url} 1x, ${seal.url2x} 2x`}
-          width={seal.width}
-          height={seal.height}
-          alt={seal.alt}
-          loading="lazy"
-          class="h-32 w-auto sm:h-40"
-        />
+        {href ? (
+          <a href={href} target="_blank" rel="noopener" class="justify-self-start rounded-ui hover:opacity-90">
+            <img
+              src={seal.url}
+              srcset={`${seal.url} 1x, ${seal.url2x} 2x`}
+              width={seal.width}
+              height={seal.height}
+              alt={`${seal.alt} – ${label} (öffnet in neuem Tab)`}
+              loading="lazy"
+              class="h-32 w-auto sm:h-40"
+            />
+          </a>
+        ) : (
+          <img
+            src={seal.url}
+            srcset={`${seal.url} 1x, ${seal.url2x} 2x`}
+            width={seal.width}
+            height={seal.height}
+            alt={seal.alt}
+            loading="lazy"
+            class="h-32 w-auto sm:h-40"
+          />
+        )}
         <div>
           {value.heading && <h2 class="h2">{value.heading}</h2>}
           {value.text && <p class="lead mt-3 max-w-2xl text-ink-700">{value.text}</p>}
-          {value.document_url && (
-            <a class="btn-secondary mt-6" href={value.document_url} target="_blank" rel="noopener">Zertifikat ansehen (PDF) <Icon name="arrow" class="h-4 w-4" /></a>
+          {href && (
+            <a class="btn-secondary mt-6" href={href} target="_blank" rel="noopener">{label} <Icon name="arrow" class="h-4 w-4" /><span class="sr-only"> (öffnet in neuem Tab)</span></a>
           )}
         </div>
       </div>

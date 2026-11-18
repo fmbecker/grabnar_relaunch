@@ -132,7 +132,16 @@ class SiteSettings(BaseSiteSetting, ClusterableModel):
         blank=True,
         on_delete=models.SET_NULL,
         related_name="+",
-        help_text=_("Wird beim Siegel verlinkt."),
+        help_text=_("Wird beim Siegel verlinkt, solange kein Link zum Zertifikat eingetragen ist."),
+    )
+    certificate_url = models.URLField(
+        _("Link zum Zertifikat"),
+        blank=True,
+        default="https://www.certipedia.com/companies/184678?locale=de",
+        help_text=_(
+            "Jedes Siegel auf der Website verlinkt hierhin (Eintrag bei Certipedia). "
+            "Leer = PDF, falls hochgeladen, sonst die Seite „Unternehmen“."
+        ),
     )
 
     # Umami (self-hosted, cookieless). Tracking stays off until script URL and website ID are set.
@@ -182,6 +191,7 @@ class SiteSettings(BaseSiteSetting, ClusterableModel):
             [
                 FieldPanel("certificate_seal"),
                 FieldPanel("certificate_label"),
+                FieldPanel("certificate_url"),
                 FieldPanel("certificate_document"),
             ],
             _("Zertifizierung"),
@@ -235,6 +245,7 @@ class SiteSettings(BaseSiteSetting, ClusterableModel):
         return {
             "label": self.certificate_label,
             "seal": seal,
+            "url": self.certificate_url,
             "document_url": self.certificate_document.url if self.certificate_document else "",
         }
 

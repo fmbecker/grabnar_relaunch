@@ -7,6 +7,9 @@ const { nav, settings } = Astro.props;
 const { contact, site } = settings;
 // Light footer so the original (blue, transparent) logo keeps its colours.
 const logo = site.logo;
+// Seal links to the certificate (Certipedia), else the PDF, else the company page.
+const certHref = site.certificate ? site.certificate.url || site.certificate.document_url || "/unternehmen/" : "";
+const certExternal = !!site.certificate && (!!site.certificate.url || !!site.certificate.document_url);
 ---
 <footer data-track-area="footer" class="relative mt-auto overflow-hidden border-t-4 border-brand-500 bg-ink-50 text-ink-900">
   {site.footer_pattern && <BrandPattern tone="light" seed={3} width={2400} class="pointer-events-none absolute inset-x-0 bottom-0 h-full w-full opacity-30" />}
@@ -20,9 +23,9 @@ const logo = site.logo;
       {site.certificate && (
         <div>
           <a
-            href={site.certificate.document_url || "/unternehmen/"}
-            target={site.certificate.document_url ? "_blank" : undefined}
-            rel={site.certificate.document_url ? "noopener" : undefined}
+            href={certHref}
+            target={certExternal ? "_blank" : undefined}
+            rel={certExternal ? "noopener" : undefined}
             class="mt-8 inline-flex items-center gap-3 rounded-ui border border-ink-100 bg-white p-2 pr-4 text-sm font-bold text-ink-900 hover:border-brand-500 hover:text-brand-700"
           >
             <img
@@ -35,6 +38,7 @@ const logo = site.logo;
               class="h-12 w-auto"
             />
             {site.certificate.label}
+            {certExternal && <span class="sr-only"> (öffnet in neuem Tab)</span>}
           </a>
         </div>
       )}
