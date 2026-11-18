@@ -12,8 +12,7 @@ const { value } = Astro.props;
       {value.motto && (
         <blockquote class="mb-6 text-lg italic">„{value.motto}“</blockquote>
       )}
-      <!-- Headline breaks only between words (no hyphenation inside a word); size scales with the viewport so the longest word fits -->
-      <h1 class="h1 hyphens-none [overflow-wrap:normal]">{value.headline}</h1>
+      <h1 class="h1">{value.headline}</h1>
       {value.subline && <p class="lead mt-6 max-w-[38ch]">{value.subline}</p>}
       {value.links.length > 0 && (
         <div class="mt-10 flex flex-wrap gap-3">

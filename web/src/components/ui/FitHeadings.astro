@@ -1,0 +1,44 @@
+---
+/**
+ * Headings break only between words, never inside one (no hyphenation, no emergency break).
+ * A heading whose longest word is wider than the heading box gets a smaller font size, just enough for that
+ * word to fit. Titles come from the CMS, so this can't be fixed with static sizes.
+ *
+ * Runs inline at the end of <body> (before first paint in practice), again once the web font has loaded, and on
+ * resize. Without JavaScript the class `fit-headings` is never set and global.css falls back to hyphenation, so no
+ * word ever overflows its box.
+ */
+---
+<script is:inline>
+  (() => {
+    const root = document.documentElement;
+    root.classList.add("fit-headings");
+    const fit = () => {
+      const hs = [...document.querySelectorAll("h1,h2,h3,h4,h5,h6")];
+      // reset, then read everything before writing anything (one layout pass)
+      for (const h of hs) h.style.removeProperty("font-size");
+      const changes = [];
+      for (const h of hs) {
+        const cs = getComputedStyle(h);
+        const avail = h.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+        if (avail <= 0) continue; // hidden
+        let widest = 0;
+        const walker = document.createTreeWalker(h, NodeFilter.SHOW_TEXT);
+        const range = document.createRange();
+        for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+          for (const m of n.data.matchAll(/\S+/g)) {
+            range.setStart(n, m.index);
+            range.setEnd(n, m.index + m[0].length);
+            widest = Math.max(widest, range.getBoundingClientRect().width);
+          }
+        }
+        if (widest > avail) changes.push([h, Math.floor(parseFloat(cs.fontSize) * (avail / widest) * 0.98 * 10) / 10]);
+      }
+      for (const [h, size] of changes) h.style.fontSize = size + "px";
+    };
+    fit();
+    document.fonts?.ready.then(fit);
+    let t;
+    addEventListener("resize", () => { clearTimeout(t); t = setTimeout(fit, 100); });
+  })();
+</script>
