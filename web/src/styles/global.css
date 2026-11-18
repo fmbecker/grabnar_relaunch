@@ -92,7 +92,11 @@
   .section-sm { @apply py-section-sm; }
   /* Headlines: Manrope 800, capitals only for h1/h2 (never body or long labels) */
   /* Long German compounds in capitals: allow hyphenation instead of overflow (html lang=de) */
-  .h1, .h2, .h3 { hyphens: auto; overflow-wrap: break-word; }
+  /* Headings break only between words: no hyphenation, no emergency break inside a word. A heading whose
+     longest word doesn't fit is scaled down by components/ui/FitHeadings.astro, which also sets .fit-headings.
+     Without JavaScript the class is missing and long words hyphenate instead of overflowing. */
+  h1, h2, h3, h4, h5, h6 { hyphens: auto; overflow-wrap: break-word; }
+  .fit-headings :is(h1, h2, h3, h4, h5, h6) { hyphens: none; overflow-wrap: normal; }
   .h1 { @apply font-display text-display font-extrabold uppercase text-balance; }
   .h2 { @apply font-display text-title font-extrabold uppercase text-balance; }
   .h3 { @apply font-display text-subtitle font-extrabold text-balance; }
