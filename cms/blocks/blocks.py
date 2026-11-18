@@ -389,7 +389,8 @@ class GalleryBlock(blocks.StructBlock):
 
 class CertificateBlock(blocks.StructBlock):
     """Shows the certification seal from the site settings (Einstellungen → Website-Einstellungen
-    → Zertifizierung). Renders nothing on the website while no seal is uploaded."""
+    → Zertifizierung), linked to the certificate set there. Renders nothing on the website while no
+    seal is uploaded."""
 
     heading = blocks.CharBlock(
         label=_("Überschrift"), required=False, default="Zertifiziert nach ISO 9001 und ISO 14001"
@@ -418,6 +419,7 @@ class CertificateBlock(blocks.StructBlock):
             "heading": value.get("heading", ""),
             "text": value.get("text", ""),
             "seal": certificate["seal"] if certificate else None,
+            "url": certificate["url"] if certificate else "",
             "document_url": certificate["document_url"] if certificate else "",
         }
 

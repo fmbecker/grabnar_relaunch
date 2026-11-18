@@ -172,6 +172,8 @@ export interface CertificateValue {
   heading: string;
   text: string;
   seal: LogoImage | null;
+  /** Link to the certificate (site settings "Link zum Zertifikat"), "" = none. */
+  url: string;
   document_url: string;
 }
 
@@ -288,6 +290,8 @@ export interface LogoImage {
 export interface CertificateSettings {
   label: string;
   seal: LogoImage;
+  /** Link to the certificate (site settings "Link zum Zertifikat"), "" = none. */
+  url: string;
   document_url: string;
 }
 
