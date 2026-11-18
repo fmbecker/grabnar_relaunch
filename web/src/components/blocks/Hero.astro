@@ -6,8 +6,8 @@ import BrandPattern from "@/components/ui/BrandPattern.astro";
 interface Props { value: HeroValue }
 const { value } = Astro.props;
 ---
-<section class="on-dark relative overflow-hidden bg-brand-500 text-white">
-  <div class="container-x grid gap-10 pt-10 sm:pt-14 lg:grid-cols-12 lg:gap-12 lg:py-20">
+<section class="on-dark relative isolate overflow-hidden bg-brand-500 text-white">
+  <div class="container-x relative z-10 grid pt-10 sm:pt-14 lg:min-h-[38rem] lg:grid-cols-12 lg:items-center lg:py-20">
     <div class="flex flex-col justify-center lg:col-span-7">
       {value.motto && (
         <blockquote class="mb-6 text-lg italic">„{value.motto}“</blockquote>
@@ -22,14 +22,15 @@ const { value } = Astro.props;
         </div>
       )}
     </div>
-    <!-- Picture: fades into the blue at an angle like the logo's roofs (mobile: towards the top, desktop: towards
-         the left; 173deg/98deg keep the former slant of the cut edge). Drawn towers until the company's photos arrive -->
-    <div class="relative -mx-4 h-64 [mask-image:linear-gradient(173deg,transparent_4%,black_42%)] sm:-mx-6 sm:h-80 lg:col-span-5 lg:mx-0 lg:h-auto lg:min-h-[34rem] lg:[mask-image:linear-gradient(98deg,transparent_6%,black_50%)]">
-      {value.image ? (
-        <Picture image={value.image} variant="hero" loading="eager" sizes="(min-width: 1024px) 42vw, 100vw" class="absolute inset-0 h-full w-full object-cover" />
-      ) : (
-        <BrandPattern class="absolute inset-0 h-full w-full" />
-      )}
-    </div>
+  </div>
+  <!-- Picture layer, landscape like the photos: mobile a band under the text that fades upwards; desktop the right
+       half of the stage, full height up to the viewport edge, fading to the left at an angle like the logo's roofs
+       (173deg/98deg keep the former slant; the transparent start is offset so no corner of the layer shows). Drawn towers until the company's photos arrive -->
+  <div class="mt-10 relative aspect-[16/10] [mask-image:linear-gradient(173deg,transparent_12vw,black_calc(12vw_+_38%))] sm:aspect-[2/1] lg:absolute lg:inset-y-0 lg:right-0 lg:aspect-auto lg:w-[56%] xl:w-[62%] lg:mt-0 lg:[mask-image:linear-gradient(98deg,transparent_100px,black_calc(100px_+_40%))]">
+    {value.image ? (
+      <Picture image={value.image} variant="hero" loading="eager" sizes="(min-width: 1280px) 62vw, (min-width: 1024px) 56vw, 100vw" class="absolute inset-0 h-full w-full object-cover" />
+    ) : (
+      <BrandPattern class="absolute inset-0 h-full w-full" />
+    )}
   </div>
 </section>
