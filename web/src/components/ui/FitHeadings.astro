@@ -1,0 +1,54 @@
+---
+/**
+ * Headings break only between words, never inside one (no hyphenation, no emergency break).
+ * A heading whose longest word is wider than the space it has gets a smaller font size, just enough for that
+ * word to fit. Titles come from the CMS, so this can't be fixed with static sizes.
+ *
+ * The available width is measured with the heading collapsed to zero width: a long word would otherwise widen
+ * its own grid/flex column (min-width: auto) and seem to fit while the page scrolls sideways.
+ *
+ * Runs inline at the end of <body> (before first paint in practice), again once the web font has loaded, and on
+ * resize. Without JavaScript the class `fit-headings` is never set and global.css falls back to hyphenation, so no
+ * word ever overflows.
+ */
+---
+<script is:inline>
+  (() => {
+    document.documentElement.classList.add("fit-headings");
+    const px = (v) => parseFloat(v) || 0;
+    const fit = () => {
+      const hs = [...document.querySelectorAll("h1,h2,h3,h4,h5,h6")];
+      // 1. reset and collapse, so headings no longer push their containers wider
+      for (const h of hs) { h.style.removeProperty("font-size"); h.style.width = "0px"; }
+      // 2. read: space the container offers, and the widest word
+      const changes = [];
+      const range = document.createRange();
+      for (const h of hs) {
+        const p = h.parentElement;
+        const ps = getComputedStyle(p);
+        const hs_ = getComputedStyle(h);
+        let avail = p.clientWidth - px(ps.paddingLeft) - px(ps.paddingRight) - px(hs_.marginLeft) - px(hs_.marginRight);
+        if (hs_.maxWidth.endsWith("px")) avail = Math.min(avail, px(hs_.maxWidth));
+        avail -= px(hs_.paddingLeft) + px(hs_.paddingRight);
+        if (avail <= 0 || !p.offsetParent && ps.position !== "fixed") continue; // hidden
+        let widest = 0;
+        const walker = document.createTreeWalker(h, NodeFilter.SHOW_TEXT);
+        for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+          for (const m of n.data.matchAll(/\S+/g)) {
+            range.setStart(n, m.index);
+            range.setEnd(n, m.index + m[0].length);
+            widest = Math.max(widest, range.getBoundingClientRect().width);
+          }
+        }
+        if (widest > avail) changes.push([h, Math.floor(px(hs_.fontSize) * (avail / widest) * 0.98 * 10) / 10]);
+      }
+      // 3. write
+      for (const h of hs) h.style.removeProperty("width");
+      for (const [h, size] of changes) h.style.fontSize = size + "px";
+    };
+    fit();
+    document.fonts?.ready.then(fit);
+    let t;
+    addEventListener("resize", () => { clearTimeout(t); t = setTimeout(fit, 100); });
+  })();
+</script>

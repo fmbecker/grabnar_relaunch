@@ -104,8 +104,11 @@
   .eyebrow { @apply text-sm font-extrabold uppercase tracking-[0.08em] text-brand-600; }
   .on-dark .eyebrow { @apply text-brand-300; }
   /* Headlines: Manrope 800, sentence case, tight tracking */
-  /* Long German compounds: allow hyphenation instead of overflow (html lang=de) */
-  .h1, .h2, .h3 { hyphens: auto; overflow-wrap: break-word; }
+  /* Headings break only between words: no hyphenation, no emergency break inside a word. A heading whose
+     longest word doesn't fit is scaled down by components/ui/FitHeadings.astro, which also sets .fit-headings.
+     Without JavaScript the class is missing and long words hyphenate instead of overflowing. */
+  h1, h2, h3, h4, h5, h6 { hyphens: auto; overflow-wrap: break-word; }
+  .fit-headings :is(h1, h2, h3, h4, h5, h6) { hyphens: none; overflow-wrap: normal; }
   .h1 { @apply font-display text-display font-extrabold text-balance; }
   .h2 { @apply font-display text-title font-extrabold text-balance; }
   .h3 { @apply font-display text-subtitle font-extrabold text-balance; }
