@@ -59,7 +59,9 @@ async function runAxe(path, viewport) {
     window.scrollTo(0, 0);
   });
   await page.waitForLoadState("networkidle");
-  await page.addScriptTag({ content: axeSource });
+  // Not addScriptTag: the page CSP blocks inline scripts it has no hash for. evaluate() runs
+  // through the DevTools protocol, which CSP doesn't apply to – and the page keeps its real CSP.
+  await page.evaluate(axeSource);
   const result = await page.evaluate(
     (tags) => window.axe.run(document, { runOnly: { type: "tag", values: tags } }),
     AXE_TAGS,

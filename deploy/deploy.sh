@@ -14,6 +14,7 @@ compose() { docker compose -f deploy/docker-compose.yml --env-file /srv/grabnar/
 
 cd "$REPO"
 git pull --ff-only
+"$REPO/deploy/check-nginx.sh"
 
 if [[ "${BUILD_LOCAL:-0}" == "1" ]]; then
   export CMS_IMAGE="grabnar-cms:local-$(git rev-parse --short=12 HEAD:cms)"

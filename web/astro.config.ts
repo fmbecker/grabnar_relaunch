@@ -17,4 +17,19 @@ export default defineConfig({
   vite: { plugins: [tailwindcss()] },
   // Images come pre-rendered from Wagtail; Astro's optimizer is not needed.
   image: { service: { entrypoint: "astro/assets/services/noop" } },
+  // Content-Security-Policy as <meta> in every page; Astro adds hashes for its own scripts and
+  // styles. img-src, connect-src and frame-src depend on settings and are added per page
+  // (src/lib/csp.ts). frame-ancestors can't be set in a <meta>: Nginx sends X-Frame-Options.
+  security: {
+    csp: {
+      directives: [
+        "default-src 'self'",
+        "base-uri 'self'",
+        "object-src 'none'",
+        "form-action 'self'",
+        "font-src 'self'",
+        "manifest-src 'self'",
+      ],
+    },
+  },
 });

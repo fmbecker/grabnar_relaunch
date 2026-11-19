@@ -9,12 +9,15 @@
  */
 
 import type { ApiImage, Navigation, PageData, PageType, RedirectItem, Settings } from "./types";
+import { originOf } from "./csp";
 
 // Runtime env (preview server) wins over build-time values.
 const runtimeEnv = (key: string): string | undefined =>
   typeof process !== "undefined" ? process.env[key] : undefined;
 const API_URL = (runtimeEnv("WAGTAIL_API_URL") ?? import.meta.env.WAGTAIL_API_URL ?? "http://127.0.0.1:8000/api/v2").replace(/\/$/, "");
 const MEDIA_URL = (runtimeEnv("WAGTAIL_MEDIA_URL") ?? import.meta.env.WAGTAIL_MEDIA_URL ?? "").replace(/\/$/, "");
+/** Host of images and documents when not served from the site itself ("" = same origin). */
+export const MEDIA_ORIGIN = originOf(MEDIA_URL);
 
 const PAGE_TYPES: PageType[] = [
   "home.HomePage",
