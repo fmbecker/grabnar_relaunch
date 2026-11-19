@@ -6,6 +6,9 @@ import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import Analytics from "@/components/Analytics.astro";
 import FitHeadings from "@/components/ui/FitHeadings.astro";
+import { MEDIA_ORIGIN } from "@/lib/wagtail";
+import { originOf, sha256, sources } from "@/lib/csp";
+import { FIT_HEADINGS_SCRIPT } from "@/lib/fit-headings";
 interface Props {
   settings: Settings;
   nav: Navigation;
@@ -17,9 +20,25 @@ interface Props {
   jsonLd?: object | object[];
   /** Editor preview: never load tracking. */
   preview?: boolean;
+  /** Origins the page shows in an iframe (job portal), for the CSP – see lib/csp.ts: frameOrigins. */
+  frameSources?: string[];
 }
-const { settings, nav, title, description, image, path, noindex, jsonLd, preview = false } = Astro.props;
+const { settings, nav, title, description, image, path, noindex, jsonLd, preview = false, frameSources = [] } = Astro.props;
 const analytics = preview ? null : settings.site.analytics;
+
+// Content-Security-Policy sources that depend on settings (base policy: astro.config.ts).
+// Images: own origin, data: URIs from the CSS, the media host. Requests: forms API and Umami.
+const umamiScript = originOf(analytics?.script_url);
+const umamiHost = originOf(analytics?.host_url) || umamiScript;
+Astro.csp?.insertDirective(`img-src ${sources(MEDIA_ORIGIN)} data:`);
+Astro.csp?.insertDirective(`connect-src ${sources(originOf(import.meta.env.PUBLIC_FORMS_API_URL), umamiHost)}`);
+Astro.csp?.insertDirective(frameSources.length ? `frame-src ${frameSources.join(" ")}` : "frame-src 'none'");
+Astro.csp?.insertScriptHash(sha256(FIT_HEADINGS_SCRIPT));
+if (umamiScript) {
+  // Replaces Astro's default script source, so 'self' has to be listed again.
+  Astro.csp?.insertScriptResource("'self'");
+  Astro.csp?.insertScriptResource(umamiScript);
+}
 const fullTitle = title.includes("Grabnar") ? title : `${title} – Grabnar Gebäudereinigung`;
 ---
 <!doctype html>

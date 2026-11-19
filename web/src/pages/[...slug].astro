@@ -3,6 +3,7 @@ import { isHomePage, isJobPage, isServiceIndexPage, isServicePage, type PageData
 import { getAllPages, getNavigation, getSettings, normalizePage, pathFromHtmlUrl } from "@/lib/wagtail";
 import { jobPosting, localBusiness } from "@/lib/jsonld";
 import Base from "@/layouts/Base.astro";
+import { frameOrigins } from "@/lib/csp";
 import PageContent from "@/components/PageContent.astro";
 
 export async function getStaticPaths() {
@@ -40,6 +41,7 @@ const image =
   path={path}
   noindex={page.hide_from_sitemap}
   jsonLd={jsonLd}
+  frameSources={frameOrigins(page)}
 >
   <PageContent page={page} settings={settings} path={path} />
 </Base>

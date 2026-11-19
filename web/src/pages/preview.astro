@@ -8,6 +8,7 @@
  * same PageContent.astro as the static site, so preview == live rendering.
  */
 import Base from "@/layouts/Base.astro";
+import { frameOrigins } from "@/lib/csp";
 import PageContent from "@/components/PageContent.astro";
 import { WagtailApiError, getNavigation, getPreviewPage, getSettings, normalizePage, pathFromHtmlUrl } from "@/lib/wagtail";
 import type { PageData } from "@/lib/types";
@@ -45,7 +46,7 @@ if (page?.meta.html_url) {
   try { path = pathFromHtmlUrl(page.meta.html_url); } catch { /* keep /preview/ */ }
 }
 ---
-<Base settings={settings} nav={nav} title={page ? `Vorschau: ${page.title}` : "Vorschau"} path={path} noindex preview>
+<Base settings={settings} nav={nav} title={page ? `Vorschau: ${page.title}` : "Vorschau"} path={path} noindex preview frameSources={frameOrigins(page)}>
   <div class="sticky top-20 z-30 bg-ink-900 text-white" role="status">
     <div class="container-x flex flex-wrap items-center justify-between gap-2 py-2 text-sm font-medium">
       <span>Vorschau – diese Version ist noch nicht veröffentlicht.</span>
