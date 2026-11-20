@@ -13,6 +13,8 @@
  * The full event plan with all properties is in docs/05-tracking.md.
  */
 
+import { isOwnHost, SITE_URL } from "@/lib/site";
+
 export const EVENT = {
   /** Call-to-action buttons (hero, CTA block, text+image). data: block, label, target */
   cta: "cta-click",
@@ -99,8 +101,8 @@ export function track(event: EventName, data: EventData = {}): void {
 /** Path of an internal href ("/kontakt/"), or the href itself for anything else. */
 export function target(href: string): string {
   try {
-    const url = new URL(href, "https://www.grabnar.de");
-    return url.hostname.endsWith("grabnar.de") ? url.pathname + url.hash : url.href;
+    const url = new URL(href, SITE_URL);
+    return isOwnHost(url.hostname) ? url.pathname + url.hash : url.href;
   } catch {
     return href;
   }
@@ -113,8 +115,8 @@ export const SERVICE_PARAM = "leistung";
 export function withService(href: string, service?: string): string {
   if (!service) return href;
   try {
-    const url = new URL(href, "https://www.grabnar.de");
-    if (!url.hostname.endsWith("grabnar.de") || url.pathname !== "/kontakt/") return href;
+    const url = new URL(href, SITE_URL);
+    if (!isOwnHost(url.hostname) || url.pathname !== "/kontakt/") return href;
     url.searchParams.set(SERVICE_PARAM, service);
     return url.pathname + url.search + url.hash;
   } catch {

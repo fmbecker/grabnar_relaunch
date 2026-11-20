@@ -14,12 +14,21 @@ LOCK=/tmp/grabnar-build.lock
 exec 9>"$LOCK"
 flock -n 9 || { echo "build already running"; exit 0; }
 
+# Domain and indexing per server: /srv/grabnar/web.env (template: deploy/web.env.example).
+# Staging: PUBLIC_SITE_URL=https://mbg.aivii.de, PUBLIC_ALLOW_INDEXING=false
+# Live:    PUBLIC_SITE_URL=https://www.grabnar.de, PUBLIC_ALLOW_INDEXING=true
+WEB_ENV=${WEB_ENV:-/srv/grabnar/web.env}
+if [[ -f "$WEB_ENV" ]]; then set -a; source "$WEB_ENV"; set +a; fi
+: "${PUBLIC_SITE_URL:?PUBLIC_SITE_URL fehlt – in $WEB_ENV setzen (siehe deploy/web.env.example)}"
+
 cd "$REPO/web"
 export ASTRO_TELEMETRY_DISABLED=1
 export WAGTAIL_API_URL=${WAGTAIL_API_URL:-http://127.0.0.1:8000/api/v2}
 export WAGTAIL_MEDIA_URL=${WAGTAIL_MEDIA_URL:-}            # same origin in production
-export PUBLIC_SITE_URL=${PUBLIC_SITE_URL:-https://www.grabnar.de}
-export PUBLIC_FORMS_API_URL=${PUBLIC_FORMS_API_URL:-https://www.grabnar.de/api/forms}
+export PUBLIC_SITE_URL=${PUBLIC_SITE_URL%/}
+export PUBLIC_ALLOW_INDEXING=${PUBLIC_ALLOW_INDEXING:-false}
+export PUBLIC_FORMS_API_URL=${PUBLIC_FORMS_API_URL:-$PUBLIC_SITE_URL/api/forms}
+echo "build for $PUBLIC_SITE_URL (indexing: $PUBLIC_ALLOW_INDEXING)"
 
 pnpm install --frozen-lockfile --prefer-offline
 rm -rf dist

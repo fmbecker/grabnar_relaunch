@@ -18,7 +18,7 @@ Betreut von Felix (Administrator der Seite, Full-Stack-Entwickler, GitHub `fmbec
 |---|---|---|
 | CMS / Backend | Wagtail (aktuelle LTS), Django, Postgres, `wagtail.api.v2`, ohne coderedcms | `cms/` |
 | Frontend | Astro (statisch, SSG), Tailwind CSS, React-Islands nur für Interaktion (Formulare, Filter, Slider) | `web/` |
-| Hosting | bestehender Linode-VPS: Nginx liefert `web/dist/client/` statisch aus und proxyt `/admin/`, `/api/` an Wagtail (Docker Compose); `/admin/` per IP-Allowlist/Basic-Auth | `deploy/` |
+| Hosting | **neuer VPS** (nicht der Linode der Altseite): Nginx liefert `web/dist/client/` statisch aus und proxyt `/admin/`, `/api/` an Wagtail (Docker Compose). Erst unter `mbg.aivii.de` (Basic-Auth, noindex), nach DNS-Umzug `www.grabnar.de` – `docs/09-domainumzug.md` | `deploy/` |
 | Live-Vorschau | `/preview/` als einzige SSR-Route (`@astrojs/node`), Nginx → `127.0.0.1:4322`; Entwurf aus `/api/v2/page_preview/` | `web/src/pages/preview.astro`, `deploy/systemd/grabnar-preview.service` |
 | Build-Trigger | Wagtail `page_published`-Signal → lokaler Webhook (:9000) → `pnpm build` auf dem Server | `cms/grabnar/signals.py`, `deploy/rebuild-hook.py` |
 
@@ -73,6 +73,7 @@ Pre-Push-Hook (einmal pro Klon aktivieren): `git config core.hooksPath .githooks
 - Formulare (Kontakt, Initiativbewerbung) senden an einen eigenen Endpunkt im CMS (`cms/forms_api/`), nicht an Drittanbieter, wegen Datenschutz (Bewerbungsdaten!). Ausnahme mit Absicht: Die Stellenangebote samt Online-Bewerbung kommen aus dem Bewerberportal Europersonal (Block `job_embed`, iframe nur nach Klick – Zwei-Klick-Lösung, keine Einbettung ohne Einwilligung).
 - Bilder: ausschließlich über Wagtail-Renditions aus der API, nie Originaldateien im Frontend.
 - Inhalte der Altseite: `docs/content-export/*.md` + `docs/redirects.csv` sind die Quelle für `manage.py import_legacy`; redaktionelle Texte (Kurztext, Einleitung, SEO) kommen aus `docs/content-overrides.csv` (Semikolon, UTF-8 mit BOM für Excel). Überarbeitete Fließtexte liegen in `docs/content-neu/*.md` (eine Datei pro Seite, Kopf mit `- Pfad:`/`- Status:`/`- Hinweise:`, Text unter `---`) und ersetzen beim Import den Alttext. Neue Aussagen über die Firma nur, wenn Felix/die Firma sie bestätigt hat (bestätigte Angaben: `docs/02-konzept.md`). Keine Privatkunden ansprechen; die Bewachungserlaubnis (§ 34a GewO) nie erwähnen. Der Import ersetzt den kompletten Seitenbaum – in Produktion nur einmal vor dem Go-Live ausführen, danach pflegen Redakteure im CMS.
+- Domain nie fest eintragen: Adresse und Indexierung kommen aus `PUBLIC_SITE_URL` / `PUBLIC_ALLOW_INDEXING` (`web/src/lib/site.ts`, Server: `/srv/grabnar/web.env`), im CMS aus `FRONTEND_URL` u. a. (`cms/.env.example`). Indexierung ist nur mit `PUBLIC_ALLOW_INDEXING=true` an.
 - Preview-Setting heißt `WAGTAIL_HEADLESS_PREVIEW` (nicht `HEADLESS_PREVIEW` – wird sonst still ignoriert). `wagtail.ts` cached nur im statischen Build; SSR-Code muss `{ fresh: true }` übergeben.
 - Beim Anlegen von Seiten per Code: Seiten, auf die Links zeigen (PageChooser), müssen vorher gespeichert sein, sonst landet `null` im StreamField. `test_all_pages_pass_admin_validation` prüft das.
 - `grabnar/urls.py` registriert `wagtail_urls` immer (auch in Produktion): `page.url` braucht `reverse("wagtail_serve")`. Nicht entfernen.
@@ -88,5 +89,5 @@ Pre-Push-Hook (einmal pro Klon aktivieren): `git config core.hooksPath .githooks
 
 ## Offene Punkte (siehe docs/04-aufgaben.md)
 
-- Zustand des Linode-VPS (OS, Nginx-Config, Docker, certbot) noch nicht erfasst.
+- Neuer VPS noch nicht eingerichtet; Termin für den DNS-Umzug von `grabnar.de` mit dem Domain-Verwalter offen.
 - Empfänger des alten Kontaktformulars ist `mail@aivii.de` – Klärung durch Felix offen.

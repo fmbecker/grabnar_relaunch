@@ -1,21 +1,39 @@
-# deploy/ – Linode-VPS
+# deploy/ – neuer VPS
 
-Verzeichnisse auf dem Server: `/srv/grabnar/{repo,web,media,cms-static,pg,logs}`, `/srv/grabnar/cms.env` (aus `cms/.env.example`, plus `POSTGRES_PASSWORD`).
+Der Relaunch läuft auf einem **frischen VPS** (aktuelles Ubuntu LTS), nicht auf dem Linode der
+Altseite. Erst unter `mbg.aivii.de` (Basic-Auth, nicht indexiert), nach dem DNS-Umzug unter
+`www.grabnar.de` – Ablauf und Checkliste: `docs/09-domainumzug.md`.
+
+Verzeichnisse auf dem Server: `/srv/grabnar/{repo,web,media,cms-static,pg,logs}`,
+`/srv/grabnar/cms.env` (aus `cms/.env.example`, plus `POSTGRES_PASSWORD`),
+`/srv/grabnar/web.env` (aus `deploy/web.env.example`: Domain und Indexierung des Frontends).
 
 Einmalige Einrichtung (Details: `docs/03-technik.md`):
 
-1. Docker + Compose, Node 22 + pnpm (via fnm) installieren.
-2. `git clone` nach `/srv/grabnar/repo`, `cms.env` anlegen.
-3. **Vorschau-Dienst:** `systemd/grabnar-preview.service` nach `/etc/systemd/system/`, `systemctl enable --now grabnar-preview` (Astro-SSR auf `127.0.0.1:4322`, Nginx leitet `/preview/` dorthin). In `cms.env`: `FRONTEND_URL=https://www.grabnar.de`.
+1. Grundsystem: Benutzer `felix` mit SSH-Key, Passwort-Login aus, Firewall (`ufw allow OpenSSH`,
+   `ufw allow 80,443/tcp`), automatische Sicherheitsupdates (`unattended-upgrades`).
+   Docker + Compose, Node 22 + pnpm (via fnm), `apache2-utils` (für `htpasswd`), certbot installieren.
+   **nginx aus dem nginx.org-Repository**, mindestens 1.30.7 (stable) bzw. 1.31.9 (mainline) –
+   ältere Versionen haben aus der Ferne ausnutzbare Lücken (CVE-2026-123007 u. a., 18.11.2026).
+   `deploy.sh` bricht auf älteren Versionen ab (`check-nginx.sh`); nur wenn ein Distributionspaket
+   die Korrektur nachweislich enthält: `NGINX_PATCHED=1 ./deploy.sh`. Das nginx.org-Paket kennt
+   `sites-enabled/` nicht: `sudo mkdir /etc/nginx/sites-enabled` und `include /etc/nginx/sites-enabled/*;`
+   im `http`-Block von `/etc/nginx/nginx.conf` ergänzen (die Proxy-Header liefert `nginx/proxy-params.conf`).
+2. `git clone` nach `/srv/grabnar/repo`, `cms.env` und `web.env` anlegen (Phase-1-Werte mit `mbg.aivii.de`).
+3. **Vorschau-Dienst:** `systemd/grabnar-preview.service` nach `/etc/systemd/system/`, `systemctl enable --now grabnar-preview` (Astro-SSR auf `127.0.0.1:4322`, Nginx leitet `/preview/` dorthin). `FRONTEND_URL` in `cms.env` = Adresse der Seite.
    sudoers-Eintrag (`visudo -f /etc/sudoers.d/grabnar`), damit `build-web.sh` nach jedem Build neu laden darf:
    `felix ALL=(root) NOPASSWD: /usr/sbin/nginx -t, /usr/sbin/nginx -s reload, /usr/bin/systemctl restart grabnar-preview`
 3b. `systemd/grabnar-rebuild.service` nach `/etc/systemd/system/`, `HOOK_SECRET` setzen (= `FRONTEND_BUILD_HOOK_SECRET` in `cms.env`; `FRONTEND_BUILD_HOOK_URL=http://host.docker.internal:9000/rebuild`), `systemctl enable --now grabnar-rebuild`.
 4. Purge-Timer: beide `grabnar-purge-applications.*` nach `/etc/systemd/system/`, `systemctl enable --now grabnar-purge-applications.timer`.
-5. `nginx/grabnar.conf` einbauen (zunächst als Staging-Server-Block auf Port 8443 mit Basic-Auth), certbot-Zeilen aus der bestehenden Config übernehmen.
-   - **nginx mindestens 1.30.7 (stable) bzw. 1.31.9 (mainline)**, aus dem nginx.org-Repository – ältere Versionen haben aus der Ferne ausnutzbare Lücken (CVE-2026-123007 u. a., 18.11.2026), für Versionen vor 1.30 gibt es keine Korrektur. `deploy.sh` bricht auf älteren Versionen ab (`check-nginx.sh`); nur wenn das Distributionspaket die Korrektur nachweislich enthält: `NGINX_PATCHED=1 ./deploy.sh`.
-   - HTTP/2 ist in `grabnar.conf` aus. Nach dem Update `http2 on;` in beiden 443-Server-Blöcken ergänzen (`check-nginx.sh` weist darauf hin).
-   - Die Sicherheits-Header (`nginx/security-headers.conf`) und der CMS-Proxy (`nginx/cms-proxy.conf`) werden direkt aus `/srv/grabnar/repo/deploy/nginx/` eingebunden; Änderungen daran wirken nach dem nächsten Deployment (`build-web.sh` prüft mit `nginx -t` und lädt neu).
-   - Zugangsbeschränkung (IP-Allowlist oder Basic-Auth) in `location ~ ^/(admin|django-admin)/` einkommentieren – sie gilt für Wagtail- und Django-Admin.
+5. **Nginx** – die Configs werden direkt aus dem Repo verlinkt, Änderungen kommen mit jedem Deployment
+   (`build-web.sh` prüft mit `nginx -t` und lädt neu). Genau **eine** davon ist aktiv:
+   - `nginx/grabnar-staging.conf` – Phase 1, `mbg.aivii.de`, ganze Seite hinter Basic-Auth, `X-Robots-Tag: noindex`.
+   - `nginx/grabnar.conf` – Phase 2, `www.grabnar.de`; `grabnar.de` und `mbg.aivii.de` leiten dorthin.
+   - Gemeinsam: `nginx/site.conf` (alle Locations), `nginx/security-headers.conf`, `nginx/cms-proxy.conf`, `nginx/proxy-params.conf`.
+   Einrichtung Phase 1 (Zertifikat, Basic-Auth, Symlink): `docs/09-domainumzug.md`.
+   - HTTP/2 ist aus. Nach Prüfung der nginx-Version `http2 on;` in allen 443-Server-Blöcken ergänzen (`check-nginx.sh` weist darauf hin).
+   - Zusätzliche Zugangsbeschränkung für die Redaktion (IP-Allowlist) in `location ~ ^/(admin|django-admin)/` in `site.conf` einkommentieren – gilt für Wagtail- und Django-Admin.
+5b. **Mail:** SMTP-Zugang eines Postfachs unter `aivii.de` in `cms.env` (`EMAIL_URL`, `DEFAULT_FROM_EMAIL`); SPF/DKIM für `aivii.de` müssen den SMTP-Server abdecken. Formular-Mails setzen `Reply-To` auf die Adresse aus dem Formular.
 6. **CMS-Image:** wird bei jedem Push auf `main` von GitHub Actions gebaut (`.github/workflows/cms.yml`, Job `image`) und als `ghcr.io/fmbecker/grabnar-cms` veröffentlicht. Einmalig auf GitHub unter *Packages → grabnar-cms → Package settings* die Sichtbarkeit auf **Public** stellen (das Image enthält nur den öffentlichen Code, keine Zugangsdaten). Alternativ privat lassen und auf dem Server `docker login ghcr.io -u fmbecker` mit einem Token (Recht `read:packages`).
    `./deploy.sh` ausführen. Danach `docker compose … exec cms python manage.py createsuperuser`.
 7. **Einmalig** die Inhalte der Altseite importieren (ersetzt den Seitenbaum!):

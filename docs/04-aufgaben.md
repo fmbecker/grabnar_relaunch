@@ -12,9 +12,9 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 - [x] Seitenbaum v2 freigegeben (4 Kategorien auf oberster Ebene, `docs/02-konzept.md`)
 - [x] 🤖 `ServiceIndexPage` = Leistungskategorie (Icon, Kurzbeschreibung, Titelbild), `ServiceGridBlock` mit Quelle Kategorien/Kategorie/manuell, Navigation mit Dropdown (Desktop) bzw. aufklappbar (Mobil)
 - [x] 🤖 `manage.py import_legacy`: baut den kompletten Seitenbaum aus `docs/content-export/` (4 Kategorien, 22 Leistungen, Kontakt, Karriere, Impressum/Datenschutz/AGB), Kontaktdaten und 28 Redirects aus `docs/redirects.csv`. `seed_dev` = `import_legacy` + Platzhalterbilder (Beispiel-Stellen nur mit `--demo-jobs`)
-- [x] Entscheidung Hosting: alles auf dem bestehenden Linode-VPS, Nginx vor statischem Frontend + Wagtail-Docker, kein DNS-Wechsel (siehe `docs/03-technik.md`)
+- [x] Entscheidung Hosting: ~~alles auf dem bestehenden Linode-VPS, kein DNS-Wechsel~~ → **neuer VPS** (OS des Linode zu alt), Abnahme unter `mbg.aivii.de`, danach DNS-Umzug von `grabnar.de` (20.11.2026, `docs/03-technik.md`, `docs/09-domainumzug.md`)
 - [ ] 👤 **Dringend, gilt schon für die Altseite:** nginx auf dem Linode auf 1.30.7+ (stable) bzw. 1.31.9+ (mainline) aus dem nginx.org-Repository aktualisieren (CVE-2026-123007, HTTP/2, aus der Ferne ausnutzbar, 18.11.2026). Bis dahin HTTP/2 in der laufenden Config abschalten (`http2` aus den `listen`-Zeilen bzw. `http2 off;`) – das stoppt nur die HTTP/2-Lücken, nicht alle
-- [ ] 👤 Linode-Bestandsaufnahme: OS-Version, Nginx-Config der Altseite, certbot-Status, freier Speicher/RAM, ob Docker installiert ist → `docs/01-ist-analyse.md`
+- [ ] 👤 Neuen VPS bestellen (2 GB RAM reichen, aktuelles Ubuntu LTS), DNS `mbg.aivii.de` darauf
 - [x] Logo (`docs/assets/logo-mbgrabnar.png`) und Markenfarben (`#2D78BC`, `#8BC1E5`) von der Altseite übernommen
 - [ ] 👤 Eigene Fotos (Team, Objekte, Fahrzeuge) sammeln → Wagtail-Mediathek
 - [ ] 👤 Logo als Vektor (SVG/PDF/EPS) bei der Firma oder Agentur anfragen
@@ -88,13 +88,14 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 - [x] 🤖 `deploy/`: `docker-compose.yml`, `nginx/grabnar.conf`, `rebuild-hook.py` + systemd-Unit, `build-web.sh`, `deploy.sh`, Backup-Skript
 - [x] 🤖 CMS-Image wird von GitHub Actions gebaut und nach `ghcr.io/fmbecker/grabnar-cms` gepusht; `deploy.sh` lädt es nur noch (kein Build auf dem 2-GB-VPS)
 - [ ] 👤 Paket `grabnar-cms` auf GitHub einmalig auf „Public“ stellen (oder Server per Token anmelden, siehe `deploy/README.md`)
-- [ ] 🤝 Docker, Node/pnpm (fnm) auf dem Linode installieren, CMS parallel zur Altseite hochfahren
-- [ ] 🤝 Staging-Server-Block (Port 8443, Basic-Auth) für Abnahme
+- [x] 🤖 Domain parametrisiert: Canonical, Sitemap, OG, JSON-LD, `robots.txt`, Weiterleitungsziele und Formular-Endpunkt aus `PUBLIC_SITE_URL`; `PUBLIC_ALLOW_INDEXING` (Vorgabe aus = `noindex` überall); Nginx-Configs für Phase 1 (`grabnar-staging.conf`, Basic-Auth) und Phase 2 (`grabnar.conf`)
+- [ ] 🤝 Neuen VPS nach `deploy/README.md` einrichten (nginx.org-Paket, Docker, Node/pnpm), Phase 1 unter `mbg.aivii.de` nach `docs/09-domainumzug.md`
 - [ ] 🤝 Vorschau-Dienst einrichten: `grabnar-preview.service`, sudoers-Eintrag, `FRONTEND_URL` in `cms.env` (siehe `deploy/README.md`)
 - [ ] 🤝 Backup nach `/srv/backup/` + Offsite-Ziel einrichten und Restore einmal testen
 - [x] Redirect-Tabelle `docs/redirects.csv` erstellt; Import erfolgt über `import_legacy`
-- [ ] 👤 Mailversand (SMTP-Zugang) für Formulare
-- [ ] 👤 Nginx auf neue Struktur umschalten, TLS prüfen (kein DNS-Wechsel nötig)
+- [ ] 👤 Mailversand: SMTP-Zugang eines Postfachs unter `aivii.de` (`EMAIL_URL`, `DEFAULT_FROM_EMAIL`), SPF/DKIM für den SMTP-Server prüfen, Testmail (Reply-To = Formularadresse)
+- [ ] 👤 Domain-Verwalter vorab: TTL von `grabnar.de`/`www` auf 300 s, Termin für den Umzug
+- [ ] 🤝 Domainumzug nach `docs/09-domainumzug.md` (DNS, Zertifikat, `web.env`/`cms.env`, `grabnar.conf`, Rebuild, Prüfliste)
 - [ ] 🤖 Nach Go-Live: 404-Check, Search Console Sitemap
 - [ ] 👤 Vor dem Abschalten: Mediathek der Altseite (`/home/mbgsite/media/`, 135 Bilder) und einen MySQL-Dump offline sichern
 - [ ] 👤 Altserver nach 4 Wochen abschalten

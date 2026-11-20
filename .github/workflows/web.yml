@@ -46,6 +46,7 @@ jobs:
           WAGTAIL_API_URL: http://127.0.0.1:8000/api/v2
           WAGTAIL_MEDIA_URL: http://127.0.0.1:8000
           PUBLIC_SITE_URL: https://www.grabnar.de
+          PUBLIC_ALLOW_INDEXING: "true"   # live build: Lighthouse SEO checks indexability
           PUBLIC_FORMS_API_URL: https://www.grabnar.de/api/forms
         run: pnpm build && node scripts/redirects.mjs > /dev/null
       - name: CMS log (on failure)
@@ -89,6 +90,7 @@ jobs:
           WAGTAIL_API_URL: http://127.0.0.1:8000/api/v2
           WAGTAIL_MEDIA_URL: ""
           PUBLIC_SITE_URL: https://www.grabnar.de
+          PUBLIC_ALLOW_INDEXING: "true"   # live build: Lighthouse SEO checks indexability
           PUBLIC_FORMS_API_URL: /api/forms
         run: |
           pnpm build
