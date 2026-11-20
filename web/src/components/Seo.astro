@@ -1,5 +1,6 @@
 ---
 import type { ApiImage } from "@/lib/types";
+import { ALLOW_INDEXING, SITE_URL } from "@/lib/site";
 interface Props {
   title: string;
   description?: string;
@@ -9,7 +10,9 @@ interface Props {
   jsonLd?: object | object[];
 }
 const { title, description = "", image, path, noindex = false, jsonLd } = Astro.props;
-const site = import.meta.env.PUBLIC_SITE_URL ?? Astro.site?.toString() ?? "";
+const site = SITE_URL;
+// Staging domain: no page is indexable, whatever the page itself says.
+const robotsNoindex = noindex || !ALLOW_INDEXING;
 const canonical = new URL(path, site).toString();
 const ogImage = image ? new URL(image.renditions.wide.url, site).toString() : null;
 const ld = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
@@ -17,7 +20,7 @@ const ld = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 <title>{title}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />
-{noindex && <meta name="robots" content="noindex,nofollow" />}
+{robotsNoindex && <meta name="robots" content="noindex,nofollow" />}
 <meta property="og:type" content="website" />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />

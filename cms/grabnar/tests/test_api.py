@@ -449,3 +449,27 @@ def test_certificate_seal(client):
         ss.certificate_seal = None
         ss.save()
         image.delete()
+
+
+def test_form_mail_sender_reply_to_and_host(client, settings):
+    from django.core import mail
+
+    settings.FORMS_NOTIFY_EMAIL = "info@grabnar.de"
+    settings.DEFAULT_FROM_EMAIL = "Website Grabnar <website@aivii.de>"
+    settings.FRONTEND_URL = "https://mbg.aivii.de"
+    payload = {
+        "name": "A",
+        "email": "kunde@example.com",
+        "message": "Hi",
+        "consent": True,
+        "started_at": 1,
+    }
+    assert (
+        client.post("/api/forms/contact/", payload, content_type="application/json").status_code
+        == 201
+    )
+    sent = mail.outbox[-1]
+    assert sent.from_email == "Website Grabnar <website@aivii.de>"
+    assert sent.to == ["info@grabnar.de"]
+    assert sent.reply_to == ["kunde@example.com"]
+    assert sent.subject == "Neue Kontaktanfrage über mbg.aivii.de"

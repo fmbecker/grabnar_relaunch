@@ -37,7 +37,7 @@ Geprüfte Alternativen:
 - Bilder: Wagtail-Renditions, `<picture>` mit `srcset`, `loading="lazy"`.
 - SEO: `src/components/Seo.astro` (Title, Description, OG, Canonical), `@astrojs/sitemap`, JSON-LD `LocalBusiness` auf Home/Kontakt, `JobPosting` auf JobPage.
 - Fonts selbst gehostet (`public/fonts/`), kein externes CDN.
-- Hosting: siehe Abschnitt „Hosting auf dem Linode-VPS“ – statisches Build-Verzeichnis `web/dist/` wird von Nginx ausgeliefert.
+- Hosting: siehe Abschnitt „Hosting auf neuem VPS“ – statisches Build-Verzeichnis `web/dist/` wird von Nginx ausgeliefert.
 
 ## Live-Vorschau für Redakteure
 
@@ -56,12 +56,17 @@ Wagtail-Editor (Vorschau-Panel)
 - Lokal: `pnpm dev` bedient `/preview/` auf Port 4321 (Standard-`FRONTEND_URL` des CMS). Gegen den gebauten Server: `node web/dist/server/entry.mjs` mit `PORT=4322` und CMS mit `FRONTEND_URL=http://127.0.0.1:4322`.
 - E2E-Test aus Redakteurssicht: `e2e/preview_admin.py` (Playwright).
 
-## Hosting auf dem Linode-VPS (entschieden)
+## Hosting auf neuem VPS (entschieden, 20.11.2026)
 
-Die bestehende Linode-Instanz bleibt. `www.grabnar.de` zeigt extern verwaltet auf deren IP – deshalb **keine neue Subdomain**, CMS und Frontend laufen unter derselben Domain, getrennt nach Pfad. So ist kein DNS-Eingriff nötig.
+Der Relaunch läuft auf einem **frischen VPS**, nicht auf dem Linode der Altseite (dessen OS ist zu alt
+für die nötigen Updates). `grabnar.de` wird extern verwaltet; deshalb zuerst Abnahme unter
+**`mbg.aivii.de`** (Basic-Auth, `noindex`), danach DNS-Umzug auf `www.grabnar.de` –
+`docs/09-domainumzug.md`. Domain und Indexierung des Frontends kommen beim Bauen aus
+`/srv/grabnar/web.env` (`PUBLIC_SITE_URL`, `PUBLIC_ALLOW_INDEXING`, `web/src/lib/site.ts`);
+CMS und Frontend laufen unter derselben Domain, getrennt nach Pfad.
 
 ```
-Internet → Nginx (:443, www.grabnar.de)
+Internet → Nginx (:443, mbg.aivii.de → später www.grabnar.de)
             ├── /                → /srv/grabnar/web/dist/        (statische Astro-Dateien)
             ├── /admin/, /api/   → proxy_pass http://127.0.0.1:8000  (Wagtail, Docker)
             ├── /media/          → /srv/grabnar/media/            (Wagtail-Uploads, Renditions)
@@ -76,18 +81,18 @@ Internet → Nginx (:443, www.grabnar.de)
 - Frontend-Build **auf dem Server**: kleiner Webhook-Dienst (`deploy/rebuild-hook.py`, Python stdlib `http.server`, systemd-Unit `grabnar-rebuild.service`), der bei `POST /_hooks/rebuild` mit gültigem `X-Hook-Secret` das Skript `deploy/build-web.sh` ausführt: `git pull`, `pnpm install --frozen-lockfile`, `pnpm build` nach `dist.new/`, dann atomar `mv dist dist.old && mv dist.new dist`. Debounce 60 s, Lock-Datei gegen Parallelbuilds. Node/pnpm auf dem Host nötig (z. B. via `fnm`).
 - Der Wagtail-Signal-Handler ruft `FRONTEND_BUILD_HOOK_URL=http://127.0.0.1:9000/rebuild` auf (intern, nicht über Nginx).
 - Redirects: `web` erzeugt beim Build aus `/api/v2/redirects/` eine Nginx-`map`-Datei `/srv/grabnar/web/redirects.map`; Nginx lädt sie per `include` und wird nach dem Build mit `nginx -s reload` neu geladen (sudoers-Regel nur für diesen Befehl).
-- TLS: bestehendes Let's-Encrypt-Setup (certbot) weiternutzen. ⬜ prüfen, ob certbot aktuell und automatisch erneuert.
-- Alte Wagtail/CodeRed-Installation: parallel laufen lassen, bis Nginx umgeschaltet ist, dann stoppen und nach 4 Wochen entfernen.
+- TLS: Let's Encrypt per `certbot certonly --webroot -w /var/www/certbot`, Pfade fest in `deploy/nginx/grabnar*.conf` (certbot ändert die Configs nicht).
+- Alte Wagtail/CodeRed-Installation: läuft auf dem Linode weiter, bis der DNS-Eintrag umgezogen ist; danach sichern und nach 4 Wochen abschalten.
 
 ### Deploy-Workflow
 
 1. `git push` nach `main` → GitHub Actions (`cms.yml`, `web.yml`) prüft Lint/Tests/Build.
-2. Deployment per `deploy/deploy.sh` (SSH auf den Linode): `git pull`, `docker compose build cms`, `docker compose up -d`, `manage.py migrate`, `collectstatic`, danach `build-web.sh`.
+2. Deployment per `deploy/deploy.sh` (SSH auf den VPS): `git pull`, `docker compose build cms`, `docker compose up -d`, `manage.py migrate`, `collectstatic`, danach `build-web.sh`.
 3. Inhaltsänderungen im CMS lösen nur den Frontend-Rebuild aus, kein Deployment.
 
 ### Backup
 
-- Nächtlich `pg_dump` + `tar` von `/srv/grabnar/media/` nach `/srv/backup/` und per `rclone`/Linode Object Storage offsite (⬜ Ziel klären). Linode-Backup-Service als zweite Ebene, falls gebucht.
+- Nächtlich `pg_dump` + `tar` von `/srv/grabnar/media/` nach `/srv/backup/` und per `rclone` offsite, z. B. Object Storage des VPS-Anbieters (⬜ Ziel klären). Snapshot-/Backup-Dienst des Anbieters als zweite Ebene, falls gebucht.
 
 ### CI (`.github/workflows/`)
 
@@ -123,7 +128,7 @@ Seed: `cms/fixtures/dev.json` mit Beispielseiten für alle Blocks, damit das Fro
 
 1. Inhalte exportieren (siehe `docs/01-ist-analyse.md`): Texte als Markdown nach `docs/content-export/`, Bilder nach `cms/fixtures/media/`.
 2. Alte URL-Liste → Mapping-Tabelle `docs/redirects.csv` (`alt,neu,status`) → beim Go-Live als `wagtail.contrib.redirects` importieren (Management-Command `import_redirects`).
-3. Go-Live-Reihenfolge (alles auf demselben Linode, kein DNS-Wechsel): neues CMS auf Port 8000 parallel zur Altinstallation starten → Inhalte einpflegen, Admin über `/admin-neu/` (temporärer Nginx-Pfad) → Frontend-Build unter `/srv/grabnar/web/dist/` erzeugen und über einen Staging-Server-Block (z. B. Port 8443 mit Basic-Auth) abnehmen → Nginx-Konfiguration für `www.grabnar.de` auf die neue Struktur umschalten (`nginx -t && nginx -s reload`) → Altinstallation stoppen, 4 Wochen aufbewahren.
+3. Go-Live-Reihenfolge: neuer VPS unter `mbg.aivii.de` einrichten → `import_legacy`, Inhalte prüfen und ergänzen → Abnahme durch die Firma (Basic-Auth) → DNS-Umzug von `grabnar.de`/`www.grabnar.de` durch den Domain-Verwalter, Zertifikat, Umschalten auf `deploy/nginx/grabnar.conf`, Rebuild mit `PUBLIC_SITE_URL=https://www.grabnar.de` (Checkliste `docs/09-domainumzug.md`) → Altserver sichern und nach 4 Wochen abschalten.
 4. Google Search Console: Sitemap neu einreichen, 404-Report nach Go-Live wöchentlich prüfen.
 
 ## Datenschutz
