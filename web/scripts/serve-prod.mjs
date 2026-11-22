@@ -31,18 +31,30 @@ const TYPES = {
   ".woff2": "font/woff2",
 };
 const COMPRESSIBLE = new Set([".html", ".css", ".js", ".mjs", ".json", ".svg", ".xml", ".txt"]);
+// Same headers as deploy/nginx/security-headers.conf (HSTS is ignored by browsers over plain http).
 const SECURITY = {
+  "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
   "X-Content-Type-Options": "nosniff",
   "X-Frame-Options": "SAMEORIGIN",
   "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Permissions-Policy": "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()",
+  "Cross-Origin-Opener-Policy": "same-origin",
 };
+// deploy/nginx/grabnar.conf, location /media/: uploads never run anything when opened directly.
+const MEDIA_CSP = "default-src 'none'; img-src 'self'; style-src 'unsafe-inline'; sandbox";
 
 function proxy(req, res, target) {
   const upstream = request(
     { hostname: target.hostname, port: target.port, path: req.url, method: req.method, headers: { ...req.headers, host: target.host, "x-forwarded-proto": "http" } },
     (up) => {
+      // Like deploy/nginx/cms-proxy.conf: Django's copies of the site-wide headers are replaced.
       const headers = { ...up.headers };
-      if (req.url.startsWith("/media/")) headers["cache-control"] = "public, max-age=2592000";
+      for (const name of Object.keys(SECURITY)) delete headers[name.toLowerCase()];
+      Object.assign(headers, SECURITY);
+      if (req.url.startsWith("/media/")) {
+        headers["cache-control"] = "public, max-age=2592000";
+        headers["Content-Security-Policy"] = MEDIA_CSP;
+      }
       res.writeHead(up.statusCode ?? 502, headers);
       up.pipe(res);
     },

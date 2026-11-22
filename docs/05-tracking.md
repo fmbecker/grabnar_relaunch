@@ -21,6 +21,12 @@ Nach dem Speichern baut die Seite automatisch neu (Rebuild-Hook). Code: `cms/sit
 (`SiteSettings.analytics_api`), `web/src/components/Analytics.astro`, `web/src/layouts/Base.astro`.
 
 Immer gesetzt: `data-exclude-hash="true"` (Sprungmarken wie `#formular` sind keine eigenen Seiten).
+
+Content-Security-Policy: Die Adressen aus Script-URL und Host-URL trägt `Base.astro` beim Bauen in
+`script-src` bzw. `connect-src` der Seiten ein (`web/src/lib/csp.ts`). Liegt Umami unter der eigenen
+Domain (`/stats/`, Nginx-Proxy in `deploy/nginx/grabnar.conf`), ist nichts zusätzlich freizugeben.
+Weil die CSP beim Bauen entsteht, gilt eine geänderte Umami-Adresse erst nach dem Rebuild – den löst
+das Speichern der Einstellungen ohnehin aus.
 Nie geladen wird das Script in der Redakteurs-Vorschau (`/preview/`).
 
 ## Seitenaufrufe
