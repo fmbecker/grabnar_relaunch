@@ -10,7 +10,9 @@
 #   NGINX_PATCHED=1 ./deploy.sh      (after checking the distribution's security notice)
 set -euo pipefail
 
-version=$(nginx -v 2>&1 | sed -n 's|.*nginx/\([0-9.]*\).*|\1|p')
+# deploy.sh runs as felix, whose PATH has no /usr/sbin – call nginx by its path then.
+nginx_bin=$(command -v nginx || echo /usr/sbin/nginx)
+version=$("$nginx_bin" -v 2>&1 | sed -n 's|.*nginx/\([0-9.]*\).*|\1|p')
 if [[ -z "$version" ]]; then
   echo "nginx-Version nicht ermittelbar (nginx -v)." >&2
   exit 1
@@ -26,7 +28,7 @@ fi
 
 if [[ "$fixed" == yes ]]; then
   echo "nginx $version: enthält die Sicherheitskorrekturen vom 18.11.2026."
-  if ! nginx -T 2>/dev/null | grep -Eq '^\s*http2\s+on;'; then
+  if ! "$nginx_bin" -T 2>/dev/null | grep -Eq '^\s*http2\s+on;'; then
     echo "Hinweis: HTTP/2 ist aus. Kann jetzt mit 'http2 on;' in beiden 443-Server-Blöcken eingeschaltet werden."
   fi
   exit 0
