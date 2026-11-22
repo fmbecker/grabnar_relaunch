@@ -3,7 +3,7 @@
 // with/without trailing slash so every form an old link might use is covered.
 //   "/Gebäudereinigung/Baureinigung/" "https://www.grabnar.de/gebaeudereinigung/baureinigung/";
 const api = (process.env.WAGTAIL_API_URL ?? "http://127.0.0.1:8000/api/v2").replace(/\/$/, "");
-const site = (process.env.PUBLIC_SITE_URL ?? "https://www.grabnar.de").replace(/\/$/, "");
+const site = (process.env.PUBLIC_SITE_URL ?? "http://localhost:4321").replace(/\/$/, "");
 const res = await fetch(`${api}/redirects/`);
 if (!res.ok) throw new Error(`redirects API ${res.status}`);
 const { items } = await res.json();

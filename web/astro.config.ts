@@ -4,7 +4,8 @@ import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 
-const site = process.env.PUBLIC_SITE_URL ?? "https://www.grabnar.de";
+// Domain comes from the build environment (deploy/web.env); see web/src/lib/site.ts.
+const site = process.env.PUBLIC_SITE_URL ?? "http://localhost:4321";
 
 export default defineConfig({
   site,

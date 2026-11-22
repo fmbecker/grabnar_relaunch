@@ -175,6 +175,8 @@ REST_FRAMEWORK = {
 EMAIL_CONFIG = env.email("EMAIL_URL", default="consolemail://")
 vars().update(EMAIL_CONFIG)
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="website@localhost")
+# Django error mails to ADMINS use the same sender.
+SERVER_EMAIL = env("SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
 FORMS_NOTIFY_EMAIL = env("FORMS_NOTIFY_EMAIL", default="")
 FORMS_MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 FORMS_ALLOWED_UPLOAD_TYPES = {

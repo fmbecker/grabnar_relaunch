@@ -13,9 +13,10 @@ from __future__ import annotations
 import hashlib
 import logging
 import time
+from urllib.parse import urlsplit
 
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 from django.utils.translation import gettext as _
 from rest_framework import serializers, status
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
@@ -104,13 +105,26 @@ def _ip_hash(request) -> str:
     return hashlib.sha256(f"{ip}{settings.SECRET_KEY}".encode()).hexdigest() if ip else ""
 
 
-def _notify(subject: str, body: str) -> bool:
+def _site_host() -> str:
+    """Public host of the site (mbg.aivii.de while staging, www.grabnar.de once live)."""
+    return urlsplit(settings.FRONTEND_URL).hostname or "der Website"
+
+
+def _notify(subject: str, body: str, reply_to: str = "") -> bool:
     to = settings.FORMS_NOTIFY_EMAIL
     if not to:
         log.warning("FORMS_NOTIFY_EMAIL not set; submission stored but no mail sent")
         return False
     try:
-        send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, [to], fail_silently=False)
+        # The sender is a technical address under aivii.de (its SPF/DKIM covers this server);
+        # "Reply" in the mail program goes to the person who filled in the form.
+        EmailMessage(
+            subject,
+            body,
+            settings.DEFAULT_FROM_EMAIL,
+            [to],
+            reply_to=[reply_to] if reply_to else None,
+        ).send(fail_silently=False)
         return True
     except Exception:  # noqa: BLE001 - never lose the submission because mail failed
         log.exception("Failed to send form notification")
@@ -134,7 +148,11 @@ class BaseFormView(APIView):
         instance = serializer.Meta.model(**_strip_meta(serializer.validated_data))
         instance.ip_hash = _ip_hash(request)
         instance.save()
-        instance.notified = _notify(self.subject, self.render_mail(instance))
+        instance.notified = _notify(
+            self.subject.format(host=_site_host()),
+            self.render_mail(instance),
+            reply_to=getattr(instance, "email", "") or "",
+        )
         instance.save(update_fields=["notified"])
         return Response({"ok": True, "id": instance.pk}, status=status.HTTP_201_CREATED)
 
@@ -154,12 +172,12 @@ class BaseFormView(APIView):
 
 class ContactView(BaseFormView):
     serializer_class = ContactSerializer
-    subject = "Neue Kontaktanfrage über www.grabnar.de"
+    subject = "Neue Kontaktanfrage über {host}"
 
 
 class ApplicationView(BaseFormView):
     serializer_class = ApplicationSerializer
-    subject = "Neue Bewerbung über www.grabnar.de"
+    subject = "Neue Bewerbung über {host}"
 
     def render_mail(self, instance) -> str:
         body = super().render_mail(instance)
