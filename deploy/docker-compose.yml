@@ -21,7 +21,8 @@ services:
   # Eigene Datenbank im selben Postgres (siehe deploy/README.md), damit der 2-GB-VPS
   # nicht einen zweiten Datenbankdienst tragen muss.
   umami:
-    image: ghcr.io/umami-software/umami:postgresql-3.0.0
+    # Ab 3.x ohne das alte `postgresql-`-Präfix im Tag.
+    image: ghcr.io/umami-software/umami:3.5.0
     restart: unless-stopped
     env_file: /srv/grabnar/umami.env     # DATABASE_URL, APP_SECRET
     environment:
