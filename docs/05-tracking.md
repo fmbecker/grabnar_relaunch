@@ -7,18 +7,17 @@ eingetragen sind.
 ## Betrieb auf dem Server
 
 Umami läuft als eigener Dienst in `deploy/docker-compose.yml` (Image
-`ghcr.io/umami-software/umami:postgresql-3.0.0`) und lauscht nur auf `127.0.0.1:3000`. Seine
-Datenbank liegt im selben Postgres-Container wie das CMS, als eigene Rolle und Datenbank `umami`;
-Zugangsdaten in `/srv/grabnar/umami.env` (Vorlage `deploy/umami.env.example`). Einrichtung:
-`deploy/README.md`, Schritt 9.
+`ghcr.io/umami-software/umami:3.5.0`; ab 3.x entfällt das `postgresql-`-Präfix im Tag) und lauscht
+nur auf `127.0.0.1:3000`. Seine Datenbank liegt im selben Postgres-Container wie das CMS, als
+eigene Rolle und Datenbank `umami`; Zugangsdaten in `/srv/grabnar/umami.env` (Vorlage
+`deploy/umami.env.example`). Einrichtung: `deploy/README.md`, Schritt 9.
 
 Nach außen gehen nur zwei Pfade, aus `deploy/nginx/site.conf` von der eigenen Domain:
 `/stats/script.js` (Tracker) und `/stats/api/send` (Collect). Die Oberfläche ist absichtlich nicht
 öffentlich – über `ssh -L 3000:127.0.0.1:3000 felix@<server>` auf `http://localhost:3000`.
 
 Die Berichtsskripte in `deploy/umami/` sprechen die API mit einem Schlüssel an; Ziele, Funnels und
-Segmente (`setup-reports.mjs`) brauchen Umami ≥ 3.4, das es noch nicht gibt. Bis dahin die
-Auswertungen in der Oberfläche anlegen.
+Segmente (`setup-reports.mjs`) brauchen Umami ≥ 3.4 – mit 3.5.0 ist das erfüllt.
 
 ## Einschalten
 
