@@ -23,6 +23,9 @@ Einmalige Einrichtung (Details: `docs/03-technik.md`):
    die Korrektur nachweislich enthält: `NGINX_PATCHED=1 ./deploy.sh`. Das nginx.org-Paket kennt
    `sites-enabled/` nicht: `sudo mkdir /etc/nginx/sites-enabled` und `include /etc/nginx/sites-enabled/*;`
    im `http`-Block von `/etc/nginx/nginx.conf` ergänzen (die Proxy-Header liefert `nginx/proxy-params.conf`).
+   Zuletzt die Logfile-Aufbewahrung auf 30 Tage stellen – die Datenschutzerklärung nennt diese
+   Frist, das nginx.org-Paket liefert aber `rotate 52` (bei `daily` also 52 Tage):
+   `sudo sed -i 's/rotate 52/rotate 30/' /etc/logrotate.d/nginx`.
 2. `git clone` nach `/srv/grabnar/repo`, `cms.env` und `web.env` anlegen (Phase-1-Werte mit `mbg.aivii.de`).
 3. **Vorschau-Dienst:** `systemd/grabnar-preview.service` nach `/etc/systemd/system/`, `systemctl enable --now grabnar-preview` (Astro-SSR auf `127.0.0.1:4322`, Nginx leitet `/preview/` dorthin). `FRONTEND_URL` in `cms.env` = Adresse der Seite.
    sudoers-Eintrag (`visudo -f /etc/sudoers.d/grabnar`), damit `build-web.sh` nach jedem Build neu laden darf:
