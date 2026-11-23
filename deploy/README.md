@@ -23,6 +23,9 @@ Einmalige Einrichtung (Details: `docs/03-technik.md`):
    die Korrektur nachweislich enthält: `NGINX_PATCHED=1 ./deploy.sh`. Das nginx.org-Paket kennt
    `sites-enabled/` nicht: `sudo mkdir /etc/nginx/sites-enabled` und `include /etc/nginx/sites-enabled/*;`
    im `http`-Block von `/etc/nginx/nginx.conf` ergänzen (die Proxy-Header liefert `nginx/proxy-params.conf`).
+   Zuletzt die Logfile-Aufbewahrung auf 30 Tage stellen – die Datenschutzerklärung nennt diese
+   Frist, das nginx.org-Paket liefert aber `rotate 52` (bei `daily` also 52 Tage):
+   `sudo sed -i 's/rotate 52/rotate 30/' /etc/logrotate.d/nginx`.
    Für die Kartenkacheln braucht derselbe `http`-Block noch den Cache – `proxy_cache_path` ist
    dort nur gültig, nicht im Server-Block, den `site.conf` füllt:
 

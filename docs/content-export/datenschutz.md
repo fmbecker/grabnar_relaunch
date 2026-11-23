@@ -14,25 +14,27 @@ Mit der folgenden Datenschutzerklärung möchten wir Sie darüber aufklären, we
 
 Die verwendeten Begriffe sind nicht geschlechtsspezifisch.
 
-Stand: 23. September 2022
+Stand: 23. November 2026
 
 ## Inhaltsübersicht
 
-* [Einleitung](#m14)
-* [Verantwortlicher](#m3)
-* [Kontakt Datenschutzbeauftragter](#m11)
-* [Übersicht der Verarbeitungen](#mOverview)
-* [Maßgebliche Rechtsgrundlagen](#m13)
-* [Sicherheitsmaßnahmen](#m27)
-* [Übermittlung von personenbezogenen Daten](#m25)
-* [Löschung von Daten](#m12)
-* [Geschäftliche Leistungen](#m317)
-* [Bereitstellung des Onlineangebotes und Webhosting](#m225)
-* [Kontakt- und Anfragenverwaltung](#m182)
-* [Plugins und eingebettete Funktionen sowie Inhalte](#m328)
-* [Änderung und Aktualisierung der Datenschutzerklärung](#m15)
-* [Rechte der betroffenen Personen](#m10)
-* [Begriffsdefinitionen](#m42)
+* Einleitung
+* Verantwortlicher
+* Kontakt Datenschutzbeauftragter
+* Übersicht der Verarbeitungen
+* Maßgebliche Rechtsgrundlagen
+* Sicherheitsmaßnahmen
+* Übermittlung von personenbezogenen Daten
+* Löschung von Daten
+* Geschäftliche Leistungen
+* Bereitstellung des Onlineangebotes und Webhosting
+* Kontakt- und Anfragenverwaltung
+* Bewerbungsverfahren
+* Webanalyse und Reichweitenmessung
+* Plugins und eingebettete Funktionen sowie Inhalte
+* Änderung und Aktualisierung der Datenschutzerklärung
+* Rechte der betroffenen Personen
+* Begriffsdefinitionen
 
 ## Verantwortlicher
 
@@ -74,6 +76,7 @@ Die nachfolgende Übersicht fasst die Arten der verarbeiteten Daten und die Zwec
 * Vertragsdaten.
 * Nutzungsdaten.
 * Meta-/Kommunikationsdaten.
+* Bewerberdaten (z.B. Angaben zur Person, Lebenslauf, angestrebte Stelle).
 
 ### Kategorien betroffener Personen
 
@@ -81,6 +84,7 @@ Die nachfolgende Übersicht fasst die Arten der verarbeiteten Daten und die Zwec
 * Kommunikationspartner.
 * Nutzer.
 * Geschäfts- und Vertragspartner.
+* Bewerber.
 
 ### Zwecke der Verarbeitung
 
@@ -89,6 +93,8 @@ Die nachfolgende Übersicht fasst die Arten der verarbeiteten Daten und die Zwec
 * Büro- und Organisationsverfahren.
 * Verwaltung und Beantwortung von Anfragen.
 * Bereitstellung unseres Onlineangebotes und Nutzerfreundlichkeit.
+* Bewerbungsverfahren.
+* Reichweitenmessung.
 
 ### Maßgebliche Rechtsgrundlagen
 
@@ -145,7 +151,7 @@ Die erforderlichen Angaben sind als solche im Rahmen des Auftrags-, Bestell- bzw
 
 ## Bereitstellung des Onlineangebotes und Webhosting
 
-Um unser Onlineangebot sicher und effizient bereitstellen zu können, nehmen wir die Leistungen von einem oder mehreren Webhosting-Anbietern in Anspruch, von deren Servern (bzw. von ihnen verwalteten Servern) das Onlineangebot abgerufen werden kann. Zu diesen Zwecken können wir Infrastruktur- und Plattformdienstleistungen, Rechenkapazität, Speicherplatz und Datenbankdienste sowie Sicherheitsleistungen und technische Wartungsleistungen in Anspruch nehmen.
+Um unser Onlineangebot sicher und effizient bereitstellen zu können, nehmen wir die Leistungen eines Webhosting-Anbieters in Anspruch, von dessen Server das Onlineangebot abgerufen werden kann. Unsere Website läuft auf einem virtuellen Server der Akamai Connected Cloud (Linode) in einem Rechenzentrum in Frankfurt am Main. Die Website wird dort vollständig von uns selbst betrieben; es sind keine weiteren Dienstleister zwischengeschaltet. Zu diesen Zwecken können wir Infrastruktur- und Plattformdienstleistungen, Rechenkapazität, Speicherplatz und Datenbankdienste sowie Sicherheitsleistungen und technische Wartungsleistungen in Anspruch nehmen.
 
 Zu den im Rahmen der Bereitstellung des Hostingangebotes verarbeiteten Daten können alle die Nutzer unseres Onlineangebotes betreffenden Angaben gehören, die im Rahmen der Nutzung und der Kommunikation anfallen. Hierzu gehören regelmäßig die IP-Adresse, die notwendig ist, um die Inhalte von Onlineangeboten an Browser ausliefern zu können, und alle innerhalb unseres Onlineangebotes oder von Webseiten getätigten Eingaben.
 
@@ -173,6 +179,37 @@ Die Beantwortung der Kontaktanfragen sowie die Verwaltung von Kontakt- und Anfra
 **Weitere Hinweise zu Verarbeitungsprozessen, Verfahren und Diensten:**
 
 * **Kontaktformular:** Wenn Nutzer über unser Kontaktformular, E-Mail oder andere Kommunikationswege mit uns in Kontakt treten, verarbeiten wir die uns in diesem Zusammenhang mitgeteilten Daten zur Bearbeitung des mitgeteilten Anliegens. Zu diesem Zweck verarbeiten wir personenbezogene Daten im Rahmen vorvertraglicher und vertraglicher Geschäftsbeziehungen, soweit dies zu deren Erfüllung erforderlich ist und im Übrigen auf Grundlage unserer berechtigten Interessen sowie der Interessen der Kommunikationspartner an der Beantwortung der Anliegen und unserer gesetzlichen Aufbewahrungspflichten.
+  Über das Formular erheben wir Name und E-Mail-Adresse (erforderlich) sowie Telefonnummer, Firma, gewünschte Leistung und Nachricht (freiwillig). Zusätzlich speichern wir den Zeitpunkt des Eingangs, die Seite, von der das Formular abgesendet wurde, und einen nicht umkehrbaren Prüfwert Ihrer IP-Adresse. Die IP-Adresse selbst wird nicht gespeichert; der Prüfwert dient allein dazu, missbräuchliche Mehrfachsendungen zu erkennen. Die Angaben werden in unserem Redaktionssystem gespeichert und zusätzlich per E-Mail an unser Postfach gesendet; als Antwortadresse dient dabei die von Ihnen angegebene E-Mail-Adresse. Es findet keine Weitergabe an Dritte statt.
+
+## Bewerbungsverfahren
+
+Unsere Stellenangebote veröffentlichen wir über ein externes Bewerberportal, dessen Übersicht wir auf unserer Karriereseite einbinden. Eine Bewerbung geben Sie dort ab, nicht auf dieser Website; für diese Verarbeitung gelten die Angaben des Portalbetreibers (siehe "Plugins und eingebettete Funktionen sowie Inhalte").
+
+Bewerbungen, die uns per E-Mail, Post oder über das Portal erreichen und die wir in unsere eigenen Systeme übernehmen, verarbeiten wir ausschließlich zum Zweck des Bewerbungsverfahrens. Dazu gehören Ihre Angaben zur Person, Ihre Kontaktdaten, die angestrebte Stelle und die von Ihnen übersandten Unterlagen. Rechtsgrundlage ist die Begründung eines Beschäftigungsverhältnisses (§ 26 Abs. 1 BDSG, Art. 6 Abs. 1 S. 1 lit. b. DSGVO).
+
+Unterlagen, die in unserem System gespeichert sind, werden spätestens 180 Tage nach Eingang automatisch und vollständig gelöscht, einschließlich übersandter Lebensläufe. Eine längere Aufbewahrung erfolgt nur, wenn Sie uns dafür ausdrücklich Ihre Einwilligung erteilt haben oder die Aufbewahrung zur Verteidigung gegen Rechtsansprüche erforderlich ist. Gespeicherte Unterlagen sind nicht öffentlich abrufbar; der Zugriff ist auf die mit dem Bewerbungsverfahren befassten Personen beschränkt.
+
+* **Verarbeitete Datenarten:** Bestandsdaten (z.B. Namen, Adressen); Kontaktdaten (z.B. E-Mail, Telefonnummern); Bewerberdaten (z.B. Angaben zur Person, Lebenslauf, angestrebte Stelle).
+* **Betroffene Personen:** Bewerber.
+* **Zwecke der Verarbeitung:** Bewerbungsverfahren.
+* **Rechtsgrundlagen:** Vertragserfüllung und vorvertragliche Anfragen (Art. 6 Abs. 1 S. 1 lit. b. DSGVO); § 26 Abs. 1 BDSG.
+* **Löschung von Daten:** Spätestens 180 Tage nach Eingang.
+
+## Webanalyse und Reichweitenmessung
+
+Wir möchten wissen, welche Seiten unseres Onlineangebotes gefunden und gelesen werden, um die Inhalte und die Technik der Website verbessern zu können. Dafür setzen wir die Software Umami ein.
+
+Umami läuft auf unserem eigenen Server. Die Messdaten verlassen unsere Infrastruktur nicht, es werden keine Daten an Dritte übermittelt und auch nicht in Länder außerhalb der Europäischen Union übertragen.
+
+Umami arbeitet ohne Cookies und ohne Kennungen, die über einen Besuch hinaus Bestand haben. Es wird kein Profil über Sie gebildet und Sie werden über mehrere Besuche hinweg nicht wiedererkannt. Erfasst werden die aufgerufene Seite, die zuvor besuchte Seite (Referrer), Datum und Uhrzeit, die Art des Geräts, Browser, Betriebssystem, Bildschirmgröße, die eingestellte Sprache sowie der ungefähre Standort (Land, Region und Stadt), der aus Ihrer IP-Adresse abgeleitet wird. Die IP-Adresse selbst wird nicht gespeichert: sie wird nur kurzzeitig verarbeitet, um den Standort zu bestimmen und Besuche innerhalb eines Tages voneinander zu unterscheiden. Zusätzlich messen wir die Ladezeit der Seiten und erfassen, welche Schaltflächen und Navigationspunkte verwendet werden.
+
+Wenn Ihr Browser die Einstellung "Do Not Track" sendet, zählt Umami Ihren Besuch nicht.
+
+* **Verarbeitete Datenarten:** Nutzungsdaten (z.B. besuchte Webseiten, Interesse an Inhalten, Zugriffszeiten); Meta-/Kommunikationsdaten (z.B. Geräte-Informationen).
+* **Betroffene Personen:** Nutzer (z.B. Webseitenbesucher, Nutzer von Onlinediensten).
+* **Zwecke der Verarbeitung:** Reichweitenmessung; Bereitstellung unseres Onlineangebotes und Nutzerfreundlichkeit.
+* **Rechtsgrundlagen:** Berechtigte Interessen (Art. 6 Abs. 1 S. 1 lit. f. DSGVO).
+* **Löschung von Daten:** Die Messdaten werden ausschließlich in aggregierter Form ausgewertet.
 
 ## Plugins und eingebettete Funktionen sowie Inhalte
 
@@ -189,8 +226,9 @@ Die Einbindung setzt immer voraus, dass die Drittanbieter dieser Inhalte die IP-
 
 **Weitere Hinweise zu Verarbeitungsprozessen, Verfahren und Diensten:**
 
-* **Font Awesome:** Darstellung von Schriftarten und Symbolen; **Dienstanbieter:** Fonticons, Inc. ,6 Porter Road Apartment 3R, Cambridge, MA 02140, USA; **Website:** <https://fontawesome.com/>; **Datenschutzerklärung:** <https://fontawesome.com/privacy>.
-* **Google Maps:** Wir binden die Landkarten des Dienstes “Google Maps” des Anbieters Google ein. Zu den verarbeiteten Daten können insbesondere IP-Adressen und Standortdaten der Nutzer gehören, die jedoch nicht ohne deren Einwilligung (im Regelfall im Rahmen der Einstellungen ihrer Mobilgeräte vollzogen), erhoben werden; **Dienstanbieter:** Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland, Mutterunternehmen: Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA 94043, USA; **Website:** <https://cloud.google.com/maps-platform>; **Datenschutzerklärung:** <https://policies.google.com/privacy>; **Widerspruchsmöglichkeit (Opt-Out):** Opt-Out-Plugin: <https://tools.google.com/dlpage/gaoptout?hl=de>, Einstellungen für die Darstellung von Werbeeinblendungen: <https://adssettings.google.com/authenticated>.
+* **Schriftarten und Symbole:** Alle Schriftarten und Symbole werden von unserem eigenen Server ausgeliefert. Es werden keine Schriftarten von externen Anbietern nachgeladen, Ihre IP-Adresse wird dafür also an niemanden übermittelt.
+* **Karte:** Auf der Kontaktseite zeigen wir eine Karte unseres Standortes. Sie wird vollständig von unserem eigenen Server ausgeliefert: die Kartensoftware gehört zu unserer Website, und auch die Kartenbilder ruft Ihr Browser ausschließlich bei uns ab. **Ihre IP-Adresse wird dabei nicht an Dritte übermittelt.** Die Kartenbilder stammen von OpenStreetMap; sie werden von unserem Server geholt, zwischengespeichert und von dort an Sie ausgeliefert. Gegenüber OpenStreetMap tritt dabei nur unser Server auf – übertragen werden dessen IP-Adresse, eine Kennung unserer Website und die Adresse der Seite, zu der die Karte gehört, aber keine Angaben über Sie. Weil die Karte von unserem Server kommt, brauchen Sie ihr nicht gesondert zuzustimmen. Auf der Kontaktseite und in der Quellenangabe der Karte verlinken wir außerdem auf OpenStreetMap; erst wenn Sie einen dieser Links anklicken, verlassen Sie unsere Website, und Ihre Daten werden vom dortigen Anbieter verarbeitet; **Dienstanbieter der Kartendaten:** OpenStreetMap Foundation, St John's Innovation Centre, Cowley Road, Cambridge, CB4 0WS, Vereinigtes Königreich; **Datenschutzerklärung:** <https://osmfoundation.org/wiki/Privacy_Policy>.
+* **Bewerberportal (Europersonal):** Auf unserer Karriereseite binden wir die Stellenübersicht unseres Bewerberportals in einem Rahmen (iframe) ein. Beim Aufruf der Karriereseite wird diese Übersicht vom Server des Anbieters geladen; dabei verarbeitet der Anbieter Ihre IP-Adresse und die üblichen Verbindungsdaten, weil er die Inhalte sonst nicht an Ihren Browser senden könnte. Wenn Sie sich dort bewerben, gelten die Angaben des Anbieters; **Dienstanbieter:** Europersonal & Consulting GmbH; **Website:** <https://grabnar.europersonal.com/>.
 
 ## Änderung und Aktualisierung der Datenschutzerklärung
 
