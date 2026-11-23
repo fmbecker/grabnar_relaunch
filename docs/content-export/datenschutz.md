@@ -55,7 +55,7 @@ Telefon:
 
 Impressum:
 
-<https://grabnar.de/impressum>
+[Impressum](/impressum/)
 
 ## Kontakt Datenschutzbeauftragter
 

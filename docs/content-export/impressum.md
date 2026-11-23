@@ -32,7 +32,7 @@ Fax:
 
 Kontaktformular:
 
-<https://grabnar.de/kontakt>
+[Kontaktformular](/kontakt/)
 
 ## Vertretungsberechtigte Personen
 
