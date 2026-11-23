@@ -43,7 +43,17 @@ Einmalige Einrichtung (Details: `docs/03-technik.md`):
 7. **Einmalig** die Inhalte der Altseite importieren (ersetzt den Seitenbaum!):
    `docker compose -f deploy/docker-compose.yml --env-file /srv/grabnar/cms.env run --rm -v /srv/grabnar/repo/docs:/docs:ro cms python manage.py import_legacy --source /docs`
 8. Backup: `backup.sh` in die root-Crontab.
-9. Optional: Monatsbericht aus Umami per E-Mail – `systemd/grabnar-umami-report.{service,timer}`, Einrichtung in `docs/05-tracking.md` („Monatsbericht per E-Mail“). `felix` muss dafür in der Gruppe `docker` sein.
+9. **Umami** (Statistik, selbst gehostet, cookielos – `docs/05-tracking.md`): eigene Datenbank im
+   schon laufenden Postgres anlegen, damit kein zweiter Datenbankdienst nötig ist:
+   `docker compose -f deploy/docker-compose.yml --env-file /srv/grabnar/cms.env exec -T db psql -U grabnar -c "CREATE ROLE umami LOGIN PASSWORD '<pw>';"`
+   und `… -c "CREATE DATABASE umami OWNER umami;"`. Dann `/srv/grabnar/umami.env` aus
+   `deploy/umami.env.example` (Modus 600, `APP_SECRET` mit `openssl rand -hex 32`),
+   `./deploy.sh` startet den Dienst mit. Umami legt sein Schema beim ersten Start selbst an und
+   beginnt mit `admin` / `umami` – **Passwort sofort ändern**. Oberfläche nur über den SSH-Tunnel:
+   `ssh -L 3000:127.0.0.1:3000 felix@<server>`, dann `http://localhost:3000`. Website dort anlegen,
+   Script-URL (`https://<domain>/stats/script.js`) und Website-ID im Wagtail-Admin eintragen,
+   danach Frontend neu bauen (die CSP entsteht beim Bauen).
+10. Optional: Monatsbericht aus Umami per E-Mail – `systemd/grabnar-umami-report.{service,timer}`, Einrichtung in `docs/05-tracking.md` („Monatsbericht per E-Mail“). `felix` muss dafür in der Gruppe `docker` sein.
 
 Jedes weitere Deployment: `./deploy.sh`. Es lädt das Image passend zum ausgecheckten Code (Tag `cms-<Tree-Hash von cms/>`) und wartet bis zu 15 Minuten, falls GitHub Actions noch baut. Auf dem Server wird nichts kompiliert.
 
