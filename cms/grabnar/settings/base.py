@@ -190,8 +190,16 @@ FORMS_APPLICATION_RETENTION_DAYS = 180
 
 # Hosts the block "Stellenangebote (externes Portal)" may embed (https only). The job ads and the
 # application process live with the provider; the website loads the iframe only after a click.
-JOB_EMBED_ALLOWED_HOSTS = env.list("JOB_EMBED_ALLOWED_HOSTS", default=["grabnar.europersonal.com"])
+#
+# The old address grabnar.europersonal.com, taken over from the previous site, answers only with
+# a 308 to the host below. That breaks the embed rather than following along: frame-src in the
+# page CSP (web/src/lib/csp.ts) is built from the stored URL, so the redirect leads to an origin
+# the page does not allow and the browser refuses the frame. Hence the target host, not the one
+# that redirects. JOB_EMBED_ALLOWED_HOSTS can be overridden in cms.env if it moves again.
+JOB_EMBED_ALLOWED_HOSTS = env.list(
+    "JOB_EMBED_ALLOWED_HOSTS", default=["grabnar.recruit.zvoove.cloud"]
+)
 JOB_EMBED_DEFAULT_URL = (
-    "https://grabnar.europersonal.com/karriere/"
+    "https://grabnar.recruit.zvoove.cloud/karriere/"
     "m-b-grabnar-gebaeudereinigungs-und-handwerker-service-gmbh"
 )
