@@ -28,8 +28,11 @@ fi
 
 if [[ "$fixed" == yes ]]; then
   echo "nginx $version: enthält die Sicherheitskorrekturen vom 18.11.2026."
-  if ! "$nginx_bin" -T 2>/dev/null | grep -Eq '^\s*http2\s+on;'; then
-    echo "Hinweis: HTTP/2 ist aus. Kann jetzt mit 'http2 on;' in beiden 443-Server-Blöcken eingeschaltet werden."
+  # Not `nginx -T`: as felix it aborts on the unreadable certificates and prints nothing, so
+  # the hint fired even when HTTP/2 was on. The linked config is the one nginx actually serves.
+  site=/etc/nginx/sites-enabled/grabnar.conf
+  if [[ -r "$site" ]] && ! grep -Eq '^\s*http2\s+on;' "$site"; then
+    echo "Hinweis: HTTP/2 ist aus. Kann jetzt mit 'http2 on;' in jedem 443-Server-Block eingeschaltet werden."
   fi
   exit 0
 fi
