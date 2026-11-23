@@ -4,8 +4,9 @@
 POST /rebuild with header X-Hook-Secret -> runs build-web.sh (debounced, serialized).
 Listens on port 9000. The CMS container reaches it via host.docker.internal, which resolves
 to the host's docker-bridge address – a socket bound to 127.0.0.1 is NOT reachable from
-there, so the default bind is all interfaces. Keep port 9000 closed in the firewall (ufw
-allows only 22/80/443); every request needs X-Hook-Secret anyway. HOST overrides the bind.
+there, so the default bind is all interfaces. ufw additionally needs
+`allow from 172.16.0.0/12 to any port 9000 proto tcp` (see deploy/README.md); from outside
+the port stays closed, and every request needs X-Hook-Secret anyway. HOST overrides the bind.
 Run via deploy/systemd/grabnar-rebuild.service.
 """
 
