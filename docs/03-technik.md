@@ -146,6 +146,35 @@ Seed: `cms/fixtures/dev.json` mit Beispielseiten für alle Blocks, damit das Fro
 - Bewerbungsdaten: Löschfrist (z. B. 6 Monate) als Management-Command `purge_applications`, im Admin dokumentiert.
 - Analytics falls gewünscht: selbst gehostetes Plausible/Umami, cookielos.
 
+### Auftragsverarbeitung Hosting (Akamai Connected Cloud / Linode)
+
+Der Server ist ein Auftragsverarbeiter nach Art. 28 DSGVO, es braucht also einen Vertrag.
+Eine **Unterschrift ist dafür nicht nötig**: Akamai bezieht seine Kunden-AVV über die
+Nutzungsbedingungen ein („incorporated into and made a part of the most recent Terms
+between Akamai and the customer"), und Art. 28 Abs. 9 lässt das elektronische Format
+ausdrücklich zu. Zu tun ist deshalb nur: herunterladen, mit Datum ablegen, ins
+Verarbeitungsverzeichnis eintragen.
+
+- **Kunden-AVV:** <https://www.akamai.com/site/en/documents/corporate/akamai-data-protection-addendum.pdf>
+- **Unterauftragsverarbeiter + Änderungsmitteilungen abonnieren:** <https://trust.akamai.com/>
+
+**Achtung, verwechselbar:** die alte Adresse `linode.com/legal-dpa/` leitet inzwischen auf die
+**Partner**-Fassung weiter (`partner-data-protection-agreement.pdf`). Die gilt für
+Wiederverkäufer, die selbst Auftragsverarbeiter sind und Akamai als Unterauftragsverarbeiter
+einsetzen – nicht für uns. Ebenso betrifft das Master Provider Agreement
+(<https://www.akamai.com/legal/mpa>) nur das Provider-Programm.
+
+Offen und nur im Dokument bzw. im Kundenbereich prüfbar (Akamais Edge weist automatisierte
+Abrufe der PDFs mit „Access Denied" ab, daher hier ungeprüft): ob die
+EU-Standardvertragsklauseln enthalten sind – Vertragspartner ist nach Drittquellen die
+US-Gesellschaft Akamai Technologies, Inc., weshalb sie relevant wären –, und welche Region
+tatsächlich gebucht ist. Die Angabe „Frankfurt am Main" in der Datenschutzerklärung stammt
+aus der IP-Geolokalisierung, nicht aus dem Vertrag.
+
+Eine gegengezeichnete Fassung ist nicht per Selbstbedienung vorgesehen; wer sie braucht, fragt
+über den Account- oder Support-Kontakt im Kundenbereich. `support@linode.com` ist im MPA nur
+als Adresse für formelle Mitteilungen genannt, nicht als AVV-Antragsstelle.
+
 ## Qualitätsprüfung (Lighthouse + Barrierefreiheit)
 
 - `web/scripts/audit.mjs`: Lighthouse im Mobil-Profil und axe-core (WCAG 2.1/2.2 AA, bei 390 und 1280 px) für 8 repräsentative Seiten. Ziele: Barrierefreiheit, Best Practices, SEO ≥ 95, Performance ≥ 90 (CI: ≥ 80, geteilte Runner schwanken), 0 axe-Verstöße. Exit-Code 1 bei Verfehlung.
