@@ -27,7 +27,9 @@ Einmalige Einrichtung (Details: `docs/03-technik.md`):
 3. **Vorschau-Dienst:** `systemd/grabnar-preview.service` nach `/etc/systemd/system/`, `systemctl enable --now grabnar-preview` (Astro-SSR auf `127.0.0.1:4322`, Nginx leitet `/preview/` dorthin). `FRONTEND_URL` in `cms.env` = Adresse der Seite.
    sudoers-Eintrag (`visudo -f /etc/sudoers.d/grabnar`), damit `build-web.sh` nach jedem Build neu laden darf:
    `felix ALL=(root) NOPASSWD: /usr/sbin/nginx -t, /usr/sbin/nginx -s reload, /usr/bin/systemctl restart grabnar-preview, /usr/bin/systemctl restart grabnar-rebuild.service`
-3b. `systemd/grabnar-rebuild.service` nach `/etc/systemd/system/`, `HOOK_SECRET` setzen (= `FRONTEND_BUILD_HOOK_SECRET` in `cms.env`; `FRONTEND_BUILD_HOOK_URL=http://host.docker.internal:9000/rebuild`), `systemctl enable --now grabnar-rebuild`.
+3b. `systemd/grabnar-rebuild.service` nach `/etc/systemd/system/`, `HOOK_SECRET` setzen (= `FRONTEND_BUILD_HOOK_SECRET` in `cms.env`; `FRONTEND_BUILD_HOOK_URL=http://host.docker.internal:9000/rebuild`; der Dienst lauscht auf allen
+   Adressen, weil der Container `127.0.0.1` des Hosts nicht erreicht – Port 9000 darf in der
+   Firewall nicht geöffnet werden), `systemctl enable --now grabnar-rebuild`.
 4. Purge-Timer: beide `grabnar-purge-applications.*` nach `/etc/systemd/system/`, `systemctl enable --now grabnar-purge-applications.timer`.
 5. **Nginx** – die Configs werden direkt aus dem Repo verlinkt, Änderungen kommen mit jedem Deployment
    (`build-web.sh` prüft mit `nginx -t` und lädt neu). Genau **eine** davon ist aktiv:

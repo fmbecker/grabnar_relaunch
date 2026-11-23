@@ -88,7 +88,9 @@ Daran ändert der Domainumzug nichts.
    (die Datei wird von `build-web.sh` im nächsten Schritt mit `nginx -t` geprüft und neu geladen).
 7. 👤 Neu bauen: `/srv/grabnar/repo/deploy/build-web.sh` (die Ausgabe nennt Domain und Indexierung).
 8. 👤 Wagtail-Admin: *Einstellungen → Websites* → Hostname `www.grabnar.de`, Port 443.
-   *Website-Einstellungen → Statistik*: Domains prüfen (Vorgabe `www.grabnar.de,grabnar.de`).
+   *Website-Einstellungen → Statistik*: Domains prüfen (Vorgabe `www.grabnar.de,grabnar.de`)
+   und **Script-URL/Host-URL auf die neue Domain umstellen** (`https://www.grabnar.de/stats/script.js`,
+   `https://www.grabnar.de/stats`) – sie enthalten die Adresse der Seite. Danach neu bauen.
 
 **Prüfen**
 

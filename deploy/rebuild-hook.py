@@ -2,7 +2,10 @@
 """Tiny webhook that rebuilds the Astro site on the server.
 
 POST /rebuild with header X-Hook-Secret -> runs build-web.sh (debounced, serialized).
-Listens on 127.0.0.1:9000 only; the CMS container reaches it via host.docker.internal.
+Listens on port 9000. The CMS container reaches it via host.docker.internal, which resolves
+to the host's docker-bridge address – a socket bound to 127.0.0.1 is NOT reachable from
+there, so the default bind is all interfaces. Keep port 9000 closed in the firewall (ufw
+allows only 22/80/443); every request needs X-Hook-Secret anyway. HOST overrides the bind.
 Run via deploy/systemd/grabnar-rebuild.service.
 """
 
@@ -78,4 +81,5 @@ class Handler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    HTTPServer(("127.0.0.1", int(os.environ.get("PORT", "9000"))), Handler).serve_forever()
+    host = os.environ.get("HOST", "0.0.0.0")  # see module docstring
+    HTTPServer((host, int(os.environ.get("PORT", "9000"))), Handler).serve_forever()
