@@ -23,6 +23,15 @@ Einmalige Einrichtung (Details: `docs/03-technik.md`):
    die Korrektur nachweislich enthält: `NGINX_PATCHED=1 ./deploy.sh`. Das nginx.org-Paket kennt
    `sites-enabled/` nicht: `sudo mkdir /etc/nginx/sites-enabled` und `include /etc/nginx/sites-enabled/*;`
    im `http`-Block von `/etc/nginx/nginx.conf` ergänzen (die Proxy-Header liefert `nginx/proxy-params.conf`).
+   Für die Kartenkacheln braucht derselbe `http`-Block noch den Cache – `proxy_cache_path` ist
+   dort nur gültig, nicht im Server-Block, den `site.conf` füllt:
+
+   ```
+   proxy_cache_path /var/cache/nginx/tiles levels=1:2 keys_zone=grabnar_tiles:10m max_size=512m inactive=60d use_temp_path=off;
+   ```
+
+   Dazu `sudo install -d -o nginx -g nginx -m 700 /var/cache/nginx/tiles`. Ohne beides
+   verweigert `nginx -t` den Dienst, weil `site.conf` die Zone `grabnar_tiles` benutzt.
 2. `git clone` nach `/srv/grabnar/repo`, `cms.env` und `web.env` anlegen (Phase-1-Werte mit `mbg.aivii.de`).
 3. **Vorschau-Dienst:** `systemd/grabnar-preview.service` nach `/etc/systemd/system/`, `systemctl enable --now grabnar-preview` (Astro-SSR auf `127.0.0.1:4322`, Nginx leitet `/preview/` dorthin). `FRONTEND_URL` in `cms.env` = Adresse der Seite.
    sudoers-Eintrag (`visudo -f /etc/sudoers.d/grabnar`), damit `build-web.sh` nach jedem Build neu laden darf:

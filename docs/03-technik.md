@@ -134,7 +134,15 @@ Seed: `cms/fixtures/dev.json` mit Beispielseiten für alle Blocks, damit das Fro
 ## Datenschutz
 
 - Keine externen Requests im Frontend (Fonts, Maps, Analytics) ohne Consent.
-- Karte als statisches Bild oder selbst gehostetes Leaflet mit OSM-Tiles von eigenem Proxy, sonst Consent-Overlay.
+- Karte: selbst gehostetes Leaflet (`web/src/components/blocks/Map.astro`), Kacheln über den
+  eigenen Proxy `/tiles/` in `deploy/nginx/site.conf`. Dadurch kein Request des Besucher-Browsers
+  an Dritte, die CSP bleibt bei `img-src 'self'`, und es braucht kein Consent-Overlay.
+  Die [OSMF-Tile-Policy](https://operations.osmfoundation.org/policies/tiles/) erlaubt einen
+  Cache-Proxy mit erkennbarem User-Agent, korrektem Referer und mindestens 7 Tagen Cache –
+  alles gesetzt. Sie sagt aber auch zu: kein SLA, und gerade gewerblichen Seiten kann der
+  Zugang ohne Vorankündigung entzogen werden. Fällt er aus, zeigt die Karte leere Kacheln;
+  Adresse und OSM-Link bleiben. Ausweichwege dann: ein anderer OSM-Tile-Anbieter hinter
+  demselben Proxy (nur die `proxy_pass`-Zeile) oder ein statisches Kartenbild.
 - Bewerbungsdaten: Löschfrist (z. B. 6 Monate) als Management-Command `purge_applications`, im Admin dokumentiert.
 - Analytics falls gewünscht: selbst gehostetes Plausible/Umami, cookielos.
 
