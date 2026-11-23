@@ -88,7 +88,7 @@ def test_karriere_embeds_job_portal(client):
     body = data["items"][0]["body"]
     assert [b["type"] for b in body] == ["job_embed", "contact_form"]
     embed = body[0]["value"]
-    assert embed["host"] == "grabnar.europersonal.com"
+    assert embed["host"] == "grabnar.recruit.zvoove.cloud"
     assert embed["url"].startswith("https://") and embed["height"] == 1700
     assert body[1]["value"]["variant"] == "application"
 
@@ -99,9 +99,15 @@ def test_job_embed_only_allowed_hosts():
     from blocks.blocks import JobEmbedBlock
 
     block = JobEmbedBlock()
-    ok = block.to_python({"url": "https://grabnar.europersonal.com/karriere/x", "height": 900})
+    ok = block.to_python({"url": "https://grabnar.recruit.zvoove.cloud/karriere/x", "height": 900})
     assert block.clean(ok)["height"] == 900
-    for url in ("http://grabnar.europersonal.com/karriere/x", "https://example.com/jobs"):
+    # The third one is the old portal address: it only redirects to the allowed host, and a
+    # redirect out of the allowlist is exactly what the page CSP refuses to frame.
+    for url in (
+        "http://grabnar.recruit.zvoove.cloud/karriere/x",
+        "https://example.com/jobs",
+        "https://grabnar.europersonal.com/karriere/x",
+    ):
         with pytest.raises(StructBlockValidationError):
             block.clean(block.to_python({"url": url, "height": 900}))
 
