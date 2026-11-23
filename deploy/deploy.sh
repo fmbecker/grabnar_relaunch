@@ -13,7 +13,13 @@ WAIT_MINUTES=${WAIT_MINUTES:-15}
 compose() { docker compose -f deploy/docker-compose.yml --env-file /srv/grabnar/cms.env "$@"; }
 
 cd "$REPO"
-git pull --ff-only
+# `git pull` rewrites this script while bash is still reading it – bash continues at its old
+# byte offset and silently skips or garbles the changed lines. So pull first, then run the
+# fresh copy from the start; DEPLOY_REEXEC keeps that to exactly one round.
+if [[ "${DEPLOY_REEXEC:-0}" != "1" ]]; then
+  git pull --ff-only
+  DEPLOY_REEXEC=1 exec "$0" "$@"
+fi
 "$REPO/deploy/check-nginx.sh"
 
 if [[ "${BUILD_LOCAL:-0}" == "1" ]]; then
