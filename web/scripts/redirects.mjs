@@ -8,6 +8,12 @@ const res = await fetch(`${api}/redirects/`);
 if (!res.ok) throw new Error(`redirects API ${res.status}`);
 const { items } = await res.json();
 const esc = (s) => s.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+// Nginx matches literal `map` keys case-insensitively. A literal key that differs from its own
+// target only in case therefore also matches the target and redirects it onto itself – an endless
+// loop that made the Handwerkerdienste pages unreachable. Keys with an uppercase letter become
+// case-sensitive regexes (`~`), which match only the spelling the old links actually used.
+const rx = (s) => s.replace(/[.^$*+?()[\]{}|\\]/g, "\\$&");
+const key = (from) => (/[A-Z]/.test(from) ? `~^${rx(from)}$` : from);
 const seen = new Set();
 for (const r of items) {
   const target = r.to.startsWith("http") ? r.to : `${site}${r.to}`;
@@ -17,6 +23,6 @@ for (const r of items) {
   for (const from of variants) {
     if (from === "/" || from === "//" || seen.has(from)) continue;
     seen.add(from);
-    process.stdout.write(`"${esc(from)}" "${esc(target)}";\n`);
+    process.stdout.write(`"${esc(key(from))}" "${esc(target)}";\n`);
   }
 }
