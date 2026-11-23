@@ -71,9 +71,15 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 - [ ] 👤 Bilder einpflegen (Wagtail-Admin)
 - [x] 🤖 Stellenangebote wie auf der Altseite aus dem Bewerberportal Europersonal: Block „Stellenangebote (externes Portal)“ (`job_embed`) auf `/karriere/`, Zwei-Klick-Lösung (Rahmen lädt erst nach Klick, Hinweis mit Link zur Datenschutzerklärung), nur freigegebene Anbieter (`JOB_EMBED_ALLOWED_HOSTS`); Initiativbewerbung darunter bleibt (01.11.2026)
 - [ ] 👤 Europersonal-Adresse prüfen (übernommen von der Altseite: `grabnar.europersonal.com/karriere/m-b-grabnar-…`) und Höhe des Rahmens im Admin anpassen, falls die Liste abgeschnitten wird
+- [ ] 👤 Auftragsverarbeitung Hosting dokumentieren (Einzelheiten und Stolperstellen: `docs/03-technik.md`, „Auftragsverarbeitung Hosting"):
+  - [ ] Kunden-AVV von Akamai herunterladen und mit Datum ablegen (keine Unterschrift nötig, gilt über die Nutzungsbedingungen)
+  - [ ] im Dokument prüfen, ob die EU-Standardvertragsklauseln enthalten sind
+  - [ ] Unterauftragsverarbeiter-Liste im Trust Center ablegen und Änderungsmitteilungen abonnieren
+  - [ ] gebuchte Region im Linode-Kundenbereich bestätigen und mit der Angabe in der Datenschutzerklärung abgleichen
+  - [ ] Eintrag im Verarbeitungsverzeichnis
 - [ ] 👤 Impressum / Datenschutz / AGB rechtlich prüfen. Datenschutz muss neue Formulare (Bewerbung mit Upload, Speicherfrist 180 Tage), Umami und das eingebettete Bewerberportal Europersonal abdecken; Impressum: Feld „Vertretungsberechtigt“ ist in der Altseite leer
 - [x] 🤖 Lighthouse (mobil) + axe-core (WCAG 2.1/2.2 AA) für 8 Seitentypen: überall 100/100/100/100, 0 axe-Verstöße (29.10.2026). Behoben: Touch-Ziele in Kategorie-Kacheln, Kontrast Kartenplatzhalter, Überschriften-Reihenfolge der Alttexte, fehlende Meta-Beschreibungen. Läuft als Job `audit` in `web.yml`, lokal: `web/scripts/audit.mjs` + `web/scripts/serve-prod.mjs`
-- [ ] 🤖 Karte in `Map.astro`: selbst gehostetes Leaflet mit OSM-Tiles (aktuell nur Adresse + OSM-Link)
+- [x] 🤖 Karte in `Map.astro`: selbst gehostetes Leaflet, Kacheln über den eigenen Proxy `/tiles/` (`deploy/nginx/site.conf`, Cache ≥ 7 Tage, erkennbarer User-Agent); Leaflet wird mitgeliefert und erst beim Scrollen geladen, ohne JavaScript bleiben Adresse und OSM-Link. Koordinaten in den Kontakt-Einstellungen (Breiten-/Längengrad)
 - [x] Schrift: Arial (Entscheidung Felix 30.10.2026), keine Webfonts nötig
 
 - [x] 🤖 Tracking mit Umami vorbereitet: Einstellungen im CMS (Script-URL, Website-ID, Domains, Web Vitals, Do Not Track), 21 Ereignisse auf allen Seiten und Komponenten (inkl. `lead`, Kopieren von Kontaktdaten, Leistung per `?leistung=` bis ins Formular), Konzept in `docs/05-tracking.md`

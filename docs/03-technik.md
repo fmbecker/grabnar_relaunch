@@ -134,9 +134,46 @@ Seed: `cms/fixtures/dev.json` mit Beispielseiten für alle Blocks, damit das Fro
 ## Datenschutz
 
 - Keine externen Requests im Frontend (Fonts, Maps, Analytics) ohne Consent.
-- Karte als statisches Bild oder selbst gehostetes Leaflet mit OSM-Tiles von eigenem Proxy, sonst Consent-Overlay.
+- Karte: selbst gehostetes Leaflet (`web/src/components/blocks/Map.astro`), Kacheln über den
+  eigenen Proxy `/tiles/` in `deploy/nginx/site.conf`. Dadurch kein Request des Besucher-Browsers
+  an Dritte, die CSP bleibt bei `img-src 'self'`, und es braucht kein Consent-Overlay.
+  Die [OSMF-Tile-Policy](https://operations.osmfoundation.org/policies/tiles/) erlaubt einen
+  Cache-Proxy mit erkennbarem User-Agent, korrektem Referer und mindestens 7 Tagen Cache –
+  alles gesetzt. Sie sagt aber auch zu: kein SLA, und gerade gewerblichen Seiten kann der
+  Zugang ohne Vorankündigung entzogen werden. Fällt er aus, zeigt die Karte leere Kacheln;
+  Adresse und OSM-Link bleiben. Ausweichwege dann: ein anderer OSM-Tile-Anbieter hinter
+  demselben Proxy (nur die `proxy_pass`-Zeile) oder ein statisches Kartenbild.
 - Bewerbungsdaten: Löschfrist (z. B. 6 Monate) als Management-Command `purge_applications`, im Admin dokumentiert.
 - Analytics falls gewünscht: selbst gehostetes Plausible/Umami, cookielos.
+
+### Auftragsverarbeitung Hosting (Akamai Connected Cloud / Linode)
+
+Der Server ist ein Auftragsverarbeiter nach Art. 28 DSGVO, es braucht also einen Vertrag.
+Eine **Unterschrift ist dafür nicht nötig**: Akamai bezieht seine Kunden-AVV über die
+Nutzungsbedingungen ein („incorporated into and made a part of the most recent Terms
+between Akamai and the customer"), und Art. 28 Abs. 9 lässt das elektronische Format
+ausdrücklich zu. Zu tun ist deshalb nur: herunterladen, mit Datum ablegen, ins
+Verarbeitungsverzeichnis eintragen.
+
+- **Kunden-AVV:** <https://www.akamai.com/site/en/documents/corporate/akamai-data-protection-addendum.pdf>
+- **Unterauftragsverarbeiter + Änderungsmitteilungen abonnieren:** <https://trust.akamai.com/>
+
+**Achtung, verwechselbar:** die alte Adresse `linode.com/legal-dpa/` leitet inzwischen auf die
+**Partner**-Fassung weiter (`partner-data-protection-agreement.pdf`). Die gilt für
+Wiederverkäufer, die selbst Auftragsverarbeiter sind und Akamai als Unterauftragsverarbeiter
+einsetzen – nicht für uns. Ebenso betrifft das Master Provider Agreement
+(<https://www.akamai.com/legal/mpa>) nur das Provider-Programm.
+
+Offen und nur im Dokument bzw. im Kundenbereich prüfbar (Akamais Edge weist automatisierte
+Abrufe der PDFs mit „Access Denied" ab, daher hier ungeprüft): ob die
+EU-Standardvertragsklauseln enthalten sind – Vertragspartner ist nach Drittquellen die
+US-Gesellschaft Akamai Technologies, Inc., weshalb sie relevant wären –, und welche Region
+tatsächlich gebucht ist. Die Angabe „Frankfurt am Main" in der Datenschutzerklärung stammt
+aus der IP-Geolokalisierung, nicht aus dem Vertrag.
+
+Eine gegengezeichnete Fassung ist nicht per Selbstbedienung vorgesehen; wer sie braucht, fragt
+über den Account- oder Support-Kontakt im Kundenbereich. `support@linode.com` ist im MPA nur
+als Adresse für formelle Mitteilungen genannt, nicht als AVV-Antragsstelle.
 
 ## Qualitätsprüfung (Lighthouse + Barrierefreiheit)
 
