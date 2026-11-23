@@ -13,6 +13,10 @@ Einmalige Einrichtung (Details: `docs/03-technik.md`):
 1. Grundsystem: Benutzer `felix` mit SSH-Key, Passwort-Login aus, Firewall (`ufw allow OpenSSH`,
    `ufw allow 80,443/tcp`), automatische Sicherheitsupdates (`unattended-upgrades`).
    Docker + Compose, Node 22 + pnpm (via fnm), `apache2-utils` (für `htpasswd`), certbot installieren.
+   Node/pnpm gehören in den PATH von **Login-Shells** (`~/.profile`, nicht `~/.bashrc`: die kehrt für
+   nicht-interaktive Shells vorzeitig zurück, und `deploy.sh` läuft per `runuser -l felix -c …`):
+   `export PATH="$HOME/.local/share/fnm/aliases/default/bin:/usr/sbin:$PATH"`.
+   Der fnm-Installer braucht `unzip`.
    **nginx aus dem nginx.org-Repository**, mindestens 1.30.7 (stable) bzw. 1.31.9 (mainline) –
    ältere Versionen haben aus der Ferne ausnutzbare Lücken (CVE-2026-123007 u. a., 18.11.2026).
    `deploy.sh` bricht auf älteren Versionen ab (`check-nginx.sh`); nur wenn ein Distributionspaket

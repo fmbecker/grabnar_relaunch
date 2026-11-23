@@ -37,6 +37,10 @@ fi
 compose up -d
 compose exec -T cms python manage.py migrate --noinput
 compose exec -T cms python manage.py collectstatic --noinput
+# ManifestStaticFilesStorage liest staticfiles.json beim Start des Workers – nach collectstatic
+# muss gunicorn neu starten, sonst scheitert jede Admin-Seite mit
+# "Missing staticfiles manifest entry".
+compose restart cms
 echo "$CMS_IMAGE" > /srv/grabnar/cms-image.txt   # what is running now (for rollbacks)
 docker image prune -f --filter "until=168h" >/dev/null || true
 sudo systemctl restart grabnar-rebuild.service
