@@ -5,6 +5,7 @@
  *   - static files from dist/client with gzip/brotli and the same cache headers
  *   - /media/, /api/, /documents/, /admin/ proxied to the CMS (default 127.0.0.1:8000)
  *   - /preview/ proxied to the SSR preview server (default 127.0.0.1:4322)
+ *   - /tiles/ answered with a blank tile instead of proxying to OpenStreetMap
  *
  * Usage: node scripts/serve-prod.mjs [--port 8080] [--cms http://127.0.0.1:8000] [--ssr http://127.0.0.1:4322]
  * Build first with same-origin URLs:  WAGTAIL_MEDIA_URL= PUBLIC_FORMS_API_URL=/api/forms pnpm build
@@ -72,10 +73,24 @@ function resolveFile(urlPath) {
   return null;
 }
 
+/**
+ * Nginx proxies /tiles/ to tile.openstreetmap.org (deploy/nginx/site.conf). Here it answers
+ * with one blank tile: the audit only needs the map to render without failed requests, and
+ * repeating the run in CI must not send automated traffic to the OSM tile servers.
+ */
+const BLANK_TILE = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAIAAADTED8xAAAB/0lEQVR42u3TQQkAAAgEwesfVsQEvs3gwCRY2FQPvBUJMAAYAAwABgADgAHAAGAAMAAYAAwABgADgAHAAGAAMAAYAAwABgADgAHAAGAAMAAYAAwABgADgAHAAGAAMAAYAAwABgADgAHAAGAAMAAYAAwABgADgAHAAGAAMAAYAAyAAVTAAGAAMAAYAAwABgADgAHAAGAAMAAYAAwABgADgAHAAGAAMAAYAAwABgADgAHAAGAAMAAYAAwABgADgAHAAGAAMAAYAAwABgADgAHAAGAAMAAYAAwABgADgAHAAGAAMAAGAAOAAcAAYAAwABgADAAGAAOAAcAAYAAwABgADAAGAAOAAcAAYAAwABgADAAGAAOAAcAAYAAwABgADAAGAAOAAcAAYAAwABgADAAGAAOAAcAAYAAwABgADAAGAAOAATCAChgADAAGAAOAAcAAYAAwABgADAAGAAOAAcAAYAAwABgADAAGAAOAAcAAYAAwABgADAAGAAOAAcAAYAAwABgADAAGAAOAAcAAYAAwABgADAAGAAOAAcAAYAAwABgADAAGwABgADAAGAAMAAYAA4ABwABgADAAGAAMAAYAA4ABwABgADAAGAAMAAYAA4ABwABgADAAGAAMAAYAA4ABwABgADAAGAAMAAYAA4ABwABgADAAGAAMAAYAA4AB4FrPkSoxfpHBdAAAAABJRU5ErkJggg==",
+  "base64",
+);
+
 createServer((req, res) => {
   const url = req.url ?? "/";
   if (/^\/(media|api|documents|admin|django-admin|django-static)\//.test(url)) return proxy(req, res, CMS);
   if (url.startsWith("/preview/")) return proxy(req, res, SSR);
+  if (url.startsWith("/tiles/")) {
+    res.writeHead(200, { "Content-Type": "image/png", "Cache-Control": "public, max-age=2592000", ...SECURITY });
+    return res.end(BLANK_TILE);
+  }
 
   let file = resolveFile(url);
   let status = 200;
