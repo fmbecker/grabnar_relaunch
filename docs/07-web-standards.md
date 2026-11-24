@@ -68,13 +68,35 @@ Betrifft Kontaktanfrage **und** Initiativbewerbung.
 `axe-core` meldet das nicht: der Fehlertext ist gültiges HTML, er ist nur mit keinem
 Feld verknüpft.
 
-Lösung nach Guide `accessible-error-announcement`: `aria-invalid="false"` als
-Ausgangszustand (nicht weglassen – Firefox und Safari melden ein leeres Pflichtfeld
-sonst schon beim Laden als ungültig), `aria-describedby` nur solange der Fehler steht,
-`:user-invalid` statt `:invalid` für die Optik, und eine höfliche Live-Region für die
-Ansage. Dazu Fokusführung beim Absenden.
+Umgesetzt nach Guide `accessible-error-announcement` am 24.11.2026:
 
-Aufwand: ca. 45 Minuten mit Test.
+- `aria-invalid` steht immer am Feld, `"false"` als Ausgangszustand. Weglassen wäre
+  falsch in beide Richtungen: Firefox und Safari melden ein leeres Pflichtfeld schon beim
+  Laden als ungültig, Chromium umgekehrt auch nach der Eingabe nicht, solange das
+  Attribut fehlt.
+- `aria-describedby` zeigt nur auf die Meldung, solange sie sichtbar ist. Text, auf den
+  `aria-describedby` zeigt, wird auch im versteckten Zustand vorgelesen – deshalb steht
+  der Bezug nicht fest im Markup.
+- Der Browser-Zustand `:user-invalid` wird auf `blur`, `input` und `invalid` nach
+  `aria-invalid` gespiegelt. Fehlt die Pseudoklasse (vor Nov 2023), entfällt nur diese
+  Spiegelung; die Server-Fehler bleiben vollständig verknüpft.
+- Nach einer Ablehnung springt der Fokus ins erste abgelehnte Feld, damit der Screenreader
+  Feldname und Meldung liest. Das ersetzt eine Live-Region für die Feldfehler. Schlüssel
+  ohne eigenes Feld (`source_path`, `job_page_id`, `non_field_errors` aus
+  `cms/forms_api/views.py`) landen auf der allgemeinen Meldung, die dafür nie `hidden`
+  sein darf – ein verstecktes Element kann keinen Fokus bekommen.
+- Nach dem Senden bekommt die Erfolgsmeldung den Fokus. Vorher verschwand der
+  Absende-Button mit dem Formular und der Fokus fiel aufs Dokument (WCAG 2.4.3).
+- Tippen löscht die Server-Meldung des Feldes sofort; während des Tippens wird nichts
+  geprüft.
+- `global.css`: `.field:is(:user-invalid, [aria-invalid="true"])` bekommt einen roten
+  Rand. Beide Selektoren in einem `:is()`, sonst verwirft ein Browser ohne
+  `:user-invalid` die ganze Regel. Die Farbe ist nie der einzige Hinweis.
+
+Nebenbei sind die zwei `FormEvent`-Hinweise aus `pnpm check` verschwunden: der Typ ist in
+den React-19-Typen als „doesn't actually exist" abgekündigt, jetzt `SyntheticEvent`.
+
+**Status: erledigt (siehe unten).**
 
 ### 3. Mobiles Menü ohne Escape und ohne Klick daneben 🤖
 
@@ -150,8 +172,9 @@ Aufwand: ca. 30 Minuten, betrifft `cms/blocks/images.py` und alle `<Picture>`-Au
 
 - [x] 🤖 Befund 1 – `scroll-padding-top`
 - [x] 🤖 Befund 3 – mobiles Menü als Popover + Polyfill
-- [ ] 🤖 Befund 2 – Formularfehler barrierefrei melden
+- [x] 🤖 Befund 2 – Formularfehler barrierefrei melden
 - [ ] 🤖 Befund 4 – Renditions nach Seitenverhältnis trennen
+- [ ] 👤 Entscheiden, ob das Prüfskript zu Befund 2 nach `e2e/` kommt (siehe unten)
 - [ ] 🤖 Kleinigkeiten 1–4
 - [x] 🤖 Lighthouse + axe gegen den Build gelaufen (24.11.2026)
 
@@ -181,10 +204,35 @@ Im Build belegt: `scroll-padding-top:5.5rem`, `max-block-size:calc(100dvh - 7rem
 der Polyfill als eigener Chunk, und die Unterlisten ohne `hidden`/`aria-expanded` im
 Markup (also ohne JavaScript vollständig lesbar).
 
-**Nicht abgedeckt:** Escape, Klick-daneben und das Aufklappen der Kategorien. axe
-prüft die Seite im Ruhezustand und öffnet das Menü nicht. Escape und Klick-daneben sind
-bei `popover="auto"` Browserverhalten nach Spezifikation; das Aufklappen hängt am Skript
-in `Header.astro`. Ein Interaktionstest dafür fehlt dem Projekt noch.
+### Geprüft nach Befund 2
+
+Der Audit bleibt unverändert bei 100/100/100/100 und 0 axe-Verstößen, auch auf
+`/kontakt/`. `pnpm check` meldet jetzt 0 Fehler, 0 Warnungen und **0 Hinweise**.
+
+Weil axe die Seite nur im Ruhezustand prüft und kein Formular abschickt, zusätzlich zehn
+Prüfungen im echten Browser (Playwright, Antwort des CMS gestubbt, also nur die Island
+im Test) – alle bestanden:
+
+1. Vor der Eingabe `aria-invalid="false"` und kein `aria-describedby`
+2. Pflichtfeld angefasst und leer gelassen → `aria-invalid="true"`
+3. Nachgetragen → wieder `"false"`
+4. Server lehnt ein Feld ab → `aria-invalid="true"`
+5. … und `aria-describedby` wird gesetzt
+6. … und zeigt auf den tatsächlichen Meldungstext
+7. Fokus steht im ersten abgelehnten Feld
+8. Tippen löscht die Server-Meldung
+9. Nach dem Senden steht der Fokus auf der Erfolgsmeldung (`role="status"`)
+10. Vor der Eingabe kein `aria-describedby` am E-Mail-Feld
+
+Das Skript liegt noch nicht im Repo. Es passt nach `e2e/` neben `preview_admin.py`, nur
+in Node statt Python, weil `playwright` seit Befund 1/3 als devDependency in `web/`
+steht. Beim Übernehmen: der Import muss dann `from "playwright"` lauten, im Scratchpad
+bekommt er den Pfad über die Umgebungsvariable `PLAYWRIGHT`.
+
+**Nicht abgedeckt:** Escape, Klick-daneben und das Aufklappen der Kategorien im mobilen
+Menü. axe öffnet das Menü nicht. Escape und Klick-daneben sind bei `popover="auto"`
+Browserverhalten nach Spezifikation; das Aufklappen hängt am Skript in `Header.astro`.
+Diese drei Fälle gehören in dasselbe `e2e/`-Skript.
 
 ### Zwei Stolpersteine beim Audit, für den nächsten Durchlauf
 
