@@ -187,21 +187,65 @@ Audit unverändert 100/100/100/100 und 0 axe-Verstöße auf allen sieben Seiten,
 
 ## Kleinigkeiten
 
-1. **`<meta charset>` nicht an erster Stelle** – `src/layouts/Base.astro:47-48`: der
-   `<link rel="preload">` für die Schrift steht davor. Innerhalb der ersten 1024 Byte
-   und damit nicht kaputt, aber die Zeichensatzangabe gehört an den Anfang des `<head>`.
+Alle vier am 24.11.2026 umgesetzt.
+
+1. **`<meta charset>` nicht an erster Stelle** – `src/layouts/Base.astro`: der
+   `<link rel="preload">` für die Schrift stand davor. Innerhalb der ersten 1024 Byte und
+   damit nicht kaputt, aber die Zeichensatzangabe gehört an den Anfang des `<head>`.
+   Jetzt `charset`, `viewport`, dann der Preload.
 2. **Stellenfilter nicht verlinkbar** – `src/components/islands/JobFilter.tsx`: der
-   Filterstand steht nicht in der URL, also kein Zurück-Button und kein teilbarer Link
-   auf eine Auswahl. Dazu empfiehlt der Guide `forms` ein `<search>`-Element um
-   Filtersteuerungen und sichtbare Labels statt `aria-label` an den beiden `<select>`.
-3. **FAQ als Exklusiv-Akkordeon** – `src/components/blocks/Faq.astro:11`: `<details
-   name="faq">` lässt den Browser immer nur einen Punkt offen halten, ohne JavaScript.
-   Hier ist `<details>` richtig (Inhalt aufklappen, keine Navigation), anders als in
-   Befund 3.
-4. **Reduced-Motion-Reset mit `*` und `!important`** – `src/styles/global.css:81-85`:
-   die harte alte Variante. Moderner wäre `motion-reduce:`-Utilities dort, wo tatsächlich
-   animiert wird; `src/components/blocks/ServiceGrid.astro:33` macht es schon so.
-   Kosmetisch, kein Fehler.
+   Filterstand stand nicht in der URL. Jetzt in `?ort=`/`?art=` per `pushState`, dazu
+   `popstate` für den Zurück-Button. Die Seite ist statisch, die URL also erst im Browser
+   bekannt: der erste Render ist ungefiltert, danach übernimmt ein Effekt die Auswahl.
+   Ein Wert, den keine Stelle hat, wird verworfen, damit ein alter Link nicht eine leere
+   Liste zeigt. Dazu nach Guide `forms` ein `<search>`-Element um die Steuerung, sichtbare
+   `<label>` statt `aria-label`, und eine `role="status"`-Region mit der Trefferzahl, die
+   bis zur ersten Auswahl leer bleibt, damit die Hydration nichts ansagt.
+3. **FAQ als Exklusiv-Akkordeon** – `src/components/blocks/Faq.astro`: `<details name>`
+   lässt den Browser ohne JavaScript nur einen Punkt offen halten. Der Name muss pro Seite
+   eindeutig sein, sonst schließen zwei faq-Blöcke gegenseitig ihre Antworten; er wird
+   darum aus dem Inhalt abgeleitet und bleibt über Builds gleich. Browser ohne
+   Unterstützung lassen einfach mehrere Antworten offen. Hier ist `<details>` richtig
+   (Inhalt aufklappen, keine Navigation), anders als in Befund 3.
+4. **Reduced-Motion-Reset mit `*` und `!important`** – `src/styles/global.css`. Beim ersten
+   Durchgang hatte ich das als kosmetisch eingeschätzt und vermutet, der globale Reset sei
+   die schützendere Variante. Der Guide `motion` sagt das Gegenteil:
+
+   > **DO NOT** globally apply `animation-duration: 0.01ms;` as it can cause certain
+   > animations to become _more_ jarring. […] Keep non-motion transitions (such as `color`
+   > or `background-color` changes on links and buttons) enabled; only dampen or disable
+   > spatial movement, scaling, rotation, or persistent animations.
+
+   Der Reset hat genau diese Farbübergänge mitabgeschaltet. Jetzt wird nur echte
+   räumliche Bewegung abgeschaltet: `scroll-behavior: auto` unter
+   `prefers-reduced-motion: reduce`, `motion-reduce:transition-none` am FAQ-Plus und am
+   Menü-Plus (beide rotieren), und in `blocks/Map.astro` **Leaflet** per
+   `matchMedia` (`zoomAnimation`, `fadeAnimation`, `markerZoomAnimation`). Letzteres ist
+   der Grund, warum das Entfernen des Resets ohne diesen Schritt eine Verschlechterung
+   gewesen wäre: Leaflet baut seine Animationen zur Laufzeit, kein Stylesheet erreicht
+   sie. `blocks/ServiceGrid.astro:33` hatte sein `motion-reduce:` schon.
+   Farbübergänge an Buttons und das Ein-/Ausblenden der Desktop-Dropdowns bleiben an –
+   Opazität ist keine Bewegung.
+
+### Geprüft nach den Kleinigkeiten
+
+`pnpm lint` sauber, `pnpm check` 0/0/0, `pnpm check:tracking` sauber, Audit unverändert
+100/100/100/100 und 0 axe-Verstöße auf allen sieben Seiten.
+
+Weder `job_list` noch `faq` kommt im Seed vor – die Stellen liegen bei Europersonal, das
+FAQ nutzt bisher keine Seite –, der Build konnte die Kleinigkeiten 2 und 3 also nicht
+zeigen. Dafür eine Wegwerf-Seite mit Beispieldaten gerendert, elf Prüfungen im Browser,
+alle bestanden, danach Seite gelöscht und neu gebaut:
+
+1. Ohne Auswahl beide Stellen, keine Query, Live-Region leer
+2. Auswahl landet als `?ort=…` in der URL, Liste gefiltert, Live-Region meldet „1 von 2"
+3. Zweiter Filter kommt als `&art=…` dazu
+4. Zurück nimmt den letzten Schritt zurück, und der Select folgt
+5. Geteilter Link `?ort=…&art=…` stellt die Auswahl wieder her
+6. `?ort=Nirgendwo` wird verworfen statt eine leere Liste zu zeigen
+7. FAQ hält nur eine Antwort offen
+
+Das Skript liegt wie das zu Befund 2 noch nicht im Repo.
 
 ## Reihenfolge
 
@@ -209,8 +253,8 @@ Audit unverändert 100/100/100/100 und 0 axe-Verstöße auf allen sieben Seiten,
 - [x] 🤖 Befund 3 – mobiles Menü als Popover + Polyfill
 - [x] 🤖 Befund 2 – Formularfehler barrierefrei melden
 - [x] 🤖 Befund 4 – Renditions nach Seitenverhältnis trennen
-- [ ] 👤 Entscheiden, ob das Prüfskript zu Befund 2 nach `e2e/` kommt (siehe unten)
-- [ ] 🤖 Kleinigkeiten 1–4
+- [x] 🤖 Kleinigkeiten 1–4
+- [ ] 👤 Entscheiden, ob die zwei Prüfskripte nach `e2e/` kommen (siehe unten)
 - [x] 🤖 Lighthouse + axe gegen den Build gelaufen (24.11.2026)
 
 ### Geprüft nach Befund 1 und 3
