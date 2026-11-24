@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import type { JobSummary } from "@/lib/types";
 import { EVENT, track, umami } from "@/lib/analytics";
 
@@ -6,9 +6,27 @@ interface Props {
   jobs: JobSummary[];
 }
 
+/** Query parameters the selection is kept in, so a filtered list can be linked and shared. */
+const PARAM = { location: "ort", type: "art" } as const;
+
+type Filter = { location: string; type: string };
+
+/** The path for a selection, keeping any other query parameter and the hash untouched. */
+function urlFor(next: Filter): string {
+  const p = new URLSearchParams(window.location.search);
+  for (const key of ["location", "type"] as const) {
+    if (next[key]) p.set(PARAM[key], next[key]);
+    else p.delete(PARAM[key]);
+  }
+  const query = p.toString();
+  return `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`;
+}
+
 export default function JobFilter({ jobs }: Props) {
-  const [location, setLocation] = useState("");
-  const [type, setType] = useState("");
+  const uid = useId();
+  const [filter, setFilter] = useState<Filter>({ location: "", type: "" });
+  // The live region stays empty until the visitor filters, so hydration announces nothing.
+  const [announce, setAnnounce] = useState(false);
 
   const locations = useMemo(() => [...new Set(jobs.map((j) => j.location))].sort(), [jobs]);
   const types = useMemo(() => {
@@ -17,34 +35,95 @@ export default function JobFilter({ jobs }: Props) {
     return [...m.entries()];
   }, [jobs]);
 
-  const visible = jobs.filter((j) => (!location || j.location === location) && (!type || j.employment_type === type));
+  // A value that no job has is dropped: a stale or hand-edited link must not leave the
+  // select showing a choice that filters everything away.
+  const fromUrl = useCallback((): Filter => {
+    const p = new URLSearchParams(window.location.search);
+    const location = p.get(PARAM.location) ?? "";
+    const type = p.get(PARAM.type) ?? "";
+    return {
+      location: locations.includes(location) ? location : "",
+      type: types.some(([k]) => k === type) ? type : "",
+    };
+  }, [locations, types]);
+
+  // The page is static, so the URL is only known in the browser: start unfiltered and take
+  // the selection over once hydrated. popstate makes the back button step through filters.
+  useEffect(() => {
+    const apply = () => {
+      const next = fromUrl();
+      setFilter(next);
+      // A value that was dropped has to leave the address bar as well, or the URL keeps
+      // claiming a filter the selects do not show – and copying that link would pass the
+      // stale selection on. replaceState, not pushState: this corrects the entry the
+      // visitor is on, it is not a step they took, and back must still leave the page.
+      const current = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+      const corrected = urlFor(next);
+      if (corrected !== current) history.replaceState(null, "", corrected);
+    };
+    apply();
+    window.addEventListener("popstate", apply);
+    return () => window.removeEventListener("popstate", apply);
+  }, [fromUrl]);
+
+  function change(field: keyof Filter, value: string) {
+    const next = { ...filter, [field]: value };
+    setFilter(next);
+    setAnnounce(true);
+
+    // One history entry per choice, so the back button undoes the last filter step.
+    history.pushState(null, "", urlFor(next));
+
+    track(EVENT.jobFilter, { field: field === "location" ? "location" : "employment_type", value: value || "alle" });
+  }
+
+  const visible = jobs.filter((j) => (!filter.location || j.location === filter.location) && (!filter.type || j.employment_type === filter.type));
+
+  // The message names the selection, not just the count: role="status" only speaks when the
+  // text changes, so a second choice that happens to match the same number of jobs would
+  // otherwise pass in silence and leave the visitor unsure whether it took effect.
+  const chosen = [filter.location, types.find(([k]) => k === filter.type)?.[1]].filter(Boolean).join(", ");
+  const message = chosen
+    ? `Auswahl ${chosen}: ${visible.length} von ${jobs.length} Stellen.`
+    : `Auswahl aufgehoben: alle ${jobs.length} Stellen.`;
 
   return (
     <div>
-      <div className="mb-6 flex flex-wrap gap-3">
-        <select className="field w-auto" value={location} onChange={(e) => {
-            setLocation(e.target.value);
-            track(EVENT.jobFilter, { field: "location", value: e.target.value || "alle" });
-          }} aria-label="Arbeitsort">
-          <option value="">Alle Orte</option>
-          {locations.map((l) => (
-            <option key={l} value={l}>
-              {l}
-            </option>
-          ))}
-        </select>
-        <select className="field w-auto" value={type} onChange={(e) => {
-            setType(e.target.value);
-            track(EVENT.jobFilter, { field: "employment_type", value: e.target.value || "alle" });
-          }} aria-label="Beschäftigungsart">
-          <option value="">Alle Beschäftigungsarten</option>
-          {types.map(([k, label]) => (
-            <option key={k} value={k}>
-              {label}
-            </option>
-          ))}
-        </select>
-      </div>
+      <search>
+        <div className="mb-6 flex flex-wrap gap-4">
+          <div>
+            <label className="label" htmlFor={`${uid}-location`}>
+              Arbeitsort
+            </label>
+            <select id={`${uid}-location`} className="field w-auto" value={filter.location} onChange={(e) => change("location", e.target.value)}>
+              <option value="">Alle Orte</option>
+              {locations.map((l) => (
+                <option key={l} value={l}>
+                  {l}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="label" htmlFor={`${uid}-type`}>
+              Beschäftigungsart
+            </label>
+            <select id={`${uid}-type`} className="field w-auto" value={filter.type} onChange={(e) => change("type", e.target.value)}>
+              <option value="">Alle Beschäftigungsarten</option>
+              {types.map(([k, label]) => (
+                <option key={k} value={k}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </search>
+
+      <p role="status" className="sr-only">
+        {announce ? message : ""}
+      </p>
+
       {visible.length === 0 ? (
         <p className="text-ink-700">Keine Stellen für diese Auswahl.</p>
       ) : (

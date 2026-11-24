@@ -28,7 +28,7 @@ const { value } = Astro.props;
        (173deg/98deg keep the former slant; the transparent start is offset so no corner of the layer shows). Drawn towers until the company's photos arrive -->
   <div class="mt-10 relative aspect-[16/10] [mask-image:linear-gradient(173deg,transparent_12vw,black_calc(12vw_+_38%))] sm:aspect-[2/1] lg:absolute lg:inset-y-0 lg:right-0 lg:aspect-auto lg:w-[56%] xl:w-[62%] lg:mt-0 lg:[mask-image:linear-gradient(98deg,transparent_100px,black_calc(100px_+_40%))]">
     {value.image ? (
-      <Picture image={value.image} variant="hero" loading="eager" sizes="(min-width: 1280px) 62vw, (min-width: 1024px) 56vw, 100vw" class="absolute inset-0 h-full w-full object-cover" />
+      <Picture image={value.image} shape="stage" loading="eager" sizes="(min-width: 1280px) 62vw, (min-width: 1024px) 56vw, 100vw" class="absolute inset-0 h-full w-full object-cover" />
     ) : (
       <BrandPattern class="absolute inset-0 h-full w-full" />
     )}

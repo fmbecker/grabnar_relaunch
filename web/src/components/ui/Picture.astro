@@ -1,27 +1,41 @@
 ---
-/** Responsive image from Wagtail renditions. */
-import type { ApiImage } from "@/lib/types";
+/**
+ * Responsive image from Wagtail renditions.
+ *
+ * `shape` picks the rendition set. Every candidate within a set has the same aspect ratio,
+ * so the crop the visitor sees does not change with the viewport or the device's pixel
+ * density – mixing ratios in one srcset was finding 4 in docs/07-web-standards.md.
+ * Pick the shape by the box the image sits in: `card` (4:3) for images in the flow, `stage`
+ * (2:1) for an area the image covers. The CSS box may have a different ratio; `object-cover`
+ * then crops every candidate the same way.
+ */
+import type { ApiImage, ImageShape } from "@/lib/types";
 interface Props {
   image: ApiImage;
-  variant?: "card" | "wide" | "hero" | "full";
+  shape?: ImageShape;
   class?: string;
   loading?: "lazy" | "eager";
   sizes?: string;
 }
-const { image, variant = "card", class: cls = "", loading = "lazy", sizes = "(min-width: 1024px) 50vw, 100vw" } = Astro.props;
-const r = image.renditions;
-const main = r[variant];
-const srcset = [r.thumb, r.card, r.wide, r.hero]
-  .filter((x, i, a) => a.findIndex((y) => y.url === x.url) === i)
-  .map((x) => `${x.url} ${x.width}w`)
-  .join(", ");
+const { image, shape = "card", class: cls = "", loading = "lazy", sizes = "(min-width: 1024px) 50vw, 100vw" } = Astro.props;
+// Wagtail never upscales: a rendition asked to be wider than the source comes back at the
+// source's size, so two specs of a set can land on the same pixel width. The crop stays
+// right (fill crops to the ratio first), but a srcset with a repeated width descriptor only
+// makes the browser choose between two identical files, so keep the first of each width.
+const candidates = image.renditions[shape].filter(
+  (r, i, all) => all.findIndex((other) => other.width === r.width) === i,
+);
+const srcset = candidates.map((r) => `${r.url} ${r.width}w`).join(", ");
+// src and width/height come from the same candidate, so the stated ratio always matches what
+// a browser without srcset loads. Every current browser picks from srcset instead.
+const fallback = candidates[Math.min(1, candidates.length - 1)];
 ---
 <img
-  src={main.url}
+  src={fallback.url}
   srcset={srcset}
   sizes={sizes}
-  width={main.width}
-  height={main.height}
+  width={fallback.width}
+  height={fallback.height}
   alt={image.alt}
   loading={loading}
   fetchpriority={loading === "eager" ? "high" : undefined}

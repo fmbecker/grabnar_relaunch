@@ -9,13 +9,28 @@ export interface Rendition {
   height: number;
 }
 
+/**
+ * Which rendition set a `<Picture>` draws from. One set = one aspect ratio, because a
+ * srcset must never mix ratios: the browser picks by viewport and pixel density, so the
+ * visible crop would otherwise change between devices.
+ * Contract with cms/blocks/images.py: RENDITION_SETS.
+ */
+export type ImageShape = "card" | "stage";
+
 export interface ApiImage {
   id: number;
   title: string;
   alt: string;
   width: number;
   height: number;
-  renditions: Record<"thumb" | "card" | "wide" | "hero" | "full", Rendition>;
+  renditions: {
+    /** 4:3, small to large – images inside a box in the flow. */
+    card: Rendition[];
+    /** 2:1, small to large – stages an image covers edge to edge. */
+    stage: Rendition[];
+    /** Uncropped, for opening a gallery image on its own. Never a srcset candidate. */
+    full: Rendition;
+  };
 }
 
 export interface ApiLink {

@@ -45,30 +45,92 @@ const phoneShort = phone.replace(/^\+49\s*\(0\)\s*(\d+)\s*/, "0$1 ");
     <a href={tel} class="btn-primary hidden px-3 lg:inline-flex wide:hidden" aria-label={`Anrufen: ${phone}`} title={phone}><Icon name="phone" class="h-5 w-5" /></a>
     <a href={tel} class="btn-primary hidden whitespace-nowrap font-display font-extrabold wide:inline-flex"><Icon name="phone" class="h-4 w-4" />{phoneShort}</a>
 
-    <!-- Mobile: details/summary, categories expandable -->
+    <!--
+      Mobile: the list is a native popover, the button its declarative trigger. Escape,
+      clicking outside and returning focus to the button all come from the browser, so this
+      needs no document-level handlers. `<summary>` is deliberately not used as a navigation
+      trigger: its button role is implemented inconsistently, and screen readers announce it
+      as "summary" or "disclosure triangle".
+      Categories are inline disclosures. They are rendered expanded and collapsed by the
+      script below, so without JavaScript the popover still opens and shows every link.
+    -->
     <div class="flex items-center gap-2 lg:hidden">
     <a href={tel} class="btn-primary px-3" aria-label={`Anrufen: ${phone}`}><Icon name="phone" class="h-5 w-5" /></a>
-    <details class="relative" data-track-toggle="mobile-menu-open" data-track-area="mobile-menu">
-      <summary class="btn-secondary min-h-11 cursor-pointer list-none rounded-ui px-4 py-2 font-bold">Menü</summary>
-      <ul class="absolute right-0 mt-2 max-h-[75vh] w-72 overflow-y-auto rounded-ui bg-white p-2 text-ink-900 shadow-xl">
-        {nav.items.map((item) =>
-          item.children && item.children.length > 0 ? (
-            <li>
-              <details>
-                <summary class="flex cursor-pointer list-none items-center justify-between rounded px-3 py-2 font-medium hover:bg-ink-50">{item.title}<span aria-hidden="true">+</span></summary>
-                <ul class="mb-1 ml-3 border-l border-ink-100 pl-2 text-sm">
-                  <li><a href={item.href} {...umami(EVENT.nav, { item: item.title, level: 1, menu: "mobile" })} class="block rounded px-3 py-1.5 font-semibold text-brand-700">Übersicht</a></li>
-                  {item.children.map((c) => <li><a href={c.href} {...umami(EVENT.nav, { item: c.title, parent: item.title, level: 2, menu: "mobile" })} class="block rounded px-3 py-1.5 hover:bg-ink-50">{c.title}</a></li>)}
-                </ul>
-              </details>
-            </li>
-          ) : (
-            <li><a href={item.href} {...umami(EVENT.nav, { item: item.title, level: 1, menu: "mobile" })} class="block rounded px-3 py-2 font-medium hover:bg-ink-50">{item.title}</a></li>
-          ),
-        )}
-        <li class="mt-2 border-t border-ink-100 pt-2"><a href={tel} class="block px-3 py-2 font-semibold text-brand-700">{phone}</a></li>
-      </ul>
-    </details>
+    <button type="button" class="btn-secondary px-4 py-2" popovertarget="mobile-menu" popovertargetaction="toggle" aria-controls="mobile-menu">Menü</button>
+    <ul id="mobile-menu" popover="auto" data-track-toggle="mobile-menu-open" data-track-area="mobile-menu" class="rounded-ui bg-white p-2 text-ink-900 shadow-xl">
+      {nav.items.map((item, i) =>
+        item.children && item.children.length > 0 ? (
+          <li>
+            <button type="button" class="flex min-h-11 w-full items-center justify-between rounded px-3 py-2 text-left font-medium hover:bg-ink-50" aria-controls={`mobile-menu-${i}`} data-menu-toggle>
+              {/* Rotation is spatial motion: it snaps under reduced motion, the state stays. */}
+              {item.title}<span aria-hidden="true" class="menu-plus ml-4 transition-transform motion-reduce:transition-none">+</span>
+            </button>
+            <ul id={`mobile-menu-${i}`} class="mb-1 ml-3 border-l border-ink-100 pl-2 text-sm">
+              <li><a href={item.href} {...umami(EVENT.nav, { item: item.title, level: 1, menu: "mobile" })} class="block rounded px-3 py-1.5 font-semibold text-brand-700">Übersicht</a></li>
+              {item.children.map((c) => <li><a href={c.href} {...umami(EVENT.nav, { item: c.title, parent: item.title, level: 2, menu: "mobile" })} class="block rounded px-3 py-1.5 hover:bg-ink-50">{c.title}</a></li>)}
+            </ul>
+          </li>
+        ) : (
+          <li><a href={item.href} {...umami(EVENT.nav, { item: item.title, level: 1, menu: "mobile" })} class="block rounded px-3 py-2 font-medium hover:bg-ink-50">{item.title}</a></li>
+        ),
+      )}
+      <li class="mt-2 border-t border-ink-100 pt-2"><a href={tel} class="block px-3 py-2 font-semibold text-brand-700">{phone}</a></li>
+    </ul>
     </div>
   </div>
 </header>
+
+<style>
+  /* The popover renders in the top layer, so it is positioned against the viewport. The
+     header is sticky and h-20 (5rem) tall on every breakpoint, which makes a fixed offset
+     exact here – no anchor positioning needed (not Baseline widely available yet).
+     dvh, not vh: on phones the browser bar must not cut off the end of the list. */
+  #mobile-menu {
+    position: fixed;
+    inset: auto;
+    inset-block-start: 5.5rem;
+    inset-inline-end: 1rem;
+    inline-size: min(80dvw, 18rem);
+    max-block-size: calc(100dvh - 7rem);
+    margin: 0;
+    overflow-y: auto;
+  }
+  /* Both selectors in one :is(): the polyfill cannot define the real pseudo-class and sets
+     a class of that name instead, and a browser lacking the pseudo-class would otherwise
+     drop the whole rule. */
+  #mobile-menu:is(:popover-open, .\:popover-open) {
+    display: block;
+  }
+  /* Without popover support the list would be visible until the polyfill has loaded. */
+  @supports not selector(:popover-open) {
+    #mobile-menu:not(.\:popover-open) {
+      display: none;
+    }
+  }
+  [aria-expanded="true"] > .menu-plus {
+    rotate: 45deg;
+  }
+</style>
+
+<script>
+  // Popover is Baseline since 2025-01-27 (iOS Safari from 18.3). Load the polyfill only
+  // where the attribute is unsupported, and detect that on the prototype – reading or
+  // writing the IDL attribute first would shadow the accessor the polyfill installs.
+  if (!Object.hasOwn(HTMLElement.prototype, "popover")) {
+    void import("@oddbird/popover-polyfill");
+  }
+
+  // Categories inside the menu are inline disclosures. The markup renders them expanded so
+  // the menu stays usable without this script; collapse them and wire the buttons here.
+  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-menu-toggle]")) {
+    const list = document.getElementById(button.getAttribute("aria-controls") ?? "");
+    if (!list) continue;
+    list.hidden = true;
+    button.setAttribute("aria-expanded", "false");
+    button.addEventListener("click", () => {
+      const open = button.getAttribute("aria-expanded") === "true";
+      button.setAttribute("aria-expanded", String(!open));
+      list.hidden = open;
+    });
+  }
+</script>

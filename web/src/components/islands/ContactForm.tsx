@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState, type FormEvent } from "react";
+import { useEffect, useId, useRef, useState, type SyntheticEvent } from "react";
 import { EVENT, SERVICE_PARAM, track } from "@/lib/analytics";
 
 interface Props {
@@ -11,11 +11,52 @@ interface Props {
 
 type Status = "idle" | "sending" | "success" | "error";
 
+/** Form controls that carry a name and a validity state. */
+type Control = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+
+function isControl(target: EventTarget | null): target is Control {
+  return (
+    target instanceof HTMLInputElement ||
+    target instanceof HTMLSelectElement ||
+    target instanceof HTMLTextAreaElement
+  );
+}
+
+/**
+ * Does the answer hold something that no field of this form can explain? True for a network
+ * error, and for a key that this variant renders no control for.
+ * The names are read off the form instead of being listed here, because which controls exist
+ * depends on the variant: an application opened from a job page renders no job_title input,
+ * yet the serializer in cms/forms_api/views.py can still reject that key. A hard-coded list
+ * would call such a key explained and hide its message entirely.
+ */
+function isUnexplained(el: HTMLFormElement, fieldErrors: Record<string, string[]>): boolean {
+  const keys = Object.keys(fieldErrors);
+  if (keys.length === 0) return true;
+  const names = new Set<string>();
+  for (const control of Array.from(el.elements)) {
+    if (isControl(control) && control.name) names.add(control.name);
+  }
+  return keys.some((k) => !names.has(k));
+}
+
 export default function ContactForm({ variant, successMessage, sourcePath, apiUrl, job }: Props) {
   const [status, setStatus] = useState<Status>("idle");
   const [errors, setErrors] = useState<Record<string, string[]>>({});
+  // Whether the last answer held something no field explains. Its own flag on purpose: it
+  // must not be derived from `errors` being empty, because typing empties `errors` too and
+  // the general message would then appear out of nowhere while the visitor is still writing.
+  const [unexplained, setUnexplained] = useState(false);
+  // Counts rejected submits. Drives the focus effect below; see the comment there.
+  const [rejected, setRejected] = useState(0);
+  // What the browser itself rejects, mirrored from the CSS :user-invalid state. Kept apart
+  // from `errors`, which only ever holds what the server sent back.
+  const [userInvalid, setUserInvalid] = useState<Record<string, boolean>>({});
   const startedAt = useRef(Date.now());
   const started = useRef(false);
+  const form = useRef<HTMLFormElement>(null);
+  const alert = useRef<HTMLParagraphElement>(null);
+  const success = useRef<HTMLParagraphElement>(null);
   const uid = useId();
   const isApplication = variant === "application";
   // Service handed over by a CTA link (?leistung=…). Prefills the field; tracked as is,
@@ -27,22 +68,81 @@ export default function ContactForm({ variant, successMessage, sourcePath, apiUr
     setService(fromLink);
   }, [variant]);
 
+  // The submit button vanishes with the form, so focus has to be placed on the message that
+  // replaces it – otherwise it falls back to the document and the visitor loses their place.
+  useEffect(() => {
+    if (status === "success") success.current?.focus();
+  }, [status]);
+
+  /**
+   * After a rejected submit, move focus to the first field the server rejected so a screen
+   * reader reads its name and its message; if nothing it named has a control here, to the
+   * general message instead.
+   * An effect, not requestAnimationFrame: only an effect is guaranteed to run after React
+   * has committed, and the element aria-describedby points to has to be in the page before
+   * focus lands on the field. The dependency is the counter and deliberately not `errors`,
+   * because typing changes `errors` as well and must not pull focus away mid-sentence; the
+   * counter changes in the same batch as `errors`, so this reads the fresh errors.
+   */
+  useEffect(() => {
+    if (rejected === 0) return;
+    const el = form.current;
+    if (!el) return;
+    for (const control of Array.from(el.elements)) {
+      if (isControl(control) && control.name && errors[control.name]) {
+        control.focus();
+        return;
+      }
+    }
+    alert.current?.focus();
+  }, [rejected]);
+
   // Tracking: form type, job title and the linked service only, never what visitors type.
   const trackData = { form: variant, job: job?.title };
-  function onFirstInput() {
-    if (started.current) return;
-    started.current = true;
-    track(EVENT.formStart, trackData);
+
+  /**
+   * Mirror the browser's :user-invalid state into aria-invalid. Without this, Chromium does
+   * not expose an empty required field as invalid to assistive technology even after the
+   * visitor has left it, while :invalid would mark every empty required field from page load.
+   * Where the pseudo-class is missing (before Nov 2023) the sync is skipped: the browser's
+   * own validation still blocks the submit, and the server errors below stay fully labelled.
+   */
+  function syncValidity(e: SyntheticEvent) {
+    const el = e.target;
+    if (!isControl(el) || !el.name) return;
+    if (!CSS.supports("selector(:user-invalid)")) return;
+    const invalid = el.matches(":user-invalid");
+    setUserInvalid((prev) => (prev[el.name] === invalid ? prev : { ...prev, [el.name]: invalid }));
+  }
+
+  function onInput(e: SyntheticEvent) {
+    if (!started.current) {
+      started.current = true;
+      track(EVENT.formStart, trackData);
+    }
+    syncValidity(e);
+    // Typing clears this field's server error right away; a new one only ever arrives with
+    // the next answer from the server. Nothing is validated while the visitor is still typing.
+    const el = e.target;
+    if (!isControl(el) || !el.name) return;
+    const name = el.name;
+    setErrors((prev) => {
+      if (!prev[name]) return prev;
+      const next = { ...prev };
+      delete next[name];
+      return next;
+    });
   }
 
   const endpoint = `${apiUrl.replace(/\/$/, "")}/${isApplication ? "application" : "contact"}/`;
 
-  async function onSubmit(e: FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: SyntheticEvent<HTMLFormElement>) {
     e.preventDefault();
     setStatus("sending");
     setErrors({});
-    const form = e.currentTarget;
-    const data = new FormData(form);
+    setUnexplained(false);
+    const el = e.currentTarget;
+    const data = new FormData(el);
     data.set("started_at", String(startedAt.current));
     data.set("source_path", sourcePath);
     data.set("consent", data.get("consent") ? "true" : "false");
@@ -55,30 +155,45 @@ export default function ContactForm({ variant, successMessage, sourcePath, apiUr
       const json = (await res.json()) as { ok: boolean; errors?: Record<string, string[]> };
       if (res.ok && json.ok) {
         setStatus("success");
-        form.reset();
+        el.reset();
+        setUserInvalid({});
         if (isApplication) track(EVENT.applicationSent, { job: job?.title });
         else track(EVENT.inquirySent, { service });
         track(EVENT.lead, { channel: isApplication ? "application" : "form", service: isApplication ? undefined : service });
       } else {
-        setErrors(json.errors ?? {});
+        const fieldErrors = json.errors ?? {};
+        setErrors(fieldErrors);
+        setUnexplained(isUnexplained(el, fieldErrors));
         setStatus("error");
-        track(EVENT.formError, { ...trackData, reason: json.errors ? "invalid" : "error", fields: Object.keys(json.errors ?? {}).join(",") });
+        setRejected((n) => n + 1);
+        track(EVENT.formError, { ...trackData, reason: json.errors ? "invalid" : "error", fields: Object.keys(fieldErrors).join(",") });
       }
     } catch {
       setStatus("error");
+      setUnexplained(true);
+      setRejected((n) => n + 1);
       track(EVENT.formError, { ...trackData, reason: "error" });
     }
   }
 
   if (status === "success") {
     return (
-      <p role="status" className="rounded-md bg-green-50 p-4 text-green-800">
+      <p ref={success} tabIndex={-1} role="status" className="rounded-md bg-green-50 p-4 text-green-800">
         {successMessage}
       </p>
     );
   }
 
   const err = (k: string) => errors[k]?.[0];
+  const errorId = (k: string) => `${uid}-${k}-error`;
+  // aria-invalid is always written out, "false" included: Firefox and Safari report an empty
+  // required field as invalid from page load, so leaving it off announces an error too early.
+  const isInvalid = (k: string) => Boolean(err(k)) || userInvalid[k] === true;
+  // Only referenced while the message is on screen – aria-describedby is read out even when
+  // what it points to is hidden.
+  const describedBy = (k: string) => (err(k) ? errorId(k) : undefined);
+  const showAlert = status === "error" && unexplained;
+
   // `remountKey` re-creates the uncontrolled input when its default value arrives after hydration.
   const field = (name: string, label: string, props: React.InputHTMLAttributes<HTMLInputElement> = {}, remountKey?: string) => (
     <div>
@@ -86,13 +201,26 @@ export default function ContactForm({ variant, successMessage, sourcePath, apiUr
         {label}
         {props.required && " *"}
       </label>
-      <input key={remountKey} id={`${uid}-${name}`} name={name} className="field" {...props} />
-      {err(name) && <p className="mt-1 text-sm text-red-700">{err(name)}</p>}
+      <input
+        key={remountKey}
+        id={`${uid}-${name}`}
+        name={name}
+        className="field"
+        aria-invalid={isInvalid(name)}
+        aria-describedby={describedBy(name)}
+        onInvalid={syncValidity}
+        {...props}
+      />
+      {err(name) && (
+        <p id={errorId(name)} className="mt-1 text-sm text-red-700">
+          {err(name)}
+        </p>
+      )}
     </div>
   );
 
   return (
-    <form onSubmit={onSubmit} onInput={onFirstInput} className="grid gap-5" noValidate={false}>
+    <form ref={form} onSubmit={onSubmit} onInput={onInput} onBlur={syncValidity} className="grid gap-5" noValidate={false}>
       {/* honeypot */}
       <div className="hidden" aria-hidden="true">
         <label htmlFor={`${uid}-website`}>Website</label>
@@ -120,8 +248,21 @@ export default function ContactForm({ variant, successMessage, sourcePath, apiUr
         <label className="label" htmlFor={`${uid}-message`}>
           {isApplication ? "Kurze Nachricht" : "Ihre Anfrage *"}
         </label>
-        <textarea id={`${uid}-message`} name="message" rows={5} className="field" required={!isApplication} />
-        {err("message") && <p className="mt-1 text-sm text-red-700">{err("message")}</p>}
+        <textarea
+          id={`${uid}-message`}
+          name="message"
+          rows={5}
+          className="field"
+          required={!isApplication}
+          aria-invalid={isInvalid("message")}
+          aria-describedby={describedBy("message")}
+          onInvalid={syncValidity}
+        />
+        {err("message") && (
+          <p id={errorId("message")} className="mt-1 text-sm text-red-700">
+            {err("message")}
+          </p>
+        )}
       </div>
 
       {isApplication && (
@@ -129,21 +270,51 @@ export default function ContactForm({ variant, successMessage, sourcePath, apiUr
           <label className="label" htmlFor={`${uid}-cv`}>
             Lebenslauf (PDF oder Word, max. 10 MB)
           </label>
-          <input id={`${uid}-cv`} name="cv" type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="field" />
-          {err("cv") && <p className="mt-1 text-sm text-red-700">{err("cv")}</p>}
+          <input
+            id={`${uid}-cv`}
+            name="cv"
+            type="file"
+            accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            className="field"
+            aria-invalid={isInvalid("cv")}
+            aria-describedby={describedBy("cv")}
+            onInvalid={syncValidity}
+          />
+          {err("cv") && (
+            <p id={errorId("cv")} className="mt-1 text-sm text-red-700">
+              {err("cv")}
+            </p>
+          )}
         </div>
       )}
 
-      <label className="flex items-start gap-3 text-sm text-ink-700">
-        <input type="checkbox" name="consent" value="true" required className="mt-1" />
-        <span>
-          Ich habe die <a href="/datenschutz/" className="underline">Datenschutzerklärung</a> gelesen und stimme der Verarbeitung meiner Angaben zur Bearbeitung meiner {isApplication ? "Bewerbung" : "Anfrage"} zu. *
-        </span>
-      </label>
-      {err("consent") && <p className="-mt-3 text-sm text-red-700">{err("consent")}</p>}
+      <div>
+        <label className="flex items-start gap-3 text-sm text-ink-700">
+          <input
+            type="checkbox"
+            name="consent"
+            value="true"
+            required
+            className="mt-1"
+            aria-invalid={isInvalid("consent")}
+            aria-describedby={describedBy("consent")}
+            onInvalid={syncValidity}
+          />
+          <span>
+            Ich habe die <a href="/datenschutz/" className="underline">Datenschutzerklärung</a> gelesen und stimme der Verarbeitung meiner Angaben zur Bearbeitung meiner {isApplication ? "Bewerbung" : "Anfrage"} zu. *
+          </span>
+        </label>
+        {err("consent") && (
+          <p id={errorId("consent")} className="mt-1 text-sm text-red-700">
+            {err("consent")}
+          </p>
+        )}
+      </div>
 
-      {status === "error" && Object.keys(errors).length === 0 && (
-        <p role="alert" className="rounded-md bg-red-50 p-3 text-sm text-red-800">
+      {/* Shown whenever something went wrong that no field explains, and then the target of
+          focusFirstError. Never `hidden`: a hidden element cannot take focus. */}
+      {showAlert && (
+        <p ref={alert} tabIndex={-1} role="alert" className="rounded-md bg-red-50 p-3 text-sm text-red-800">
           Das Senden hat nicht geklappt. Bitte versuchen Sie es erneut oder rufen Sie uns an.
         </p>
       )}

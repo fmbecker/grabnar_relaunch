@@ -80,12 +80,16 @@ const contactConfig = { phoneTail: contact.phone.replace(/\D/g, "").slice(-6), e
     track(EVENT.lead, { channel: `${type}-copy`, placement });
   });
 
-  // <details data-track-toggle="faq-open" data-track-label="…">: count openings only.
+  // <details data-track-toggle="faq-open" data-track-label="…"> and the [popover] menu in
+  // Header.astro: count openings only. Neither element's toggle event bubbles, hence capture.
   document.addEventListener(
     "toggle",
     (e) => {
-      const el = e.target as HTMLDetailsElement;
-      if (!(el instanceof HTMLDetailsElement) || !el.open || !el.dataset.trackToggle) return;
+      const el = e.target;
+      if (!(el instanceof HTMLElement) || !el.dataset.trackToggle) return;
+      // <details> carries its state on the element, a popover only on the event.
+      const opened = el instanceof HTMLDetailsElement ? el.open : (e as ToggleEvent).newState === "open";
+      if (!opened) return;
       const name = el.dataset.trackToggle as (typeof EVENT)[keyof typeof EVENT];
       track(name, el.dataset.trackLabel ? { question: el.dataset.trackLabel } : {});
     },

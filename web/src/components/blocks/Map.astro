@@ -65,12 +65,21 @@ const where = `${contact.company_name}, ${contact.street}, ${contact.postal_code
     if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
 
     const L = (await import("leaflet")).default;
+    // Leaflet builds its animations at runtime, so no stylesheet reaches them; they have to
+    // be switched off here when the visitor asked for less motion. `inertia` belongs in the
+    // list: it keeps the map gliding after a drag has ended, which is movement the visitor
+    // no longer controls.
+    const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const map = L.map(box, {
       center: [lat, lon],
       zoom,
       // Scrolling the page must not zoom the map; a click enables the wheel.
       scrollWheelZoom: false,
       attributionControl: false,
+      zoomAnimation: !calm,
+      fadeAnimation: !calm,
+      markerZoomAnimation: !calm,
+      inertia: !calm,
     });
     map.once("click", () => map.scrollWheelZoom.enable());
 

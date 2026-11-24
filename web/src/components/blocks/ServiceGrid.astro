@@ -30,7 +30,7 @@ const pad = (n: number) => String(n + 1).padStart(2, "0");
               <a href={c.href} tabindex="-1" aria-hidden="true" {...overview}
                 class:list={["block overflow-hidden bg-brand-50 lg:col-span-6", flip && "lg:order-2 lg:col-start-7"]}>
                 {c.image
-                  ? <Picture image={c.image} variant="wide" sizes="(min-width: 1024px) 50vw, 100vw" class="aspect-[4/3] w-full object-cover transition-transform duration-500 hover:scale-[1.02] motion-reduce:transition-none motion-reduce:hover:scale-100" />
+                  ? <Picture image={c.image} shape="card" sizes="(min-width: 1024px) 50vw, 100vw" class="aspect-[4/3] w-full object-cover transition-transform duration-500 hover:scale-[1.02] motion-reduce:transition-none motion-reduce:hover:scale-100" />
                   : <BrandPattern tone="light" seed={i} class="aspect-[4/3] w-full" />}
               </a>
               <div class:list={["lg:col-span-6", flip && "lg:order-1 lg:col-start-1 lg:row-start-1"]}>
@@ -71,7 +71,7 @@ const pad = (n: number) => String(n + 1).padStart(2, "0");
             <a href={s.href} {...umami(EVENT.service, { service: s.title, list })} class="group flex h-full flex-col border border-ink-100 bg-white transition-colors hover:border-brand-500 motion-reduce:transition-none">
               <div class="relative overflow-hidden bg-brand-50">
                 {s.image
-                  ? <Picture image={s.image} variant="card" sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" class="aspect-[3/2] w-full object-cover" />
+                  ? <Picture image={s.image} shape="card" sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" class="aspect-[3/2] w-full object-cover" />
                   : <BrandPattern tone="light" seed={i} class="aspect-[3/2] w-full" />}
                 <span class="absolute bottom-0 left-0 bg-brand-500 p-2.5 text-white"><Icon name={s.icon} class="h-5 w-5" /></span>
               </div>

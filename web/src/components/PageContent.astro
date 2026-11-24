@@ -41,7 +41,7 @@ const enquiry = svc ? withService("/kontakt/", page.title) : "";
           </div>
         </div>
         <div class="relative aspect-[16/10] [mask-image:linear-gradient(173deg,transparent_12vw,black_calc(12vw_+_38%))] sm:aspect-[2/1] lg:absolute lg:inset-y-0 lg:right-0 lg:aspect-auto lg:w-[56%] xl:w-[62%] lg:[mask-image:linear-gradient(104deg,transparent_160px,black_calc(160px_+_40%))]">
-          <Picture image={headImage} variant="hero" loading="eager" sizes="(min-width: 1280px) 62vw, (min-width: 1024px) 56vw, 100vw" class="absolute inset-0 h-full w-full object-cover" />
+          <Picture image={headImage} shape="stage" loading="eager" sizes="(min-width: 1280px) 62vw, (min-width: 1024px) 56vw, 100vw" class="absolute inset-0 h-full w-full object-cover" />
         </div>
       </div>
     ) : (
@@ -74,7 +74,7 @@ const enquiry = svc ? withService("/kontakt/", page.title) : "";
       </div>
       <div class="relative aspect-[16/10] [mask-image:linear-gradient(173deg,transparent_12vw,black_calc(12vw_+_38%))] sm:aspect-[2/1] lg:absolute lg:inset-y-0 lg:right-0 lg:aspect-auto lg:w-[56%] xl:w-[62%] lg:[mask-image:linear-gradient(104deg,transparent_160px,black_calc(160px_+_40%))]">
         {svc.hero_image
-          ? <Picture image={svc.hero_image} variant="hero" loading="eager" sizes="(min-width: 1280px) 62vw, (min-width: 1024px) 56vw, 100vw" class="absolute inset-0 h-full w-full object-cover" />
+          ? <Picture image={svc.hero_image} shape="stage" loading="eager" sizes="(min-width: 1280px) 62vw, (min-width: 1024px) 56vw, 100vw" class="absolute inset-0 h-full w-full object-cover" />
           : <BrandPattern tone="dark" seed={page.id} class="absolute inset-0 h-full w-full" />}
       </div>
     </div>

@@ -90,6 +90,12 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 - [ ] 🤝 Nach dem Umami-Update: API-Schlüssel anlegen, `setup-reports.mjs` ausführen, Journey-Bericht in der Oberfläche anlegen (`docs/05-tracking.md`)
 - [x] 🤖 Monatsbericht per E-Mail aus Umami: `deploy/umami/monthly-report.mjs` + `send-monthly-report.sh` + systemd-Timer (1. des Monats, 07:15)
 - [ ] 👤 Empfänger des Monatsberichts festlegen, `/srv/grabnar/umami-report.env` anlegen, Timer aktivieren (`docs/05-tracking.md`)
+- [x] 🤖 Frontend auf veraltete Muster und heutige Web-Standards geprüft: keine Altlasten, vier Befunde + vier Kleinigkeiten in `docs/07-web-standards.md`
+- [x] 🤖 Befund 1: `scroll-padding-top` – Anker landeten hinter dem Sticky-Header („Jetzt bewerben" → `#formular`)
+- [x] 🤖 Befund 3: mobiles Menü als `popover` statt `<details>` – Escape, Klick-daneben und Fokusrückgabe vom Browser, `dvh` statt `vh`
+- [x] 🤖 Befund 2: Formularfehler mit `aria-invalid`/`aria-describedby` gemeldet, Fokus ins erste abgelehnte Feld und nach dem Senden auf die Erfolgsmeldung (WCAG 3.3.1/3.3.3/2.4.3)
+- [x] 🤖 Befund 4: Bild-Renditions nach Seitenverhältnis getrennt (`card` 4:3, `stage` 2:1, `full` einzeln); `Picture.astro` nimmt `shape` statt `variant`
+- [x] 🤖 Kleinigkeiten 1–4: `<meta charset>` zuerst, Stellenfilter mit `<search>`/Labels/URL-Status, FAQ als natives Exklusiv-Akkordeon, Reduced Motion je Stelle statt global (inkl. Leaflet)
 
 ## Phase 4 – Go-Live
 
