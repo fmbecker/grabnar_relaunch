@@ -88,9 +88,13 @@ Neue interaktive Elemente: Ereignis in `EVENT` ergänzen, an Links/Buttons `{...
 setzen, in Islands `track(EVENT.x, {...})` aufrufen, Tabelle oben ergänzen.
 
 Geprüft am 30.10.2026 mit einem Test-Tracker im Browser (Playwright): alle Ereignisse oben außer
-`faq-open`, `gallery-open` und `download-click` (auf der Seite derzeit kein FAQ, keine Galerie,
+`faq-open`, `gallery-open` und `download-click` (damals auf der Seite kein FAQ, keine Galerie,
 kein Dokument), `job-apply-click` (gleiche Technik wie `job-open`) und `application-sent`
 (gleicher Code wie `inquiry-sent`).
+
+Seit dem 24.11.2026 legt `seed_dev` ein FAQ und eine Stellenliste als Beispielblöcke an
+(Begründung in `docs/07-web-standards.md`), `faq-open` und `job-filter` sind damit
+nachprüfbar – mit dem Test-Tracker nachgeholt ist es noch nicht.
 
 ## Auswertung in Umami (Vorschlag)
 

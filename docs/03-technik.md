@@ -56,6 +56,12 @@ Wagtail-Editor (Vorschau-Panel)
 - Lokal: `pnpm dev` bedient `/preview/` auf Port 4321 (Standard-`FRONTEND_URL` des CMS). Gegen den gebauten Server: `node web/dist/server/entry.mjs` mit `PORT=4322` und CMS mit `FRONTEND_URL=http://127.0.0.1:4322`.
 - E2E-Test aus Redakteurssicht: `e2e/preview_admin.py` (Playwright).
 
+**Weitere E2E-Skripte** (Node + Playwright, gegen einen ausgelieferten Build; Aufruf und
+Voraussetzungen in `docs/07-web-standards.md`): `e2e/contact_form.mjs` (Formularfehler
+barrierefrei gemeldet), `e2e/job_filter_faq.mjs` (Stellenfilter in der URL, FAQ-Akkordeon),
+`e2e/mobile_menu.mjs` (Popover-Menü: Escape, Klick daneben, Kategorien). Sie laufen noch
+nicht in CI.
+
 ## Hosting auf neuem VPS (entschieden, 20.11.2026)
 
 Der Relaunch läuft auf einem **frischen VPS**, nicht auf dem Linode der Altseite (dessen OS ist zu alt

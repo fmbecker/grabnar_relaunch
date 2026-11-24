@@ -96,6 +96,10 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 - [x] 🤖 Befund 2: Formularfehler mit `aria-invalid`/`aria-describedby` gemeldet, Fokus ins erste abgelehnte Feld und nach dem Senden auf die Erfolgsmeldung (WCAG 3.3.1/3.3.3/2.4.3)
 - [x] 🤖 Befund 4: Bild-Renditions nach Seitenverhältnis getrennt (`card` 4:3, `stage` 2:1, `full` einzeln); `Picture.astro` nimmt `shape` statt `variant`
 - [x] 🤖 Kleinigkeiten 1–4: `<meta charset>` zuerst, Stellenfilter mit `<search>`/Labels/URL-Status, FAQ als natives Exklusiv-Akkordeon, Reduced Motion je Stelle statt global (inkl. Leaflet)
+- [x] 🤖 Sieben Befunde aus dem Code-Review der eigenen Umsetzung behoben (Sammelmeldung erschien beim Korrigieren, Schlüssel ohne Feld, Fokus per `useEffect`, FAQ-Gruppenname, Live-Region, Filterwert in der URL, Leaflet-`inertia`)
+- [x] 🤖 46 Prüfungen in `e2e/` (Kontaktformular, Stellenfilter + FAQ, mobiles Menü); `seed_dev` legt FAQ und Stellenliste als Beispielblöcke an, damit überhaupt etwas sie rendert
+- [ ] 👤 Die drei `e2e/`-Skripte in `.github/workflows/web.yml` aufnehmen (Seed mit `--demo-jobs`, Server, drei `node`-Aufrufe)
+- [ ] 👤 Browser-Unterstützung in `CLAUDE.md` festlegen (Vorschlag in `docs/07-web-standards.md`)
 
 ## Phase 4 – Go-Live
 

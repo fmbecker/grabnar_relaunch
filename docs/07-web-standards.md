@@ -245,7 +245,8 @@ alle bestanden, danach Seite gelöscht und neu gebaut:
 6. `?ort=Nirgendwo` wird verworfen statt eine leere Liste zu zeigen
 7. FAQ hält nur eine Antwort offen
 
-Das Skript liegt wie das zu Befund 2 noch nicht im Repo.
+Das Skript liegt seit dem 24.11.2026 als `e2e/job_filter_faq.mjs` im Repo – siehe
+„Prüfskripte in `e2e/`" unten.
 
 ## Reihenfolge
 
@@ -255,7 +256,7 @@ Das Skript liegt wie das zu Befund 2 noch nicht im Repo.
 - [x] 🤖 Befund 4 – Renditions nach Seitenverhältnis trennen
 - [x] 🤖 Kleinigkeiten 1–4
 - [x] 🤖 Sieben Befunde aus dem Code-Review der eigenen Umsetzung (24.11.2026)
-- [ ] 👤 Entscheiden, ob die zwei Prüfskripte nach `e2e/` kommen (siehe unten)
+- [x] 🤖 Prüfskripte nach `e2e/`, Beispielblöcke in `seed_dev` (24.11.2026)
 - [x] 🤖 Lighthouse + axe gegen den Build gelaufen (24.11.2026)
 
 ### Geprüft nach Befund 1 und 3
@@ -304,15 +305,8 @@ im Test) – alle bestanden:
 9. Nach dem Senden steht der Fokus auf der Erfolgsmeldung (`role="status"`)
 10. Vor der Eingabe kein `aria-describedby` am E-Mail-Feld
 
-Das Skript liegt noch nicht im Repo. Es passt nach `e2e/` neben `preview_admin.py`, nur
-in Node statt Python, weil `playwright` seit Befund 1/3 als devDependency in `web/`
-steht. Beim Übernehmen: der Import muss dann `from "playwright"` lauten, im Scratchpad
-bekommt er den Pfad über die Umgebungsvariable `PLAYWRIGHT`.
-
-**Nicht abgedeckt:** Escape, Klick-daneben und das Aufklappen der Kategorien im mobilen
-Menü. axe öffnet das Menü nicht. Escape und Klick-daneben sind bei `popover="auto"`
-Browserverhalten nach Spezifikation; das Aufklappen hängt am Skript in `Header.astro`.
-Diese drei Fälle gehören in dasselbe `e2e/`-Skript.
+Das Skript liegt seit dem 24.11.2026 als `e2e/contact_form.mjs` im Repo – siehe
+„Prüfskripte in `e2e/`" unten.
 
 ## Code-Review der eigenen Umsetzung
 
@@ -373,6 +367,61 @@ zeigen *und* den Fokus bekommen; zwei Filterwahlen mit derselben Trefferzahl mü
 verschiedene Texte in der Live-Region ergeben; `?ort=Nirgendwo` muss auch aus der URL
 verschwinden; und zwei FAQ-Blöcke mit fast gleicher Überschrift dürfen sich nicht
 gegenseitig schließen.
+
+## Prüfskripte in `e2e/`
+
+Die drei Skripte liegen neben `preview_admin.py`, in Node statt Python, weil `playwright`
+seit Befund 1/3 als devDependency in `web/` steht. `e2e/playwright.mjs` löst das Paket
+aus `web/package.json` auf und bringt `check`/`report` mit, damit die Skripte selbst nur
+aus Prüfungen bestehen.
+
+| Skript | Prüfungen | Deckt ab |
+|---|---|---|
+| `e2e/contact_form.mjs` | 14 | Befund 2 und die drei Review-Befunde dazu |
+| `e2e/job_filter_faq.mjs` | 17 | Kleinigkeiten 2 und 3, drei Review-Befunde |
+| `e2e/mobile_menu.mjs` | 15 | Befund 3: Escape, Klick daneben, Kategorien |
+
+Alle drei brauchen einen ausgelieferten Build:
+
+```
+cd cms && uv run manage.py seed_dev --demo-jobs      # --demo-jobs: sonst ist die Stellenliste leer
+cd web && pnpm build && node scripts/serve-prod.mjs
+node e2e/contact_form.mjs && node e2e/job_filter_faq.mjs && node e2e/mobile_menu.mjs
+```
+
+Die Antwort des CMS auf das Kontaktformular ist in `contact_form.mjs` gestubbt
+(`page.route`), es werden also keine echten Submissions angelegt.
+
+### Warum `seed_dev` jetzt zwei Beispielblöcke anlegt
+
+`faq` und `job_list` kamen auf der ganzen Seite nicht vor: die Stellenanzeigen liegen im
+Bewerberportal (`job_embed`), und freigegebenen FAQ-Text gibt es nicht. Damit rendert kein
+Build `Faq.astro`, `JobList.astro` oder die `JobFilter`-Island – und ein Block, den nichts
+rendert, ist ein Block, dessen Bruch niemandem auffällt. `seed_dev` hängt darum an
+„Unternehmen" zwei `faq`-Blöcke und an „Karriere" einen `job_list`-Block.
+
+- **Zwei FAQ-Blöcke mit Absicht.** Nur so ist prüfbar, dass die Gruppennamen verschieden
+  sind – der Review-Befund dazu. `test_faq_blocks_have_distinct_ids` sichert dieselbe
+  Zusage auf CMS-Seite ab.
+- **Texte als Beispiel gekennzeichnet**, in Überschrift und Antwort. Über die Firma
+  dürfen nur bestätigte Aussagen auf der Seite stehen (`docs/02-konzept.md`), und
+  FAQ-Antworten wären neue; die Demo-Stellenanzeigen machen es mit „Beispielanzeige:"
+  genauso.
+- **Nicht in `import_legacy`.** Das bleibt die echte Inhaltsquelle für den Go-Live.
+  `test_karriere_embeds_job_portal` und `test_unternehmen_page` nennen die Beispielblöcke
+  jetzt ausdrücklich, damit die Grenze im Test sichtbar bleibt.
+- **Nebeneffekt, gewollt:** CI seedet ohne `--demo-jobs`, rendert die Blöcke aber trotzdem
+  (die Stellenliste in ihrem Leer-Zustand), sodass Build und Audit jetzt bei jedem Push
+  über `Faq.astro` und `JobList.astro` laufen. Dafür musste keine Workflow-Datei angefasst
+  werden.
+
+### Offen dazu
+
+- 👤 Die drei Skripte laufen in CI nicht mit. Das bräuchte einen Schritt in
+  `.github/workflows/web.yml` (Seed mit `--demo-jobs`, Server, drei `node`-Aufrufe) –
+  Workflow-Dateien ändere ich nicht selbst.
+- 👤 `e2e/` wird von keinem Linter erfasst: `ruff` läuft in `cms/`, `eslint` in `web/`.
+  Gilt auch für `preview_admin.py` und ist bisher niemandem im Weg gewesen.
 
 ### Zwei Stolpersteine beim Audit, für den nächsten Durchlauf
 
