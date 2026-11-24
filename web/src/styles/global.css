@@ -136,5 +136,11 @@
   .prose-site ul:has(> li:nth-child(6)) > li:last-child:nth-child(odd) { @apply sm:col-span-2; }
   .prose-site ul:has(> li:nth-child(6)) > li::before { @apply left-4 top-[1.05em]; }
   .field { @apply block min-h-11 w-full rounded-ui border border-ink-300 bg-white px-3 py-2.5 text-base focus:border-brand-500 focus:ring-1 focus:ring-brand-500; }
+  /* Rejected field: :user-invalid, never :invalid – the latter marks every empty required
+     field from page load, before the visitor has typed anything. [aria-invalid] carries the
+     same cue for what the server rejected (islands/ContactForm.tsx sets it).
+     Both inside one :is() so a browser without :user-invalid keeps the rest of the rule.
+     The red border is never the only cue: every rejected field also gets a message. */
+  .field:is(:user-invalid, [aria-invalid="true"]) { @apply border-red-600; }
   .label { @apply mb-1.5 block text-sm font-bold text-ink-900; }
 }
