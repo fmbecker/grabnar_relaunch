@@ -153,21 +153,57 @@ Aufwand: ca. 30 Minuten, betrifft `cms/blocks/images.py` und alle `<Picture>`-Au
 - [ ] 🤖 Befund 2 – Formularfehler barrierefrei melden
 - [ ] 🤖 Befund 4 – Renditions nach Seitenverhältnis trennen
 - [ ] 🤖 Kleinigkeiten 1–4
-- [ ] 👤 `node scripts/audit.mjs` braucht Playwright, das hier nicht installiert ist –
-      einmal `pnpm dlx playwright install chromium`, dann Lighthouse + axe gegen den Build
+- [x] 🤖 Lighthouse + axe gegen den Build gelaufen (24.11.2026)
 
 ### Geprüft nach Befund 1 und 3
 
-`pnpm lint` sauber, `pnpm check` 0 Fehler (die zwei Hinweise zu `FormEvent` sind älter
-und gehören zu Befund 2), `pnpm build` durch, `pnpm check:tracking` sauber. Im Build
-belegt: `scroll-padding-top:5.5rem`, `max-block-size:calc(100dvh - 7rem)`,
+Vollständig, in dieser Reihenfolge, gegen das lokal laufende CMS (sqlite, Port 8000):
+
+| Prüfung | Ergebnis |
+|---|---|
+| `cms`: `ruff check .` | sauber |
+| `cms`: `ruff format --check .` | 47 Dateien formatiert |
+| `cms`: `pytest -q` | 25 passed |
+| `web`: `pnpm lint` | sauber |
+| `web`: `pnpm check` | 0 Fehler, 0 Warnungen, 2 Hinweise |
+| `web`: `pnpm check:tracking` | 16 Ereignis-Bezüge, alle in `EVENT` |
+| `web`: `pnpm build` | 33 Seiten, `noindex` korrekt gesetzt |
+| `scripts/audit.mjs`, 7 Seiten | alle bestanden |
+
+Die zwei Hinweise aus `pnpm check` betreffen das veraltete `FormEvent` in
+`islands/ContactForm.tsx` und gehören zu Befund 2.
+
+Audit je Seite: Performance 100, Barrierefreiheit 100, Best Practices 100, SEO 100,
+0 axe-Verstöße (WCAG 2.1/2.2 AA, mobil **und** Desktop), CLS 0, LCP mobil 0,9–1,8 s.
+
+Im Build belegt: `scroll-padding-top:5.5rem`, `max-block-size:calc(100dvh - 7rem)`,
 `popover="auto"` samt `popovertarget`, der `@supports`-Rückfall mit `.\:popover-open`,
 der Polyfill als eigener Chunk, und die Unterlisten ohne `hidden`/`aria-expanded` im
 Markup (also ohne JavaScript vollständig lesbar).
 
-Nicht geprüft, weil Playwright fehlt: Escape, Klick-daneben und das Aufklappen der
-Kategorien im echten Browser. Escape und Klick-daneben sind bei `popover="auto"`
-Browserverhalten nach Spezifikation, das Aufklappen hängt am Skript in `Header.astro`.
+**Nicht abgedeckt:** Escape, Klick-daneben und das Aufklappen der Kategorien. axe
+prüft die Seite im Ruhezustand und öffnet das Menü nicht. Escape und Klick-daneben sind
+bei `popover="auto"` Browserverhalten nach Spezifikation; das Aufklappen hängt am Skript
+in `Header.astro`. Ein Interaktionstest dafür fehlt dem Projekt noch.
+
+### Zwei Stolpersteine beim Audit, für den nächsten Durchlauf
+
+1. **SEO fällt scheinbar durch.** Mit der normalen `.env` trägt jede Seite
+   `<meta name="robots" content="noindex,nofollow">`, weil `PUBLIC_ALLOW_INDEXING`
+   nicht gesetzt ist – Lighthouse gibt dann SEO 69 (`is-crawlable` = 0). Der Audit
+   braucht also einen eigenen Build:
+   `WAGTAIL_MEDIA_URL= PUBLIC_FORMS_API_URL=/api/forms PUBLIC_ALLOW_INDEXING=true pnpm build`,
+   dann `node scripts/serve-prod.mjs --port 8080` und
+   `node scripts/audit.mjs --base http://127.0.0.1:8080`.
+2. **`ECONNREFUSED 127.0.0.1:8000` heißt nicht, dass das CMS weg ist.**
+   Djangos `runserver` hat einen Listen-Backlog von 10; die parallelen API-Abrufe des
+   Builds überfahren ihn gelegentlich. Einfach wiederholen.
+
+Lighthouse nennt außerdem vier Punkte unterhalb der Schwelle, die die Kategoriewertung
+nicht drücken: `render-blocking-insight` (290 ms, das gebündelte CSS im `<head>`),
+`unused-javascript` (37 KiB, nur `/kontakt/`, die React-Island des Formulars),
+`cache-insight` (6 KiB, Header von `serve-prod.mjs`, nicht von Nginx) und
+`image-delivery-insight` (7 KiB, WebP-Qualität 70). Nichts davon ist zu tun.
 
 ## Browser-Unterstützung: offene Festlegung
 
