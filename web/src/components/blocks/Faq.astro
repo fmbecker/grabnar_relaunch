@@ -2,16 +2,27 @@
 import type { FaqValue } from "@/lib/types";
 interface Props { value: FaqValue }
 const { value } = Astro.props;
+// Exclusive accordion: `name` makes the browser keep only one answer open, without script.
+// The name has to be unique per page – two faq blocks sharing one would close each other's
+// answers – and is derived from the content so it stays the same across builds.
+// Browsers without support for `name` on <details> simply let several answers stay open.
+const group = `faq-${value.heading || value.items[0]?.question || ""}`
+  .toLowerCase()
+  .replace(/[^a-z0-9]+/g, "-")
+  .replace(/-+$/, "")
+  .slice(0, 40);
 ---
 <section class="section">
   <div class="container-x max-w-3xl">
     {value.heading && <h2 class="h2 mb-6">{value.heading}</h2>}
     <div class="divide-y divide-ink-100 rounded-lg border border-ink-100">
       {value.items.map((item) => (
-        <details class="group p-5" data-track-toggle="faq-open" data-track-label={item.question}>
+        <details class="group p-5" name={group} data-track-toggle="faq-open" data-track-label={item.question}>
           <summary class="flex cursor-pointer list-none items-center justify-between font-semibold">
             {item.question}
-            <span class="ml-4 text-brand-600 transition group-open:rotate-45" aria-hidden="true">+</span>
+            {/* Rotation is spatial motion, so it snaps instead of turning under reduced
+                motion – the open state stays visible either way. */}
+            <span class="ml-4 text-brand-600 transition motion-reduce:transition-none group-open:rotate-45" aria-hidden="true">+</span>
           </summary>
           <div class="prose-site mt-3 text-sm" set:html={item.answer} />
         </details>

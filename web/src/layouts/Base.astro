@@ -44,9 +44,11 @@ const fullTitle = title.includes("Grabnar") ? title : `${title} â€“ Grabnar GebÃ
 <!doctype html>
 <html lang="de" class="h-full">
   <head>
-    <link rel="preload" href="/fonts/manrope-800.woff2" as="font" type="font/woff2" crossorigin />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Right after the two meta elements: the headline font is needed for the first paint,
+         but the character set has to be settled before the parser reads anything else. -->
+    <link rel="preload" href="/fonts/manrope-800.woff2" as="font" type="font/woff2" crossorigin />
     <Seo title={fullTitle} description={description} image={image ?? settings.site.default_og_image} path={path} noindex={noindex} jsonLd={jsonLd} />
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />

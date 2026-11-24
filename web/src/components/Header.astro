@@ -62,7 +62,8 @@ const phoneShort = phone.replace(/^\+49\s*\(0\)\s*(\d+)\s*/, "0$1 ");
         item.children && item.children.length > 0 ? (
           <li>
             <button type="button" class="flex min-h-11 w-full items-center justify-between rounded px-3 py-2 text-left font-medium hover:bg-ink-50" aria-controls={`mobile-menu-${i}`} data-menu-toggle>
-              {item.title}<span aria-hidden="true" class="menu-plus ml-4 transition-transform">+</span>
+              {/* Rotation is spatial motion: it snaps under reduced motion, the state stays. */}
+              {item.title}<span aria-hidden="true" class="menu-plus ml-4 transition-transform motion-reduce:transition-none">+</span>
             </button>
             <ul id={`mobile-menu-${i}`} class="mb-1 ml-3 border-l border-ink-100 pl-2 text-sm">
               <li><a href={item.href} {...umami(EVENT.nav, { item: item.title, level: 1, menu: "mobile" })} class="block rounded px-3 py-1.5 font-semibold text-brand-700">Übersicht</a></li>

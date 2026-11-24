@@ -69,8 +69,17 @@
 
 @layer base {
   /* The header is sticky and h-20 (5rem) on every breakpoint, so an anchor target has to
-     stop below it – otherwise "#formular" and any anchor an editor writes land behind it. */
+     stop below it – otherwise "#formular" and any anchor an editor writes land behind it.
+     Reduced motion is handled per rule, never globally: a blanket
+     `animation-duration: 0.01ms !important` on `*` makes some animations more jarring, not
+     calmer, and it also kills colour transitions on links and buttons, which are not motion
+     and should keep working. Only spatial movement is switched off – here the smooth scroll,
+     elsewhere with `motion-reduce:` where the movement actually is (ServiceGrid, Faq,
+     Header) and in JavaScript for Leaflet, which builds its animations at runtime. */
   html { scroll-behavior: smooth; scroll-padding-top: 5.5rem; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
   body { @apply bg-white text-ink-900 antialiased; }
   :focus-visible { @apply outline-3 outline-offset-2 outline-brand-500; }
   /* Dark surfaces (brand-500, accent-600) mark themselves with .on-dark: white focus ring */
@@ -78,14 +87,6 @@
   /* Light panels inside dark surfaces (header dropdowns, mobile menu) need the blue ring again */
   .on-dark .bg-white :focus-visible { @apply outline-brand-500; }
   a, button, summary { -webkit-tap-highlight-color: transparent; }
-  @media (prefers-reduced-motion: reduce) {
-    html { scroll-behavior: auto; }
-    *, *::before, *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-    }
-  }
 }
 
 @layer components {
