@@ -254,6 +254,7 @@ Das Skript liegt wie das zu Befund 2 noch nicht im Repo.
 - [x] 🤖 Befund 2 – Formularfehler barrierefrei melden
 - [x] 🤖 Befund 4 – Renditions nach Seitenverhältnis trennen
 - [x] 🤖 Kleinigkeiten 1–4
+- [x] 🤖 Sieben Befunde aus dem Code-Review der eigenen Umsetzung (24.11.2026)
 - [ ] 👤 Entscheiden, ob die zwei Prüfskripte nach `e2e/` kommen (siehe unten)
 - [x] 🤖 Lighthouse + axe gegen den Build gelaufen (24.11.2026)
 
@@ -312,6 +313,66 @@ bekommt er den Pfad über die Umgebungsvariable `PLAYWRIGHT`.
 Menü. axe öffnet das Menü nicht. Escape und Klick-daneben sind bei `popover="auto"`
 Browserverhalten nach Spezifikation; das Aufklappen hängt am Skript in `Header.astro`.
 Diese drei Fälle gehören in dasselbe `e2e/`-Skript.
+
+## Code-Review der eigenen Umsetzung
+
+Nach dem Pull Request lief ein Review über den gesamten Branch (`origin/main...HEAD`,
+Stufe `high`). Es fand sieben Stellen, alle in dem, was in diesem Durchgang neu
+entstanden ist, und alle haben standgehalten. Behoben am 24.11.2026.
+
+Der schwerwiegendste war selbst eingebaut, in Befund 2:
+
+1. **Eine falsche Fehlermeldung beim Korrigieren** – `islands/ContactForm.tsx`. Die
+   Sammelmeldung („Das Senden hat nicht geklappt") wurde daraus abgeleitet, dass kein
+   Feldfehler mehr übrig ist. Genau das erzeugt aber das Tippen: `onInput` löscht den
+   Schlüssel, `status` bleibt auf `"error"` – und sobald die letzte Feldmeldung weg war,
+   erschien die rote Sammelmeldung aus dem Nichts und wurde Screenreadern mitten im
+   Tippen vorgelesen. Vor diesem Branch konnte das nicht passieren, weil `errors` erst
+   beim nächsten Absenden geleert wurde. Jetzt ein eigenes Flag, das nur die Antwort des
+   Servers setzt.
+2. **Kein Feld, keine Meldung** – `islands/ContactForm.tsx`. Die Liste der Schlüssel mit
+   eigenem Feld war fest eingetragen und enthielt `job_title`. Dieses Feld wird aber nur
+   gerendert, wenn die Bewerbung *nicht* von einer Stellenseite kommt. Eine Ablehnung
+   dieses Schlüssels wäre dann als „erklärt" gezählt worden, hätte nirgends eine Meldung
+   gezeigt und auch den Fokus nicht bewegt – das Formular hätte scheinbar nichts getan.
+   Die Namen kommen jetzt aus dem Formular selbst (`el.elements`), nicht aus einer Liste.
+3. **`requestAnimationFrame` ist kein „nach dem Commit"** – `islands/ContactForm.tsx`.
+   React plant die Aktualisierung aus der `async`-Fortsetzung über den Scheduler
+   (MessageChannel); dass der rAF-Callback danach läuft, ist nicht garantiert. Auf dem
+   Pfad ohne Feldfehler existiert das Ziel vor dem Commit gar nicht. Der Fokussprung –
+   der eigentliche Zweck von Befund 2 – konnte also still ausbleiben. Jetzt ein
+   `useEffect` auf einem Zähler, der pro abgelehntem Absenden hochgeht.
+4. **Der FAQ-Gruppenname war doch nicht eindeutig** – `blocks/Faq.astro`. Aus dem Inhalt
+   abgeleitet und auf 40 Zeichen gekürzt: zwei Blöcke, deren Überschriften in den ersten
+   Zeichen übereinstimmen, landeten auf einem Namen und schlossen gegenseitig ihre
+   Antworten. `BlockRenderer.astro` hat die StreamField-`id` ohnehin in der Hand; die ist
+   pro Seite eindeutig und über Builds stabil.
+5. **Die Live-Region schwieg bei gleicher Trefferzahl** – `islands/JobFilter.tsx`.
+   `role="status"` spricht nur, wenn sich der Text ändert. Die Meldung bestand nur aus
+   Zahlen, also blieb eine zweite Auswahl mit derselben Trefferzahl stumm. Die Meldung
+   nennt jetzt die Auswahl mit.
+6. **Verworfener Filterwert blieb in der Adresszeile** – `islands/JobFilter.tsx`. Die
+   Selects zeigten „Alle Orte", die URL behauptete weiter einen Filter, und wer den Link
+   kopierte, gab den alten Stand weiter. Jetzt korrigiert ein `replaceState` die Adresse
+   (nicht `pushState`: es ist keine Aktion der Besucherin, und Zurück muss die Seite
+   verlassen).
+7. **Leaflets `inertia` lief weiter** – `blocks/Map.astro`. Abgeschaltet waren Zoom-,
+   Fade- und Marker-Animation, nicht aber das Nachgleiten nach dem Ziehen – und genau
+   dafür war der globale Reduced-Motion-Reset bis zu Kleinigkeit 4 das Netz.
+
+### Geprüft nach dem Review
+
+`ruff check`/`ruff format --check` sauber, 27 pytest-Tests grün, `pnpm lint` sauber,
+`pnpm check` 0/0/0, `pnpm check:tracking` sauber, Audit 100/100/100/100 und 0
+axe-Verstöße auf allen sieben Seiten.
+
+Dazu 29 Prüfungen im Browser (vorher 21), alle bestanden – die neuen treffen genau die
+Befunde: Tippen darf keine Sammelmeldung erscheinen lassen; ein Schlüssel ohne Feld
+(hier `job_title` im Kontaktformular, das dieses Feld nie rendert) muss die Meldung
+zeigen *und* den Fokus bekommen; zwei Filterwahlen mit derselben Trefferzahl müssen zwei
+verschiedene Texte in der Live-Region ergeben; `?ort=Nirgendwo` muss auch aus der URL
+verschwinden; und zwei FAQ-Blöcke mit fast gleicher Überschrift dürfen sich nicht
+gegenseitig schließen.
 
 ### Zwei Stolpersteine beim Audit, für den nächsten Durchlauf
 
