@@ -3,7 +3,8 @@
 
 Runs import_legacy (real pages, settings, redirects) and then adds what the
 old site does not have yet, so every block/page type can be developed:
-placeholder images, an optional admin user and, on request, example job ads.
+placeholder images, an FAQ and a job list as example blocks, an optional admin
+user and, on request, example job ads.
 
 The live job ads come from the external applicant portal (block job_embed on /karriere/);
 the own job pages (JobPage, block job_list) stay available but are unused for now.
@@ -24,8 +25,28 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from wagtail.images.models import Image
 
+from home.models import StandardPage
 from jobs.models import JobIndexPage, JobPage
 from services.models import ServiceIndexPage, ServicePage
+
+# Development text, never a statement about the company: the firm has supplied no FAQ
+# answers, and only confirmed statements may appear on the site (see docs/02-konzept.md).
+# Marked as an example in both the heading and the answer, like the demo job ads below.
+DEMO_ANSWER = "<p>Beispielantwort für die Entwicklung – kein freigegebener Text.</p>"
+
+# Two blocks on one page on purpose: each only keeps its own answer open if the two group
+# names differ. blocks/Faq.astro derives them from the StreamField id, which makes them
+# unique; a name cut from the heading did not, and the blocks closed each other's answers.
+DEMO_FAQS = [
+    (
+        "Häufige Fragen zu Auftrag und Ablauf (Beispielinhalt)",
+        ["Wie kommt ein Angebot zustande?", "Wie schnell ist ein Termin möglich?"],
+    ),
+    (
+        "Häufige Fragen zu Qualität und Zertifizierung (Beispielinhalt)",
+        ["Nach welchen Normen ist das Unternehmen zertifiziert?"],
+    ),
+]
 
 DEMO_JOBS = [
     (
@@ -87,6 +108,42 @@ class Command(BaseCommand):
             )
             index.add_child(instance=job)
             job.save_revision().publish()
+
+        # Blocks the real content leaves unused: the live job ads come from the applicant
+        # portal (job_embed), and there is no approved FAQ text. Without these two, nothing
+        # in a build renders Faq.astro, JobList.astro or the JobFilter island – and a block
+        # that nothing renders is a block whose breakage nobody notices. e2e/job_filter_faq.mjs
+        # checks both here. The job list only shows its filter with --demo-jobs; without the
+        # flag it shows the empty text, which is worth seeing too.
+        about = StandardPage.objects.filter(slug="unternehmen").first()
+        if about:
+            for heading, questions in DEMO_FAQS:
+                about.body.append(
+                    (
+                        "faq",
+                        {
+                            "heading": heading,
+                            "items": [{"question": q, "answer": DEMO_ANSWER} for q in questions],
+                        },
+                    )
+                )
+            about.save_revision().publish()
+
+        if index:
+            index.body.append(
+                (
+                    "job_list",
+                    {
+                        "heading": "Eigene Stellenliste (Beispielblock)",
+                        "show_filter": True,
+                        "empty_text": (
+                            "Derzeit sind keine Stellen ausgeschrieben. "
+                            "Initiativbewerbungen sind willkommen."
+                        ),
+                    },
+                )
+            )
+            index.save_revision().publish()
 
         if superuser:
             User = get_user_model()

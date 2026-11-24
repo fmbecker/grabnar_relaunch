@@ -86,7 +86,8 @@ def test_settings_and_redirects(client):
 def test_karriere_embeds_job_portal(client):
     data = client.get("/api/v2/pages/", {"type": "jobs.JobIndexPage", "fields": "body"}).json()
     body = data["items"][0]["body"]
-    assert [b["type"] for b in body] == ["job_embed", "contact_form"]
+    # job_list is the example block seed_dev appends; the real content ends at contact_form.
+    assert [b["type"] for b in body] == ["job_embed", "contact_form", "job_list"]
     embed = body[0]["value"]
     assert embed["host"] == "grabnar.recruit.zvoove.cloud"
     assert embed["url"].startswith("https://") and embed["height"] == 1700
@@ -258,8 +259,29 @@ def test_unternehmen_page(client):
         "/api/v2/pages/", {"type": "home.StandardPage", "slug": "unternehmen", "fields": "body"}
     ).json()["items"][0]
     types = [b["type"] for b in page["body"]]
-    assert types == ["rich_text", "feature_list", "certificate", "service_grid", "cta"]
+    # The two faq blocks are seed_dev's examples; the real content ends at cta. Two of them
+    # on purpose: they only keep their answers apart if their group names differ.
+    assert types == [
+        "rich_text",
+        "feature_list",
+        "certificate",
+        "service_grid",
+        "cta",
+        "faq",
+        "faq",
+    ]
     assert "Meisterbetrieb" in [f["title"] for f in page["body"][1]["value"]["features"]]
+
+
+def test_faq_blocks_have_distinct_ids(client):
+    """blocks/Faq.astro groups its <details name> by the StreamField id, so two faq blocks
+    on one page need different ids - otherwise they close each other's answers."""
+    page = client.get(
+        "/api/v2/pages/", {"type": "home.StandardPage", "slug": "unternehmen", "fields": "body"}
+    ).json()["items"][0]
+    ids = [b["id"] for b in page["body"] if b["type"] == "faq"]
+    assert len(ids) == 2
+    assert len(set(ids)) == 2
 
 
 def test_rich_text_heading_order():
