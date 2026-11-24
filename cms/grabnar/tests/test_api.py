@@ -479,3 +479,39 @@ def test_form_mail_sender_reply_to_and_host(client, settings):
     assert sent.to == ["info@grabnar.de"]
     assert sent.reply_to == ["kunde@example.com"]
     assert sent.subject == "Neue Kontaktanfrage über mbg.aivii.de"
+
+
+def test_rendition_sets_have_one_aspect_ratio_each():
+    """A srcset must never mix aspect ratios.
+
+    The browser picks a candidate from the viewport and the device's pixel density, so with
+    mixed ratios the same photo is cropped differently on a retina screen than on a plain
+    one. docs/07-web-standards.md, finding 4.
+    """
+    from blocks.images import RENDITION_SETS
+
+    for name, specs in RENDITION_SETS.items():
+        sizes = [tuple(int(n) for n in spec.removeprefix("fill-").split("x")) for spec in specs]
+        ratios = {round(w / h, 4) for w, h in sizes}
+        widths = [w for w, _ in sizes]
+        assert len(ratios) == 1, f"set {name!r} mixes aspect ratios: {ratios}"
+        assert widths == sorted(set(widths)), (
+            f"set {name!r} is not ordered small to large: {widths}"
+        )
+
+
+def test_image_api_serialises_both_sets(client):
+    # A service page always carries a hero image; the home page hero may have none.
+    page = client.get(
+        "/api/v2/pages/", {"type": "services.ServicePage", "fields": "*", "limit": 1}
+    ).json()["items"][0]
+    image = page["hero_image"]
+    assert image, "seeded service page has no hero image"
+    assert sorted(image["renditions"]) == ["card", "full", "stage"]
+    for name, expected in (("card", 4 / 3), ("stage", 2.0)):
+        candidates = image["renditions"][name]
+        assert len(candidates) == 4
+        assert [c["width"] for c in candidates] == sorted(c["width"] for c in candidates)
+        for c in candidates:
+            assert round(c["width"] / c["height"], 2) == round(expected, 2), (name, c)
+    assert isinstance(image["renditions"]["full"], dict)  # not a srcset candidate

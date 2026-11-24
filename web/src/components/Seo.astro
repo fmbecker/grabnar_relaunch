@@ -14,7 +14,10 @@ const site = SITE_URL;
 // Staging domain: no page is indexable, whatever the page itself says.
 const robotsNoindex = noindex || !ALLOW_INDEXING;
 const canonical = new URL(path, site).toString();
-const ogImage = image ? new URL(image.renditions.wide.url, site).toString() : null;
+// Social networks want roughly 1200 px at about 2:1, so the stage set is the right one.
+// Picked by width, not by index, so reordering the set cannot silently change the OG image.
+const ogRendition = image ? (image.renditions.stage.find((r) => r.width >= 1200) ?? image.renditions.stage.at(-1)) : null;
+const ogImage = ogRendition ? new URL(ogRendition.url, site).toString() : null;
 const ld = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 ---
 <title>{title}</title>

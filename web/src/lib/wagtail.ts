@@ -8,7 +8,7 @@
  * in the long-running preview server.
  */
 
-import type { ApiImage, Navigation, PageData, PageType, RedirectItem, Settings } from "./types";
+import type { ApiImage, Navigation, PageData, PageType, RedirectItem, Rendition, Settings } from "./types";
 import { originOf } from "./csp";
 
 // Runtime env (preview server) wins over build-time values.
@@ -64,10 +64,10 @@ export function mediaUrl(url: string): string {
 /** Rewrite all rendition URLs in an image so <img src> works in dev and prod. */
 export function withMedia<T extends ApiImage | null>(image: T): T {
   if (!image) return image;
-  const renditions = Object.fromEntries(
-    Object.entries(image.renditions).map(([k, r]) => [k, { ...r, url: mediaUrl(r.url) }]),
-  ) as ApiImage["renditions"];
-  return { ...image, renditions };
+  // Spelled out per key rather than mapped: the sets are lists, `full` is a single rendition.
+  const fix = (r: Rendition): Rendition => ({ ...r, url: mediaUrl(r.url) });
+  const { card, stage, full } = image.renditions;
+  return { ...image, renditions: { card: card.map(fix), stage: stage.map(fix), full: fix(full) } };
 }
 
 /** Path part of Wagtail's html_url, always with trailing slash. */
