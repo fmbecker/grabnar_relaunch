@@ -94,7 +94,7 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 - [x] 🤖 Befund 1: `scroll-padding-top` – Anker landeten hinter dem Sticky-Header („Jetzt bewerben" → `#formular`)
 - [x] 🤖 Befund 3: mobiles Menü als `popover` statt `<details>` – Escape, Klick-daneben und Fokusrückgabe vom Browser, `dvh` statt `vh`
 - [x] 🤖 Befund 2: Formularfehler mit `aria-invalid`/`aria-describedby` gemeldet, Fokus ins erste abgelehnte Feld und nach dem Senden auf die Erfolgsmeldung (WCAG 3.3.1/3.3.3/2.4.3)
-- [ ] 🤖 Befund 4: Bild-Renditions nach Seitenverhältnis trennen (ein `srcset` mischt derzeit 4:3, 16:9 und 2:1)
+- [x] 🤖 Befund 4: Bild-Renditions nach Seitenverhältnis getrennt (`card` 4:3, `stage` 2:1, `full` einzeln); `Picture.astro` nimmt `shape` statt `variant`
 - [ ] 🤖 Kleinigkeiten 1–4 aus `docs/07-web-standards.md`
 
 ## Phase 4 – Go-Live

@@ -144,11 +144,46 @@ dasselbe Bild ist auf einem Retina-Display anders beschnitten als auf einem norm
 Kein Layoutsprung, weil überall eine `aspect-[…]`-Klasse mit `object-cover` daneben
 steht; die Klasse verdeckt den Fehler nur.
 
-Lösung: zwei getrennte Rendition-Sätze im CMS mit je einheitlichem Seitenverhältnis
-(4:3 für Karten, 2:1 für Bühnen) und `Picture.astro` baut das `srcset` nur noch aus
-dem passenden Satz.
+Umgesetzt am 24.11.2026: zwei Sätze in `cms/blocks/images.py` (`RENDITION_SETS`), jeder mit
+genau einem Seitenverhältnis, dazu `full` außerhalb beider Sätze.
 
-Aufwand: ca. 30 Minuten, betrifft `cms/blocks/images.py` und alle `<Picture>`-Aufrufe.
+| Satz | Verhältnis | Breiten | Wofür |
+|---|---|---|---|
+| `card` | 4:3 | 400, 800, 1200, 1600 | Bilder in einer Box im Fluss |
+| `stage` | 2:1 | 800, 1200, 1600, 2000 | Flächen, die ein Bild bedeckt |
+| `full` | Original | 1600 | Galeriebild einzeln öffnen, nie im `srcset` |
+
+`Picture.astro` nimmt statt `variant` jetzt `shape` (`card`/`stage`) und baut das `srcset`
+nur aus dem gewählten Satz; alle sieben Aufrufstellen sind umgestellt. Das CSS-Verhältnis
+der Box darf abweichen – `object-cover` beschneidet dann jeden Kandidaten gleich.
+
+Eine gewollte Sichtänderung: `blocks/ServiceGrid.astro:33` zog das 16:9-Bild in eine
+`aspect-[4/3]`-Box und bekommt jetzt den 4:3-Satz. Dort ist mehr Bildhöhe zu sehen.
+
+`Seo.astro` nahm `renditions.wide` für `og:image` und holt es jetzt aus dem `stage`-Satz,
+nach Breite ausgewählt (≥ 1200) statt nach Index – ein Umsortieren des Satzes kann das
+OG-Bild so nicht still verändern.
+
+Zwei Dinge, die erst der Build gezeigt hat:
+
+1. **Wagtail skaliert nicht hoch.** Beim 1408 px breiten Platzhalter liefern
+   `fill-1600x800` und `fill-2000x1000` dieselben Pixelmaße, also stand zweimal `1408w`
+   im `srcset` und der Browser hätte zwischen zwei identischen Dateien gewählt.
+   `Picture.astro` behält darum den ersten Kandidaten je Breite.
+2. **Der Zuschnitt übersteht das Begrenzen** – nachgemessen, nicht angenommen: `fill`
+   beschneidet zuerst auf das Verhältnis und verkleinert dann, also halten auch die
+   begrenzten Varianten ihr Verhältnis (1334×1000 = 1,334, Rundung auf ganze Pixel).
+   Deshalb prüft der Test mit `round(..., 2)`.
+
+Zwei neue Tests halten den Vertrag fest:
+`test_rendition_sets_have_one_aspect_ratio_each` direkt an `RENDITION_SETS`,
+`test_image_api_serialises_both_sets` an der echten API-Antwort.
+
+Kosten: 9 Renditions je Bild statt 5. Wagtail speichert sie nach dem ersten Build, nur
+neu hochgeladene Bilder kosten etwas.
+
+**Status: erledigt. Geprüft:** 27 pytest-Tests, `pnpm lint`/`check` sauber (0 Hinweise),
+Audit unverändert 100/100/100/100 und 0 axe-Verstöße auf allen sieben Seiten, CLS 0.
 
 ## Kleinigkeiten
 
@@ -173,7 +208,7 @@ Aufwand: ca. 30 Minuten, betrifft `cms/blocks/images.py` und alle `<Picture>`-Au
 - [x] 🤖 Befund 1 – `scroll-padding-top`
 - [x] 🤖 Befund 3 – mobiles Menü als Popover + Polyfill
 - [x] 🤖 Befund 2 – Formularfehler barrierefrei melden
-- [ ] 🤖 Befund 4 – Renditions nach Seitenverhältnis trennen
+- [x] 🤖 Befund 4 – Renditions nach Seitenverhältnis trennen
 - [ ] 👤 Entscheiden, ob das Prüfskript zu Befund 2 nach `e2e/` kommt (siehe unten)
 - [ ] 🤖 Kleinigkeiten 1–4
 - [x] 🤖 Lighthouse + axe gegen den Build gelaufen (24.11.2026)
