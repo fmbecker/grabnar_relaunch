@@ -1,16 +1,14 @@
 ---
 import type { FaqValue } from "@/lib/types";
-interface Props { value: FaqValue }
-const { value } = Astro.props;
+interface Props { value: FaqValue; id: string }
+const { value, id } = Astro.props;
 // Exclusive accordion: `name` makes the browser keep only one answer open, without script.
-// The name has to be unique per page – two faq blocks sharing one would close each other's
-// answers – and is derived from the content so it stays the same across builds.
+// The name is the StreamField block's own id: unique per page and stable across builds.
+// Deriving it from the heading was not enough, because the name had to be cut short: two
+// faq blocks whose headings agreed in their first characters ended up with one name and
+// then closed each other's answers.
 // Browsers without support for `name` on <details> simply let several answers stay open.
-const group = `faq-${value.heading || value.items[0]?.question || ""}`
-  .toLowerCase()
-  .replace(/[^a-z0-9]+/g, "-")
-  .replace(/-+$/, "")
-  .slice(0, 40);
+const group = `faq-${id}`;
 ---
 <section class="section">
   <div class="container-x max-w-3xl">

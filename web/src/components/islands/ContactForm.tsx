@@ -11,13 +11,6 @@ interface Props {
 
 type Status = "idle" | "sending" | "success" | "error";
 
-/**
- * Error keys that have a control of their own here, so their message is shown at the field.
- * The serializers in cms/forms_api/views.py can also reject keys that this form never shows
- * (source_path, job_page_id, and DRF's non_field_errors); those need the general message.
- */
-const FIELD_KEYS = ["name", "email", "phone", "company", "job_title", "service", "message", "cv", "consent"];
-
 /** Form controls that carry a name and a validity state. */
 type Control = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 
@@ -29,9 +22,33 @@ function isControl(target: EventTarget | null): target is Control {
   );
 }
 
+/**
+ * Does the answer hold something that no field of this form can explain? True for a network
+ * error, and for a key that this variant renders no control for.
+ * The names are read off the form instead of being listed here, because which controls exist
+ * depends on the variant: an application opened from a job page renders no job_title input,
+ * yet the serializer in cms/forms_api/views.py can still reject that key. A hard-coded list
+ * would call such a key explained and hide its message entirely.
+ */
+function isUnexplained(el: HTMLFormElement, fieldErrors: Record<string, string[]>): boolean {
+  const keys = Object.keys(fieldErrors);
+  if (keys.length === 0) return true;
+  const names = new Set<string>();
+  for (const control of Array.from(el.elements)) {
+    if (isControl(control) && control.name) names.add(control.name);
+  }
+  return keys.some((k) => !names.has(k));
+}
+
 export default function ContactForm({ variant, successMessage, sourcePath, apiUrl, job }: Props) {
   const [status, setStatus] = useState<Status>("idle");
   const [errors, setErrors] = useState<Record<string, string[]>>({});
+  // Whether the last answer held something no field explains. Its own flag on purpose: it
+  // must not be derived from `errors` being empty, because typing empties `errors` too and
+  // the general message would then appear out of nowhere while the visitor is still writing.
+  const [unexplained, setUnexplained] = useState(false);
+  // Counts rejected submits. Drives the focus effect below; see the comment there.
+  const [rejected, setRejected] = useState(0);
   // What the browser itself rejects, mirrored from the CSS :user-invalid state. Kept apart
   // from `errors`, which only ever holds what the server sent back.
   const [userInvalid, setUserInvalid] = useState<Record<string, boolean>>({});
@@ -56,6 +73,29 @@ export default function ContactForm({ variant, successMessage, sourcePath, apiUr
   useEffect(() => {
     if (status === "success") success.current?.focus();
   }, [status]);
+
+  /**
+   * After a rejected submit, move focus to the first field the server rejected so a screen
+   * reader reads its name and its message; if nothing it named has a control here, to the
+   * general message instead.
+   * An effect, not requestAnimationFrame: only an effect is guaranteed to run after React
+   * has committed, and the element aria-describedby points to has to be in the page before
+   * focus lands on the field. The dependency is the counter and deliberately not `errors`,
+   * because typing changes `errors` as well and must not pull focus away mid-sentence; the
+   * counter changes in the same batch as `errors`, so this reads the fresh errors.
+   */
+  useEffect(() => {
+    if (rejected === 0) return;
+    const el = form.current;
+    if (!el) return;
+    for (const control of Array.from(el.elements)) {
+      if (isControl(control) && control.name && errors[control.name]) {
+        control.focus();
+        return;
+      }
+    }
+    alert.current?.focus();
+  }, [rejected]);
 
   // Tracking: form type, job title and the linked service only, never what visitors type.
   const trackData = { form: variant, job: job?.title };
@@ -96,29 +136,11 @@ export default function ContactForm({ variant, successMessage, sourcePath, apiUr
 
   const endpoint = `${apiUrl.replace(/\/$/, "")}/${isApplication ? "application" : "contact"}/`;
 
-  /**
-   * Put focus on the first field the server rejected, so a screen reader reads its name and
-   * its message. Runs after the next paint, because the message element it points to through
-   * aria-describedby is only in the page once React has rendered the new state.
-   * Keys without a control of their own (source_path, job_page_id, non_field_errors) fall
-   * through to the general message.
-   */
-  function focusFirstError(el: HTMLFormElement, fieldErrors: Record<string, string[]>) {
-    requestAnimationFrame(() => {
-      for (const control of Array.from(el.elements)) {
-        if (isControl(control) && control.name && fieldErrors[control.name]) {
-          control.focus();
-          return;
-        }
-      }
-      alert.current?.focus();
-    });
-  }
-
   async function onSubmit(e: SyntheticEvent<HTMLFormElement>) {
     e.preventDefault();
     setStatus("sending");
     setErrors({});
+    setUnexplained(false);
     const el = e.currentTarget;
     const data = new FormData(el);
     data.set("started_at", String(startedAt.current));
@@ -141,13 +163,15 @@ export default function ContactForm({ variant, successMessage, sourcePath, apiUr
       } else {
         const fieldErrors = json.errors ?? {};
         setErrors(fieldErrors);
+        setUnexplained(isUnexplained(el, fieldErrors));
         setStatus("error");
-        focusFirstError(el, fieldErrors);
+        setRejected((n) => n + 1);
         track(EVENT.formError, { ...trackData, reason: json.errors ? "invalid" : "error", fields: Object.keys(fieldErrors).join(",") });
       }
     } catch {
       setStatus("error");
-      focusFirstError(el, {});
+      setUnexplained(true);
+      setRejected((n) => n + 1);
       track(EVENT.formError, { ...trackData, reason: "error" });
     }
   }
@@ -168,8 +192,7 @@ export default function ContactForm({ variant, successMessage, sourcePath, apiUr
   // Only referenced while the message is on screen – aria-describedby is read out even when
   // what it points to is hidden.
   const describedBy = (k: string) => (err(k) ? errorId(k) : undefined);
-  const keys = Object.keys(errors);
-  const showAlert = status === "error" && (keys.length === 0 || keys.some((k) => !FIELD_KEYS.includes(k)));
+  const showAlert = status === "error" && unexplained;
 
   // `remountKey` re-creates the uncontrolled input when its default value arrives after hydration.
   const field = (name: string, label: string, props: React.InputHTMLAttributes<HTMLInputElement> = {}, remountKey?: string) => (

@@ -11,6 +11,17 @@ const PARAM = { location: "ort", type: "art" } as const;
 
 type Filter = { location: string; type: string };
 
+/** The path for a selection, keeping any other query parameter and the hash untouched. */
+function urlFor(next: Filter): string {
+  const p = new URLSearchParams(window.location.search);
+  for (const key of ["location", "type"] as const) {
+    if (next[key]) p.set(PARAM[key], next[key]);
+    else p.delete(PARAM[key]);
+  }
+  const query = p.toString();
+  return `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`;
+}
+
 export default function JobFilter({ jobs }: Props) {
   const uid = useId();
   const [filter, setFilter] = useState<Filter>({ location: "", type: "" });
@@ -39,7 +50,17 @@ export default function JobFilter({ jobs }: Props) {
   // The page is static, so the URL is only known in the browser: start unfiltered and take
   // the selection over once hydrated. popstate makes the back button step through filters.
   useEffect(() => {
-    const apply = () => setFilter(fromUrl());
+    const apply = () => {
+      const next = fromUrl();
+      setFilter(next);
+      // A value that was dropped has to leave the address bar as well, or the URL keeps
+      // claiming a filter the selects do not show – and copying that link would pass the
+      // stale selection on. replaceState, not pushState: this corrects the entry the
+      // visitor is on, it is not a step they took, and back must still leave the page.
+      const current = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+      const corrected = urlFor(next);
+      if (corrected !== current) history.replaceState(null, "", corrected);
+    };
     apply();
     window.addEventListener("popstate", apply);
     return () => window.removeEventListener("popstate", apply);
@@ -50,20 +71,21 @@ export default function JobFilter({ jobs }: Props) {
     setFilter(next);
     setAnnounce(true);
 
-    const params = new URLSearchParams(window.location.search);
-    for (const key of ["location", "type"] as const) {
-      if (next[key]) params.set(PARAM[key], next[key]);
-      else params.delete(PARAM[key]);
-    }
-    const query = params.toString();
-    const url = `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`;
     // One history entry per choice, so the back button undoes the last filter step.
-    history.pushState(null, "", url);
+    history.pushState(null, "", urlFor(next));
 
     track(EVENT.jobFilter, { field: field === "location" ? "location" : "employment_type", value: value || "alle" });
   }
 
   const visible = jobs.filter((j) => (!filter.location || j.location === filter.location) && (!filter.type || j.employment_type === filter.type));
+
+  // The message names the selection, not just the count: role="status" only speaks when the
+  // text changes, so a second choice that happens to match the same number of jobs would
+  // otherwise pass in silence and leave the visitor unsure whether it took effect.
+  const chosen = [filter.location, types.find(([k]) => k === filter.type)?.[1]].filter(Boolean).join(", ");
+  const message = chosen
+    ? `Auswahl ${chosen}: ${visible.length} von ${jobs.length} Stellen.`
+    : `Auswahl aufgehoben: alle ${jobs.length} Stellen.`;
 
   return (
     <div>
@@ -99,7 +121,7 @@ export default function JobFilter({ jobs }: Props) {
       </search>
 
       <p role="status" className="sr-only">
-        {announce ? `${visible.length} von ${jobs.length} Stellen entsprechen der Auswahl.` : ""}
+        {announce ? message : ""}
       </p>
 
       {visible.length === 0 ? (
