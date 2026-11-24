@@ -68,7 +68,9 @@
 }
 
 @layer base {
-  html { scroll-behavior: smooth; }
+  /* The header is sticky and h-20 (5rem) on every breakpoint, so an anchor target has to
+     stop below it – otherwise "#formular" and any anchor an editor writes land behind it. */
+  html { scroll-behavior: smooth; scroll-padding-top: 5.5rem; }
   body { @apply bg-white text-ink-900 antialiased; }
   :focus-visible { @apply outline-3 outline-offset-2 outline-brand-500; }
   /* Dark surfaces (brand-500, accent-600) mark themselves with .on-dark: white focus ring */
