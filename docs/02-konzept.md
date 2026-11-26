@@ -86,7 +86,7 @@ Site-weite Einstellungen (`wagtail.contrib.settings`): `ContactSettings` (Adress
 | `StatsBlock` | `Stats.astro` | Kennzahlen („seit 19xx“, „x Mitarbeiter“) |
 | `TestimonialBlock` | `Testimonial.astro` | Zitat, Name, Firma |
 | `FaqBlock` | `Faq.astro` | Frage/Antwort-Liste (Accordion, kein JS nötig: `<details>`) |
-| `CtaBlock` | `Cta.astro` | Flächiger Call-to-Action mit Button |
+| `CtaBlock` | `Cta.astro` | Flächiger Call-to-Action mit Button, optionales Bild (Position links/rechts) |
 | `ContactFormBlock` | `islands/ContactForm.tsx` | React-Island, POST an `cms/forms_api` |
 | `JobListBlock` | `JobList.astro` + optional `islands/JobFilter.tsx` | Liste aller gültigen JobPages |
 | `MapBlock` | `Map.astro` | statische Karte/Leaflet ohne Google-Tracking |

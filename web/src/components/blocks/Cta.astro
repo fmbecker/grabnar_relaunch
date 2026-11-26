@@ -1,38 +1,64 @@
 ---
 import type { CtaValue } from "@/lib/types";
 import LinkButton from "@/components/ui/LinkButton.astro";
-import BrandPattern from "@/components/ui/BrandPattern.astro";
+import Picture from "@/components/ui/Picture.astro";
 interface Props { value: CtaValue; service?: string; showPhone?: boolean }
 const { value, service, showPhone = true } = Astro.props;
 // Phone tracking is added automatically for tel: links (Analytics.astro).
 const tel = showPhone && value.phone ? `tel:${value.phone.replace(/\s/g, "")}` : "";
+// Same convention as TextImage.astro: the choice names where the IMAGE goes.
+const imgFirst = value.image_position === "left";
+const imgOrder = imgFirst ? "lg:order-1" : "lg:order-2";
+const textOrder = imgFirst ? "lg:order-2" : "lg:order-1";
 ---
 {value.style === "career" ? (
   <section class="section bg-brand-50">
-    <div class="container-x grid items-center gap-10 lg:grid-cols-12">
-      <div class="lg:col-span-7">
+    <div class="container-x grid items-center gap-10 lg:grid-cols-2">
+      <div class={value.image ? textOrder : ""}>
         <h2 class="h2">{value.heading}</h2>
         {value.text && <p class="lead mt-4 max-w-[46ch] text-ink-700">{value.text}</p>}
         <LinkButton block="cta" link={value.link} service={service} class="mt-8" />
       </div>
-      <BrandPattern tone="light" seed={2} class="hidden aspect-[4/3] w-full lg:col-span-5 lg:block" />
+      {value.image && (
+        <div class={imgOrder}>
+          <Picture image={value.image} shape="card" class="aspect-[4/3] w-full rounded-lg object-cover" />
+        </div>
+      )}
     </div>
   </section>
 ) : (
   <section class="band-accent on-dark relative overflow-hidden bg-accent-600 text-white">
-    {value.pattern && <BrandPattern seed={1} width={2400} class="pointer-events-none absolute inset-x-0 bottom-0 h-full w-full opacity-30" />}
     <div class="container-x relative py-section">
-      <div class="max-w-3xl">
-        <h2 class="h2">{value.heading}</h2>
-        {value.text && <p class="lead mt-4 max-w-[46ch] text-accent-100">{value.text}</p>}
-        <LinkButton block="cta" link={value.link} service={service} class="mt-8" />
-      </div>
-      {tel && (
-        <div class="mt-12 border-t border-white/40 pt-8">
-          <p class="text-sm font-bold uppercase tracking-wide text-accent-100">Oder direkt anrufen</p>
-          <a href={tel} class="mt-2 inline-block font-display text-[clamp(2rem,0.9rem+5vw,5.5rem)] font-extrabold leading-none sm:whitespace-nowrap decoration-4 underline-offset-8 hover:underline">{value.phone}</a>
+      <div class="grid items-center gap-10 lg:grid-cols-2">
+        <div class={value.image ? textOrder : "lg:col-span-2"}>
+          <div class={value.image ? "" : "max-w-3xl"}>
+            <h2 class="h2">{value.heading}</h2>
+            {value.text && <p class="lead mt-4 max-w-[46ch] text-accent-100">{value.text}</p>}
+            <LinkButton block="cta" link={value.link} service={service} class="mt-8" />
+          </div>
+          {tel && (
+            <div class="mt-12 border-t border-white/40 pt-8">
+              <p class="text-sm font-bold uppercase tracking-wide text-accent-100">Oder direkt anrufen</p>
+              {/* Half the width means the number needs a smaller ceiling, otherwise it
+                  overflows its column on wide screens. */}
+              <a
+                href={tel}
+                class:list={[
+                  "mt-2 inline-block font-display font-extrabold leading-none decoration-4 underline-offset-8 hover:underline sm:whitespace-nowrap",
+                  value.image
+                    ? "text-[clamp(1.75rem,0.8rem+3vw,3rem)]"
+                    : "text-[clamp(2rem,0.9rem+5vw,5.5rem)]",
+                ]}
+              >{value.phone}</a>
+            </div>
+          )}
         </div>
-      )}
+        {value.image && (
+          <div class={imgOrder}>
+            <Picture image={value.image} shape="card" class="aspect-[4/3] w-full rounded-lg object-cover" />
+          </div>
+        )}
+      </div>
     </div>
   </section>
 )}
