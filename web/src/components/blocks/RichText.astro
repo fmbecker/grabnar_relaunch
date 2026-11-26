@@ -1,5 +1,26 @@
 ---
-interface Props { value: string }
+import type { RichTextValue } from "@/lib/types";
+interface Props { value: RichTextValue }
 const { value } = Astro.props;
+// The heading is part of the rich text HTML. In the highlighted variant it leaves the flow and
+// gets its own column, so it is cut off the front here – Wagtail writes exactly one leading
+// <h2> when the text starts with a heading. Without one the text fills the wide column alone.
+const lead = value.variant === "highlight" ? value.text.match(/^\s*<h2[^>]*>([\s\S]*?)<\/h2>/) : null;
+const body = lead ? value.text.slice(lead[0].length) : value.text;
 ---
-<section class="section"><div class="container-x"><div class="prose-site max-w-3xl" set:html={value} /></div></section>
+{value.variant === "highlight" ? (
+  <section class="section bg-brand-50">
+    <div class="container-x lg:grid lg:grid-cols-12 lg:gap-x-10">
+      {lead && <h2 class="h2 lg:col-span-4" set:html={lead[1]} />}
+      <div
+        class:list={[
+          "prose-site prose-highlight max-w-[60ch]",
+          lead ? "mt-6 lg:col-span-7 lg:col-start-6 lg:mt-0" : "lg:col-span-8 lg:col-start-3",
+        ]}
+        set:html={body}
+      />
+    </div>
+  </section>
+) : (
+  <section class="section"><div class="container-x"><div class="prose-site max-w-3xl" set:html={value.text} /></div></section>
+)}

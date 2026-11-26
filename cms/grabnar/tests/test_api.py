@@ -279,7 +279,7 @@ def test_rich_text_heading_order():
             for block in getattr(page, field.name):
                 if block.block_type != "rich_text":
                     continue
-                levels = [int(n) for n in re.findall(r"<h([1-6])\b", str(block.value.source))]
+                levels = [int(n) for n in re.findall(r"<h([1-6])\b", block.value["text"].source)]
                 previous = 1  # the page title
                 for level in levels:
                     if level > previous + 1:
@@ -317,11 +317,11 @@ def test_rewrites_replace_legacy_bodies():
     by_url = {p.url: p.specific for p in Page.objects.live() if p.url}
     for path, (name, body) in rewrites.items():
         page = by_url[path]
-        html = "".join(str(b.value) for b in page.body if b.block_type == "rich_text")
+        html = "".join(str(b.value["text"]) for b in page.body if b.block_type == "rich_text")
         first_heading = re.search(r"^## (.+)$", body, re.M).group(1)
         assert f">{first_heading}</h2>" in html, name
     unterhalt = by_url["/gebaeudereinigung/unterhaltsreinigung/"]
-    assert str(unterhalt.body[0].value).count("Verkehrsmittel") == 1  # legacy duplicate gone
+    assert str(unterhalt.body[0].value["text"]).count("Verkehrsmittel") == 1  # legacy duplicate gone
 
 
 def test_rewrite_links_point_to_live_pages():
