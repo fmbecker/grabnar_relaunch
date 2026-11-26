@@ -75,6 +75,13 @@ export interface HeroValue {
   links: ApiLink[];
 }
 
+export interface RichTextValue {
+  /** rich text HTML */
+  text: string;
+  /** "plain" = flowing text, "highlight" = own surface with the heading beside it */
+  variant: "plain" | "highlight";
+}
+
 export interface TextImageValue {
   heading: string;
   text: string; // rich text HTML
@@ -169,7 +176,7 @@ export interface GalleryValue {
 
 export type Block =
   | { type: "facts"; id: string; value: FactsValue }
-  | { type: "rich_text"; id: string; value: string }
+  | { type: "rich_text"; id: string; value: RichTextValue }
   | { type: "text_image"; id: string; value: TextImageValue }
   | { type: "service_grid"; id: string; value: ServiceGridValue }
   | { type: "feature_list"; id: string; value: FeatureListValue }

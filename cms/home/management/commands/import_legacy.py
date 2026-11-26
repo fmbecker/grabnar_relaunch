@@ -130,6 +130,11 @@ def fix_spelling(text: str) -> str:
     return re.sub(r"\bIFSG\b", "IfSG", text)
 
 
+def _rich_text(html: str, variant: str = "plain") -> tuple:
+    """A rich text block. Since it became a StructBlock the value is a dict, not the HTML."""
+    return ("rich_text", {"text": html, "variant": variant})
+
+
 def join_de(items: list[str]) -> str:
     """'a, b und c' – German enumeration."""
     return items[0] if len(items) == 1 else ", ".join(items[:-1]) + " und " + items[-1]
@@ -495,7 +500,7 @@ class Command(BaseCommand):
                     teaser=lead,
                     seo_title=svc.seo_title or f"{svc.title} in Stuttgart – M. B. Grabnar GmbH",
                     search_description=svc.description or self.teaser(lead, 155),
-                    body=[("rich_text", html), cta(f"{svc.title} anfragen")] if html else [],
+                    body=[_rich_text(html), cta(f"{svc.title} anfragen")] if html else [],
                 )
                 cat_page.add_child(instance=page)
                 services.append(page)
@@ -548,9 +553,8 @@ class Command(BaseCommand):
                 "Gebäudereinigerhandwerks."
             ),
             body=[
-                (
-                    "rich_text",
-                    rewritten("/unternehmen/", "Unternehmen") or f"<h2>{motto}</h2>" + home_html,
+                _rich_text(
+                    rewritten("/unternehmen/", "Unternehmen") or f"<h2>{motto}</h2>" + home_html
                 ),
                 (
                     "feature_list",
@@ -625,7 +629,7 @@ class Command(BaseCommand):
             page = StandardPage(
                 title={"agb": "AGB"}.get(slug, legacy.title),
                 slug=slug,
-                body=[("rich_text", html)],
+                body=[_rich_text(html)],
             )
             home.add_child(instance=page)
             legal_pages.append(page)
@@ -682,7 +686,7 @@ class Command(BaseCommand):
                     "services": [],
                 },
             ),
-            ("rich_text", home_intro),
+            _rich_text(home_intro, "highlight"),
             (
                 "feature_list",
                 {

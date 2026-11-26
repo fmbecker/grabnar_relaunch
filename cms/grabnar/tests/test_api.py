@@ -52,7 +52,7 @@ def test_service_page_content_and_list(client):
     ).json()
     page = data["items"][0]
     assert page["meta"]["html_url"].endswith("/services/wachdienste/")
-    assert "<li>Citystreifen</li>" in page["body"][0]["value"]
+    assert "<li>Citystreifen</li>" in page["body"][0]["value"]["text"]
     assert page["teaser"] and len(page["related"]) == 2
     assert page["category"] == {"title": "Services", "href": "/services/"}
 
@@ -212,7 +212,7 @@ def test_service_teaser_not_repeated_in_body(client):
     ).json()
     assert len(data["items"]) == 22
     for page in data["items"]:
-        body = page["body"][0]["value"] if page["body"] else ""
+        body = page["body"][0]["value"]["text"] if page["body"] else ""
         assert page["teaser"], page["title"]
         assert page["teaser"] not in body, f"teaser repeated in body: {page['title']}"
 
@@ -279,7 +279,7 @@ def test_rich_text_heading_order():
             for block in getattr(page, field.name):
                 if block.block_type != "rich_text":
                     continue
-                levels = [int(n) for n in re.findall(r"<h([1-6])\b", str(block.value.source))]
+                levels = [int(n) for n in re.findall(r"<h([1-6])\b", block.value["text"].source)]
                 previous = 1  # the page title
                 for level in levels:
                     if level > previous + 1:
@@ -317,11 +317,13 @@ def test_rewrites_replace_legacy_bodies():
     by_url = {p.url: p.specific for p in Page.objects.live() if p.url}
     for path, (name, body) in rewrites.items():
         page = by_url[path]
-        html = "".join(str(b.value) for b in page.body if b.block_type == "rich_text")
+        html = "".join(str(b.value["text"]) for b in page.body if b.block_type == "rich_text")
         first_heading = re.search(r"^## (.+)$", body, re.M).group(1)
         assert f">{first_heading}</h2>" in html, name
     unterhalt = by_url["/gebaeudereinigung/unterhaltsreinigung/"]
-    assert str(unterhalt.body[0].value).count("Verkehrsmittel") == 1  # legacy duplicate gone
+    assert (
+        str(unterhalt.body[0].value["text"]).count("Verkehrsmittel") == 1
+    )  # legacy duplicate gone
 
 
 def test_rewrite_links_point_to_live_pages():

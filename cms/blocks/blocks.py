@@ -88,6 +88,9 @@ class HeroBlock(blocks.StructBlock):
 
 
 class RichTextBlock(blocks.RichTextBlock):
+    """Only still here for the historical migrations: they reference this path and build the
+    block with no arguments. The block in use is RichTextSectionBlock below."""
+
     class Meta:
         icon = "pilcrow"
         label = _("Fließtext")
@@ -95,6 +98,29 @@ class RichTextBlock(blocks.RichTextBlock):
     def __init__(self, **kwargs):
         kwargs.setdefault("features", RICH_TEXT_FEATURES)
         super().__init__(**kwargs)
+
+
+class RichTextSectionBlock(blocks.StructBlock):
+    """Flowing text. Used to be a bare RichTextBlock, i.e. a plain HTML string; it became a
+    StructBlock so the text can carry the surface it sits on. Migration 0011 in `home` rewrote
+    the stored strings, revisions included."""
+
+    text = blocks.RichTextBlock(label=_("Text"), features=RICH_TEXT_FEATURES)
+    # Only ever picks the surface, never the content. "plain" is what every block looked like
+    # before the choice existed, so nothing changes unless an editor switches it.
+    variant = blocks.ChoiceBlock(
+        label=_("Darstellung"),
+        choices=[("plain", _("Fließtext")), ("highlight", _("Hervorgehoben"))],
+        default="plain",
+        help_text=_(
+            "„Hervorgehoben“ stellt den Text auf eine eigene helle Fläche und setzt die "
+            "Überschrift daneben – für einen Absatz, der als eigener Block gelesen werden soll."
+        ),
+    )
+
+    class Meta:
+        icon = "pilcrow"
+        label = _("Fließtext")
 
 
 class TextImageBlock(blocks.StructBlock):
@@ -465,7 +491,7 @@ class BodyStreamBlock(blocks.StreamBlock):
     """The body of every page type. HeroBlock is a separate field on HomePage."""
 
     facts = FactsBlock()
-    rich_text = RichTextBlock()
+    rich_text = RichTextSectionBlock()
     text_image = TextImageBlock()
     service_grid = ServiceGridBlock()
     feature_list = FeatureListBlock()

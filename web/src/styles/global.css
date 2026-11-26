@@ -136,6 +136,13 @@
   .prose-site ul:has(> li:nth-child(6)) > li { @apply mb-0 bg-white py-3 pr-4 pl-11; }
   .prose-site ul:has(> li:nth-child(6)) > li:last-child:nth-child(odd) { @apply sm:col-span-2; }
   .prose-site ul:has(> li:nth-child(6)) > li::before { @apply left-4 top-[1.05em]; }
+  /* Highlighted rich text: a closing paragraph that holds nothing but a link reads as the
+     block's button, so it is drawn as one – same shape as .btn-secondary beside it. */
+  .prose-highlight > p:last-child:has(> a:only-child) { @apply mt-8 mb-0; }
+  .prose-highlight > p:last-child:has(> a:only-child) > a {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-ui border-2 border-brand-500 px-6 py-3 text-base font-bold text-brand-700 no-underline transition-colors duration-150;
+  }
+  .prose-highlight > p:last-child:has(> a:only-child) > a:hover { @apply bg-brand-100; }
   .field { @apply block min-h-11 w-full rounded-ui border border-ink-300 bg-white px-3 py-2.5 text-base focus:border-brand-500 focus:ring-1 focus:ring-brand-500; }
   /* Rejected field: :user-invalid, never :invalid – the latter marks every empty required
      field from page load, before the visitor has typed anything. [aria-invalid] carries the
