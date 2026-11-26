@@ -38,7 +38,9 @@ def test_home_shows_categories(client):
     ctas = [b["value"] for b in page["body"] if b["type"] == "cta"]
     assert [c["style"] for c in ctas] == ["career", "contact"]
     assert ctas[-1]["phone"]  # closing band shows the phone number from the settings
-    assert ctas[-1]["pattern"] is False  # tower pattern is opt-in per block
+    # Image is optional; the closing band on the home page has none and runs full width.
+    assert ctas[-1]["image"] is None
+    assert ctas[-1]["image_position"] == "right"  # the default, also without an image
     grid = next(b for b in page["body"] if b["type"] == "service_grid")["value"]
     assert grid["kind"] == "categories" and len(grid["services"]) == 4
     assert grid["services"][0]["children"][0]["href"].startswith("/gebaeudereinigung/")

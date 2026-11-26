@@ -245,11 +245,17 @@ class CtaBlock(blocks.StructBlock):
         ],
         default="contact",
     )
-    pattern = blocks.BooleanBlock(
-        label=_("Turm-Muster im Hintergrund"),
+    image = ApiImageChooserBlock(
+        label=_("Bild"),
         required=False,
-        default=False,
-        help_text=_("Zeigt die Türme aus dem Logo stark abgedimmt hinter dem Text."),
+        help_text=_("Ohne Bild nimmt der Text die ganze Breite ein."),
+    )
+    # Same two choices and the same default as TextImageBlock, so the editing
+    # area asks the question the same way in both blocks.
+    image_position = blocks.ChoiceBlock(
+        label=_("Bildposition"),
+        choices=[("left", _("Links")), ("right", _("Rechts"))],
+        default="right",
     )
 
     class Meta:

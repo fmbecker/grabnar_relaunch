@@ -122,8 +122,10 @@ export interface CtaValue {
   link: ApiLink;
   /** "contact" = closing band with phone number, "career" = careers teaser */
   style: "contact" | "career";
-  /** Dimmed tower pattern behind the text */
-  pattern: boolean;
+  /** Optional; without it the text takes the full width */
+  image: ApiImage | null;
+  /** Which side the image sits on, as in TextImageValue */
+  image_position: "left" | "right";
   /** From the contact settings (added by the API). */
   phone: string;
 }
