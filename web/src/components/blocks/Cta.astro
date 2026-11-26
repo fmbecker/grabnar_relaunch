@@ -6,59 +6,68 @@ interface Props { value: CtaValue; service?: string; showPhone?: boolean }
 const { value, service, showPhone = true } = Astro.props;
 // Phone tracking is added automatically for tel: links (Analytics.astro).
 const tel = showPhone && value.phone ? `tel:${value.phone.replace(/\s/g, "")}` : "";
-// Same convention as TextImage.astro: the choice names where the IMAGE goes.
-const imgFirst = value.image_position === "left";
-const imgOrder = imgFirst ? "lg:order-1" : "lg:order-2";
-const textOrder = imgFirst ? "lg:order-2" : "lg:order-1";
+const imgRight = value.image_position !== "left";
+// Picture layer. Below lg the photo is simply a band under the text: full width, square corners,
+// no mask – nothing fades, because there is no text over it that a fade would have to free up.
+// From lg it moves behind the text onto the chosen side at full height, and only there does the
+// inner edge dissolve horizontally; it is fully transparent well before the centre line, so the
+// text in front of it always stands on the plain surface and never on the photo.
+const layer = [
+  "mt-10 relative aspect-[16/10] sm:aspect-[2/1] lg:absolute lg:inset-y-0 lg:mt-0 lg:aspect-auto lg:w-[62%]",
+  imgRight
+    ? "lg:right-0 lg:[mask-image:linear-gradient(to_right,transparent,black_70%)]"
+    : "lg:left-0 lg:[mask-image:linear-gradient(to_left,transparent,black_70%)]",
+];
+// Half the columns, on the side the image leaves free. Six and not seven because the fade is
+// still around 28 % opaque where the text ends – at seven columns the text would reach into the
+// part of the photo that is 60 % visible, and whether that still reads depends on the photo.
+const textCols = imgRight ? "lg:col-span-6" : "lg:col-span-6 lg:col-start-7";
+const sizes = "(min-width: 1024px) 62vw, 100vw";
 ---
 {value.style === "career" ? (
-  <section class="section bg-brand-50">
-    <div class="container-x grid items-center gap-10 lg:grid-cols-2">
-      <div class={value.image ? textOrder : ""}>
+  <section class="section relative isolate overflow-hidden bg-brand-50">
+    <div class="container-x relative z-10 lg:grid lg:grid-cols-12">
+      <div class={value.image ? textCols : ""}>
         <h2 class="h2">{value.heading}</h2>
         {value.text && <p class="lead mt-4 max-w-[46ch] text-ink-700">{value.text}</p>}
         <LinkButton block="cta" link={value.link} service={service} class="mt-8" />
       </div>
-      {value.image && (
-        <div class={imgOrder}>
-          <Picture image={value.image} shape="card" class="aspect-[4/3] w-full rounded-lg object-cover" />
-        </div>
-      )}
     </div>
+    {value.image && (
+      <div class:list={layer}>
+        <Picture image={value.image} shape="stage" sizes={sizes} class="absolute inset-0 h-full w-full object-cover" />
+      </div>
+    )}
   </section>
 ) : (
-  <section class="band-accent on-dark relative overflow-hidden bg-accent-600 text-white">
-    <div class="container-x relative py-section">
-      <div class="grid items-center gap-10 lg:grid-cols-2">
-        <div class={value.image ? textOrder : "lg:col-span-2"}>
-          <div class={value.image ? "" : "max-w-3xl"}>
-            <h2 class="h2">{value.heading}</h2>
-            {value.text && <p class="lead mt-4 max-w-[46ch] text-accent-100">{value.text}</p>}
-            <LinkButton block="cta" link={value.link} service={service} class="mt-8" />
-          </div>
-          {tel && (
-            <div class="mt-12 border-t border-white/40 pt-8">
-              <p class="text-sm font-bold uppercase tracking-wide text-accent-100">Oder direkt anrufen</p>
-              {/* Half the width means the number needs a smaller ceiling, otherwise it
-                  overflows its column on wide screens. */}
-              <a
-                href={tel}
-                class:list={[
-                  "mt-2 inline-block font-display font-extrabold leading-none decoration-4 underline-offset-8 hover:underline sm:whitespace-nowrap",
-                  value.image
-                    ? "text-[clamp(1.75rem,0.8rem+3vw,3rem)]"
-                    : "text-[clamp(2rem,0.9rem+5vw,5.5rem)]",
-                ]}
-              >{value.phone}</a>
-            </div>
-          )}
-        </div>
-        {value.image && (
-          <div class={imgOrder}>
-            <Picture image={value.image} shape="card" class="aspect-[4/3] w-full rounded-lg object-cover" />
+  <section class="band-accent on-dark relative isolate overflow-hidden bg-accent-600 text-white">
+    <div class="container-x relative z-10 py-section lg:grid lg:grid-cols-12">
+      <div class={value.image ? textCols : "max-w-3xl"}>
+        <h2 class="h2">{value.heading}</h2>
+        {value.text && <p class="lead mt-4 max-w-[46ch] text-accent-100">{value.text}</p>}
+        <LinkButton block="cta" link={value.link} service={service} class="mt-8" />
+        {tel && (
+          <div class="mt-12 border-t border-white/40 pt-8">
+            <p class="text-sm font-bold uppercase tracking-wide text-accent-100">Oder direkt anrufen</p>
+            {/* Seven of twelve columns means the number needs a smaller ceiling, otherwise it
+                overflows its column on wide screens. */}
+            <a
+              href={tel}
+              class:list={[
+                "mt-2 inline-block font-display font-extrabold leading-none decoration-4 underline-offset-8 hover:underline sm:whitespace-nowrap",
+                value.image
+                  ? "text-[clamp(1.75rem,0.8rem+3.2vw,3.5rem)]"
+                  : "text-[clamp(2rem,0.9rem+5vw,5.5rem)]",
+              ]}
+            >{value.phone}</a>
           </div>
         )}
       </div>
     </div>
+    {value.image && (
+      <div class:list={layer}>
+        <Picture image={value.image} shape="stage" sizes={sizes} class="absolute inset-0 h-full w-full object-cover" />
+      </div>
+    )}
   </section>
 )}
