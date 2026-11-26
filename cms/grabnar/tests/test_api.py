@@ -321,7 +321,9 @@ def test_rewrites_replace_legacy_bodies():
         first_heading = re.search(r"^## (.+)$", body, re.M).group(1)
         assert f">{first_heading}</h2>" in html, name
     unterhalt = by_url["/gebaeudereinigung/unterhaltsreinigung/"]
-    assert str(unterhalt.body[0].value["text"]).count("Verkehrsmittel") == 1  # legacy duplicate gone
+    assert (
+        str(unterhalt.body[0].value["text"]).count("Verkehrsmittel") == 1
+    )  # legacy duplicate gone
 
 
 def test_rewrite_links_point_to_live_pages():
