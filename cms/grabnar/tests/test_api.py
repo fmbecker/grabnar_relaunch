@@ -52,7 +52,7 @@ def test_service_page_content_and_list(client):
     ).json()
     page = data["items"][0]
     assert page["meta"]["html_url"].endswith("/services/wachdienste/")
-    assert "<li>Citystreifen</li>" in page["body"][0]["value"]
+    assert "<li>Citystreifen</li>" in page["body"][0]["value"]["text"]
     assert page["teaser"] and len(page["related"]) == 2
     assert page["category"] == {"title": "Services", "href": "/services/"}
 
@@ -212,7 +212,7 @@ def test_service_teaser_not_repeated_in_body(client):
     ).json()
     assert len(data["items"]) == 22
     for page in data["items"]:
-        body = page["body"][0]["value"] if page["body"] else ""
+        body = page["body"][0]["value"]["text"] if page["body"] else ""
         assert page["teaser"], page["title"]
         assert page["teaser"] not in body, f"teaser repeated in body: {page['title']}"
 
