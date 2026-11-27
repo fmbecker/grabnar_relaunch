@@ -78,6 +78,9 @@ Daran ändert der Domainumzug nichts.
    Bis zum Zertifikat beantwortet `grabnar-staging.conf` HTTP für beide Namen mit 503 und lässt nur
    die Let's-Encrypt-Prüfung durch.
 3. 👤 `sudo certbot certonly --webroot -w /var/www/certbot -d www.grabnar.de -d grabnar.de`
+   `grabnar.de` hat auch einen AAAA-Eintrag; beide Nginx-Configs horchen deshalb zusätzlich auf
+   `listen [::]:80` / `listen [::]:443` – ohne das erreicht ein Besucher über IPv6 nichts, und
+   Let's Encrypt fragt AAAA vor A ab.
 4. 👤 `/srv/grabnar/web.env`: `PUBLIC_SITE_URL=https://www.grabnar.de`, `PUBLIC_ALLOW_INDEXING=true`.
 5. 👤 `/srv/grabnar/cms.env`: in `ALLOWED_HOSTS`, `CSRF_TRUSTED_ORIGINS`, `WAGTAILADMIN_BASE_URL`,
    `FRONTEND_URL`, `CORS_ALLOWED_ORIGINS` `mbg.aivii.de` durch `www.grabnar.de` ersetzen
@@ -111,6 +114,12 @@ Daran ändert der Domainumzug nichts.
 - 👤 Altserver: Mediathek und MySQL-Dump offline sichern, nach 4 Wochen abschalten
   (`docs/04-aufgaben.md`, Phase 4).
 - 👤 `mbg.aivii.de` und sein Zertifikat behalten – die Weiterleitung in `grabnar.conf` braucht es.
+- 👤 HSTS geht ohne `includeSubDomains` raus (`deploy/nginx/security-headers.conf`): `mail`,
+  `webmail`, `smtp`, `imap`, `shop` und `intranet` unter `grabnar.de` liegen auf einem anderen
+  Server, dessen Zertifikat nur `grabnar.de` abdeckt, also hat keine davon ein brauchbares
+  HTTPS. Mit `includeSubDomains` würde ein Besuch von `www.grabnar.de` dem Browser für ein Jahr
+  verbieten, sie per HTTP zu öffnen – ohne Möglichkeit, das wegzuklicken. Erst aufnehmen, wenn
+  alle `*.grabnar.de` HTTPS sprechen.
 
 ## Zurück
 
