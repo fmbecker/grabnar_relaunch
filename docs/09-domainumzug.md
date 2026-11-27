@@ -39,6 +39,25 @@ SPF von `grabnar.de` scheitern. Damit „Antworten“ beim Empfänger zum Kunden
 setzt das CMS `Reply-To` auf die Adresse aus dem Formular (`cms/forms_api/views.py`).
 Daran ändert der Domainumzug nichts.
 
+## Zertifikate und ihre Erneuerung
+
+Let's Encrypt über certbot, ein Zertifikat für `www.grabnar.de` + `grabnar.de` und eines für
+`mbg.aivii.de`. Erneuert wird automatisch: `certbot.timer` läuft zweimal täglich und erneuert, was
+in weniger als 30 Tagen abläuft, über `--webroot -w /var/www/certbot` – ohne nginx anzuhalten.
+
+Nginx liest die Zertifikate beim Start und behält sie im Speicher, liefert nach einer Erneuerung
+also weiter das alte, bis es neu geladen wird. Dafür sorgt `deploy/certbot-reload-nginx.sh`, von
+certbot nach jeder erfolgreichen Erneuerung aufgerufen. Das Skript wird **kopiert**, nicht
+verlinkt – certbot führt Hooks als root aus, und der Checkout gehört `felix`:
+
+```
+sudo install -m 755 /srv/grabnar/repo/deploy/certbot-reload-nginx.sh \
+     /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh
+sudo certbot renew --dry-run --run-deploy-hooks
+```
+
+Ändert sich das Skript im Repo, muss es erneut kopiert werden.
+
 ## Phase 1 – Abnahme unter mbg.aivii.de
 
 👤 = Felix, 🌐 = Domain-Verwalter von grabnar.de
