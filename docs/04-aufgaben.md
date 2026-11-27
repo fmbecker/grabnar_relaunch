@@ -103,13 +103,13 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 - [x] 🤖 CMS-Image wird von GitHub Actions gebaut und nach `ghcr.io/fmbecker/grabnar-cms` gepusht; `deploy.sh` lädt es nur noch (kein Build auf dem 2-GB-VPS)
 - [ ] 👤 Paket `grabnar-cms` auf GitHub einmalig auf „Public“ stellen (oder Server per Token anmelden, siehe `deploy/README.md`)
 - [x] 🤖 Domain parametrisiert: Canonical, Sitemap, OG, JSON-LD, `robots.txt`, Weiterleitungsziele und Formular-Endpunkt aus `PUBLIC_SITE_URL`; `PUBLIC_ALLOW_INDEXING` (Vorgabe aus = `noindex` überall); Nginx-Configs für Phase 1 (`grabnar-staging.conf`, Basic-Auth) und Phase 2 (`grabnar.conf`)
-- [ ] 🤝 Neuen VPS nach `deploy/README.md` einrichten (nginx.org-Paket, Docker, Node/pnpm), Phase 1 unter `mbg.aivii.de` nach `docs/09-domainumzug.md`
+- [x] 🤝 Neuen VPS nach `deploy/README.md` einrichten (nginx.org-Paket, Docker, Node/pnpm), Phase 1 unter `mbg.aivii.de` nach `docs/09-domainumzug.md` (22.11.2026)
 - [ ] 🤝 Vorschau-Dienst einrichten: `grabnar-preview.service`, sudoers-Eintrag, `FRONTEND_URL` in `cms.env` (siehe `deploy/README.md`)
 - [ ] 🤝 Backup nach `/srv/backup/` + Offsite-Ziel einrichten und Restore einmal testen
 - [x] Redirect-Tabelle `docs/redirects.csv` erstellt; Import erfolgt über `import_legacy`
-- [ ] 👤 Mailversand: SMTP-Zugang eines Postfachs unter `aivii.de` (`EMAIL_URL`, `DEFAULT_FROM_EMAIL`), SPF/DKIM für den SMTP-Server prüfen, Testmail (Reply-To = Formularadresse)
+- [x] 👤 Mailversand: SMTP-Zugang eines Postfachs unter `aivii.de` (`EMAIL_URL`, `DEFAULT_FROM_EMAIL`), SPF/DKIM für den SMTP-Server prüfen, Testmail (Reply-To = Formularadresse) (25.11.2026, Postfach `info@aivii.de` bei Uberspace; `DEFAULT_FROM_EMAIL` muss dieses Postfach sein, sonst weist der Server die Mail ab)
 - [ ] 👤 Domain-Verwalter vorab: TTL von `grabnar.de`/`www` auf 300 s, Termin für den Umzug
-- [ ] 🤝 Domainumzug nach `docs/09-domainumzug.md` (DNS, Zertifikat, `web.env`/`cms.env`, `grabnar.conf`, Rebuild, Prüfliste)
+- [x] 🤝 Domainumzug nach `docs/09-domainumzug.md` (DNS, Zertifikat, `web.env`/`cms.env`, `grabnar.conf`, Rebuild, Prüfliste) (27.11.2026, live unter `https://www.grabnar.de`)
 - [ ] 🤖 Nach Go-Live: 404-Check, Search Console Sitemap
 - [ ] 👤 Vor dem Abschalten: Mediathek der Altseite (`/home/mbgsite/media/`, 135 Bilder) und einen MySQL-Dump offline sichern
 - [ ] 👤 Altserver nach 4 Wochen abschalten

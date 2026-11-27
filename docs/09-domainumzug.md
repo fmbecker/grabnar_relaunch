@@ -39,6 +39,25 @@ SPF von `grabnar.de` scheitern. Damit „Antworten“ beim Empfänger zum Kunden
 setzt das CMS `Reply-To` auf die Adresse aus dem Formular (`cms/forms_api/views.py`).
 Daran ändert der Domainumzug nichts.
 
+## Zertifikate und ihre Erneuerung
+
+Let's Encrypt über certbot, ein Zertifikat für `www.grabnar.de` + `grabnar.de` und eines für
+`mbg.aivii.de`. Erneuert wird automatisch: `certbot.timer` läuft zweimal täglich und erneuert, was
+in weniger als 30 Tagen abläuft, über `--webroot -w /var/www/certbot` – ohne nginx anzuhalten.
+
+Nginx liest die Zertifikate beim Start und behält sie im Speicher, liefert nach einer Erneuerung
+also weiter das alte, bis es neu geladen wird. Dafür sorgt `deploy/certbot-reload-nginx.sh`, von
+certbot nach jeder erfolgreichen Erneuerung aufgerufen. Das Skript wird **kopiert**, nicht
+verlinkt – certbot führt Hooks als root aus, und der Checkout gehört `felix`:
+
+```
+sudo install -m 755 /srv/grabnar/repo/deploy/certbot-reload-nginx.sh \
+     /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh
+sudo certbot renew --dry-run --run-deploy-hooks
+```
+
+Ändert sich das Skript im Repo, muss es erneut kopiert werden.
+
 ## Phase 1 – Abnahme unter mbg.aivii.de
 
 👤 = Felix, 🌐 = Domain-Verwalter von grabnar.de
@@ -78,6 +97,9 @@ Daran ändert der Domainumzug nichts.
    Bis zum Zertifikat beantwortet `grabnar-staging.conf` HTTP für beide Namen mit 503 und lässt nur
    die Let's-Encrypt-Prüfung durch.
 3. 👤 `sudo certbot certonly --webroot -w /var/www/certbot -d www.grabnar.de -d grabnar.de`
+   `grabnar.de` hat auch einen AAAA-Eintrag; beide Nginx-Configs horchen deshalb zusätzlich auf
+   `listen [::]:80` / `listen [::]:443` – ohne das erreicht ein Besucher über IPv6 nichts, und
+   Let's Encrypt fragt AAAA vor A ab.
 4. 👤 `/srv/grabnar/web.env`: `PUBLIC_SITE_URL=https://www.grabnar.de`, `PUBLIC_ALLOW_INDEXING=true`.
 5. 👤 `/srv/grabnar/cms.env`: in `ALLOWED_HOSTS`, `CSRF_TRUSTED_ORIGINS`, `WAGTAILADMIN_BASE_URL`,
    `FRONTEND_URL`, `CORS_ALLOWED_ORIGINS` `mbg.aivii.de` durch `www.grabnar.de` ersetzen
@@ -111,6 +133,12 @@ Daran ändert der Domainumzug nichts.
 - 👤 Altserver: Mediathek und MySQL-Dump offline sichern, nach 4 Wochen abschalten
   (`docs/04-aufgaben.md`, Phase 4).
 - 👤 `mbg.aivii.de` und sein Zertifikat behalten – die Weiterleitung in `grabnar.conf` braucht es.
+- 👤 HSTS geht ohne `includeSubDomains` raus (`deploy/nginx/security-headers.conf`): `mail`,
+  `webmail`, `smtp`, `imap`, `shop` und `intranet` unter `grabnar.de` liegen auf einem anderen
+  Server, dessen Zertifikat nur `grabnar.de` abdeckt, also hat keine davon ein brauchbares
+  HTTPS. Mit `includeSubDomains` würde ein Besuch von `www.grabnar.de` dem Browser für ein Jahr
+  verbieten, sie per HTTP zu öffnen – ohne Möglichkeit, das wegzuklicken. Erst aufnehmen, wenn
+  alle `*.grabnar.de` HTTPS sprechen.
 
 ## Zurück
 
