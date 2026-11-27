@@ -2,7 +2,9 @@
 Description=Monthly Umami website report (1st of each month, 07:15)
 
 [Timer]
-OnCalendar=*-*-01 07:15:00
+# Mit Zeitzone: die Serveruhr läuft auf UTC, der Bericht rechnet in Europe/Berlin – ohne den
+# Zusatz käme er im Winter um 08:15 Uhr deutscher Zeit und im Sommer um 09:15 Uhr.
+OnCalendar=*-*-01 07:15:00 Europe/Berlin
 Persistent=true
 RandomizedDelaySec=10min
 

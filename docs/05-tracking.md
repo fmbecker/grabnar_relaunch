@@ -142,9 +142,11 @@ Oberfläche: **Journey** (Website → Journey, 5 Schritte, Ende = Ereignis `lead
 Ereignis in `web/src/lib/analytics.ts` existiert. Wer ein Ereignis umbenennt, muss also beide Stellen
 anpassen.
 
-Geprüft: `reports.json` gegen die Eingabe-Schemas aus dem Umami-Quellcode v3.4.0 (alle 16 Einträge
-gültig), das Skript gegen eine nachgebaute API (Anlegen, Aktualisieren, Probelauf). Gegen eine echte
-Umami-Instanz noch nicht ausgeführt.
+Geprüft: `reports.json` gegen die Eingabe-Schemas aus dem Umami-Quellcode v3.4.0, das Skript gegen
+eine nachgebaute API (Anlegen, Aktualisieren, Probelauf). Am 27.11.2026 gegen die echte Instanz
+(Umami 3.5.0) ausgeführt: 5 Ziele, 8 Funnels, 4 Segmente angelegt, ein zweiter Lauf erkennt alle
+17 wieder und aktualisiert sie statt sie zu verdoppeln. Beim Nachsehen über die API beachten:
+`/segments` verlangt `?type=segment`, ohne den Parameter antwortet Umami mit 400.
 
 ## Monatsbericht per E-Mail
 
@@ -172,11 +174,15 @@ Einrichten (nach dem Umami-Update und `setup-reports.mjs`):
     sudo cp deploy/systemd/grabnar-umami-report.* /etc/systemd/system/
     sudo systemctl daemon-reload && sudo systemctl enable --now grabnar-umami-report.timer
 
+Die Units werden **kopiert**, nicht verlinkt; nach einer Änderung im Repo also erneut kopieren
+und `daemon-reload`. Die `OnCalendar`-Zeile nennt ausdrücklich `Europe/Berlin`, weil die
+Serveruhr auf UTC läuft – sonst käme der Bericht im Winter um 08:15 und im Sommer um 09:15 Uhr.
+
 Vorschau des Layouts ohne Umami: `node deploy/umami/monthly-report.mjs --demo --out=/tmp/bericht.html`.
 
 Geprüft: Monatsgrenzen in Europe/Berlin (inkl. Sommerzeitwechsel), Abruf aller 13 Endpunkte gegen
 eine nachgebaute Umami-API, Versand über `send_report_mail` (Test in `cms/grabnar/tests/test_api.py`).
-Gegen eine echte Umami-Instanz noch nicht ausgeführt.
+Am 27.11.2026 erstmals gegen die echte Instanz gelaufen (`--month=2026-11`) und per Mail verschickt.
 
 ## Kampagnen-Links (UTM)
 
