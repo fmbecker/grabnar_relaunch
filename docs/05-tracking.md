@@ -122,6 +122,20 @@ Inhalt:
   Stellenportal (`/karriere/` → `job-portal-load`), Initiativbewerbung (`/karriere/` → `form-start` → `application-sent`),
   Startseite → Kategorie → Kontakt, und je Leistungskategorie `/<kategorie>/*` → `lead`
 - **4 Segmente:** Kunden (ohne Karriere), Bewerber (Karriere), Mobil, Desktop
+- **4 Journeys:** Einstieg von der Startseite weiter, Weg zur Kontaktseite, Weg zur Karriereseite,
+  und einmal dasselbe mit Klick-Ereignissen als Schritten
+
+Funnel und Journey beantworten verschiedene Fragen: der Funnel zählt einen **vorgegebenen** Weg
+nach („wie viele kommen von A bis D?“), die Journey zeigt die **tatsächlich gelaufenen** Wege, auch
+die, die niemand erwartet hat. Zwei Eigenheiten dabei:
+
+- Ereignisse gelten als eigene Schritte. Ohne Einschränkung stehen `nav-click` oder
+  `mobile-menu-open` zwischen den Seiten und verbrauchen die vier bis fünf Schritte. Drei der vier
+  Journeys setzen deshalb `filters.eventType: 1` (nur Seitenaufrufe); die vierte lässt die
+  Ereignisse ausdrücklich zu, weil dort interessiert, welcher Button den nächsten Aufruf ausgelöst hat.
+- `endStep` meint den **letzten** Schritt des Besuchs, nicht „irgendwann enthalten“. Ein Ereignis
+  wie `lead` ist selten das Letzte, was jemand tut – `endStep: "lead"` liefert fast keine Zeilen.
+  Für „wie kommt es zum Kontakt?“ ist deshalb `/kontakt/` der Endpunkt, und der Rest steht im Funnel.
 
 Ausführen (auf dem Server, Umami lauscht auf `127.0.0.1:3000`):
 
@@ -134,9 +148,13 @@ Ausführen (auf dem Server, Umami lauscht auf `127.0.0.1:3000`):
        node deploy/umami/setup-reports.mjs --dry-run
        node deploy/umami/setup-reports.mjs
 
-Nicht per API möglich (Umami 3.4 hat dafür keine Definitions-Endpunkte), daher einmal in der
-Oberfläche: **Journey** (Website → Journey, 5 Schritte, Ende = Ereignis `lead`) sowie bei Bedarf
-**Retention**, **Attribution** und **UTM** – diese Berichte brauchen keine Definition, nur den Zeitraum.
+Journeys liegen nicht unter der Website, sondern unter `/api/reports` (`type: "journey"`, die
+`websiteId` im Body) – dort liegen auch Ziele und Funnels, weshalb das Skript die Liste nach `type`
+filtert, damit der Namensabgleich nicht einen Funnel trifft. Sie werden also mitgepflegt, nichts
+davon ist Handarbeit.
+
+**Retention**, **Attribution** und **UTM** brauchen gar keine Definition, nur den Zeitraum – die
+öffnet man in der Oberfläche direkt.
 
 `pnpm check:tracking` (in CI und im Pre-Push-Hook) prüft, dass jedes in `reports.json` verwendete
 Ereignis in `web/src/lib/analytics.ts` existiert. Wer ein Ereignis umbenennt, muss also beide Stellen
@@ -144,9 +162,9 @@ anpassen.
 
 Geprüft: `reports.json` gegen die Eingabe-Schemas aus dem Umami-Quellcode v3.4.0, das Skript gegen
 eine nachgebaute API (Anlegen, Aktualisieren, Probelauf). Am 27.11.2026 gegen die echte Instanz
-(Umami 3.5.0) ausgeführt: 5 Ziele, 8 Funnels, 4 Segmente angelegt, ein zweiter Lauf erkennt alle
-17 wieder und aktualisiert sie statt sie zu verdoppeln. Beim Nachsehen über die API beachten:
-`/segments` verlangt `?type=segment`, ohne den Parameter antwortet Umami mit 400.
+(Umami 3.5.0) ausgeführt: 5 Ziele, 8 Funnels, 4 Segmente, 4 Journeys angelegt; ein zweiter Lauf
+erkennt alle 21 wieder und aktualisiert sie statt sie zu verdoppeln. Beim Nachsehen über die API
+beachten: `/segments` verlangt `?type=segment`, ohne den Parameter antwortet Umami mit 400.
 
 ## Monatsbericht per E-Mail
 

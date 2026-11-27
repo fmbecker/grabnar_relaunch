@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Applies deploy/umami/reports.json (goals, funnels, segments) to an Umami >= 3.4 website.
+ * Applies deploy/umami/reports.json (goals, funnels, segments, journeys) to an Umami >= 3.4 website.
  *
  *   UMAMI_URL=http://127.0.0.1:3000 \
  *   UMAMI_API_KEY=umami_… \            # Umami → Einstellungen → API-Schlüssel
@@ -46,10 +46,44 @@ async function sync(kind, entries, payload, listQuery = "") {
   }
 }
 
+/**
+ * Journeys hängen nicht unter der Website, sondern unter /api/reports, mit der websiteId im Body –
+ * dort liegen auch Ziele und Funnels, deshalb wird die Liste nach type gefiltert, damit der
+ * Namensabgleich nicht versehentlich einen Funnel trifft.
+ */
+async function syncJourneys(entries) {
+  if (!entries?.length) return;
+  const url = `${UMAMI_URL.replace(/\/$/, "")}/api/reports`;
+  const headers = { Authorization: `Bearer ${UMAMI_API_KEY}`, "Content-Type": "application/json" };
+  const list = await fetch(`${url}?websiteId=${UMAMI_WEBSITE_ID}&pageSize=200`, { headers });
+  if (!list.ok) throw new Error(`GET /api/reports → HTTP ${list.status}`);
+  const byName = new Map(
+    ((await list.json()).data ?? []).filter((e) => e.type === "journey").map((e) => [e.name, e]),
+  );
+  for (const entry of entries) {
+    const found = byName.get(entry.name);
+    console.log(`${DRY ? "[dry-run] " : ""}journeys: ${found ? "aktualisieren" : "anlegen"} „${entry.name}“`);
+    if (DRY) continue;
+    const res = await fetch(found ? `${url}/${found.id}` : url, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        websiteId: UMAMI_WEBSITE_ID,
+        type: "journey",
+        name: entry.name,
+        description: entry.description ?? "",
+        parameters: entry.parameters,
+      }),
+    });
+    if (!res.ok) throw new Error(`POST /api/reports → HTTP ${res.status}: ${(await res.text()).slice(0, 300)}`);
+  }
+}
+
 try {
   await sync("goals", config.goals, (g) => ({ name: g.name, description: g.description ?? "", parameters: g.parameters }));
   await sync("funnels", config.funnels, (f) => ({ name: f.name, description: f.description ?? "", parameters: f.parameters }));
   await sync("segments", config.segments, (s) => ({ type: "segment", name: s.name, parameters: s.parameters }), "&type=segment");
+  await syncJourneys(config.journeys);
   console.log(DRY ? "Probelauf beendet, nichts geändert." : "Fertig.");
 } catch (err) {
   console.error(String(err.message ?? err));
