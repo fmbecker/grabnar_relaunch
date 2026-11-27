@@ -85,11 +85,15 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 - [x] Schrift: Arial (Entscheidung Felix 30.10.2026), keine Webfonts nötig
 
 - [x] 🤖 Tracking mit Umami vorbereitet: Einstellungen im CMS (Script-URL, Website-ID, Domains, Web Vitals, Do Not Track), 21 Ereignisse auf allen Seiten und Komponenten (inkl. `lead`, Kopieren von Kontaktdaten, Leistung per `?leistung=` bis ins Formular), Konzept in `docs/05-tracking.md`
-- [ ] 👤 Umami auf v3 aktualisieren (nur noch PostgreSQL – ggf. MySQL-Migration), Website anlegen, Website-ID im CMS eintragen
+- [x] 👤 Umami auf v3 aktualisieren (nur noch PostgreSQL – ggf. MySQL-Migration), Website anlegen, Website-ID im CMS eintragen (22.11.2026, Umami 3.5.0)
 - [x] 🤖 Ziele, Funnels und Segmente als `deploy/umami/reports.json` + Skript `deploy/umami/setup-reports.mjs` (Umami-API ≥ 3.4)
-- [ ] 🤝 Nach dem Umami-Update: API-Schlüssel anlegen, `setup-reports.mjs` ausführen, Journey-Bericht in der Oberfläche anlegen (`docs/05-tracking.md`)
+- [x] 🤝 Nach dem Umami-Update: API-Schlüssel anlegen, `setup-reports.mjs` ausführen (27.11.2026: 5 Ziele, 8 Funnels, 4 Segmente)
+- [ ] 👤 Journey-Bericht in der Umami-Oberfläche anlegen – per API nicht möglich (`docs/05-tracking.md`)
 - [x] 🤖 Monatsbericht per E-Mail aus Umami: `deploy/umami/monthly-report.mjs` + `send-monthly-report.sh` + systemd-Timer (1. des Monats, 07:15)
-- [ ] 👤 Empfänger des Monatsberichts festlegen, `/srv/grabnar/umami-report.env` anlegen, Timer aktivieren (`docs/05-tracking.md`)
+- [x] 🤝 `/srv/grabnar/umami-report.env` angelegt, Timer aktiv, Testbericht für November verschickt (27.11.2026)
+- [ ] 👤 Bei der Übergabe an die Firma entscheiden, wer den Monatsbericht bekommt. Bis dahin bewusst
+  nur Felix (entschieden am 27.11.2026); eine Zeile in `/srv/grabnar/umami-report.env`
+  (`REPORT_RECIPIENTS`, mehrere Adressen mit Komma)
 - [x] 🤖 Frontend auf veraltete Muster und heutige Web-Standards geprüft: keine Altlasten, vier Befunde + vier Kleinigkeiten in `docs/07-web-standards.md`
 - [x] 🤖 Befund 1: `scroll-padding-top` – Anker landeten hinter dem Sticky-Header („Jetzt bewerben" → `#formular`)
 - [x] 🤖 Befund 3: mobiles Menü als `popover` statt `<details>` – Escape, Klick-daneben und Fokusrückgabe vom Browser, `dvh` statt `vh`
