@@ -89,9 +89,10 @@ Legende: 🤖 kann Claude Code weitgehend allein · 👤 braucht Felix (Zugänge
 - [x] 🤖 Ziele, Funnels und Segmente als `deploy/umami/reports.json` + Skript `deploy/umami/setup-reports.mjs` (Umami-API ≥ 3.4)
 - [x] 🤝 Nach dem Umami-Update: API-Schlüssel anlegen, `setup-reports.mjs` ausführen (27.11.2026: 5 Ziele, 8 Funnels, 4 Segmente)
 - [x] 🤖 4 Journeys angelegt (Einstieg, Weg zur Kontaktseite, Weg zur Karriereseite, Wege mit Klicks) – geht doch per API, über `/api/reports`, und steckt jetzt in `reports.json` (27.11.2026)
-- [x] 🤖 Monatsbericht per E-Mail aus Umami: `deploy/umami/monthly-report.mjs` + `send-monthly-report.sh` + systemd-Timer (1. des Monats, 07:15)
+- [x] 🤖 Bericht per E-Mail aus Umami: `deploy/umami/report.mjs` + `send-report.sh` + systemd-Timer
+- [x] 🤖 Bericht auf **wöchentlich** umgestellt (montags 07:15, Woche Mo–So; `--month` bleibt für den Monatsrückblick, 28.11.2026)
 - [x] 🤝 `/srv/grabnar/umami-report.env` angelegt, Timer aktiv, Testbericht für November verschickt (27.11.2026)
-- [ ] 👤 Bei der Übergabe an die Firma entscheiden, wer den Monatsbericht bekommt. Bis dahin bewusst
+- [ ] 👤 Bei der Übergabe an die Firma entscheiden, wer den Wochenbericht bekommt. Bis dahin bewusst
   nur Felix (entschieden am 27.11.2026); eine Zeile in `/srv/grabnar/umami-report.env`
   (`REPORT_RECIPIENTS`, mehrere Adressen mit Komma)
 - [x] 🤖 Frontend auf veraltete Muster und heutige Web-Standards geprüft: keine Altlasten, vier Befunde + vier Kleinigkeiten in `docs/07-web-standards.md`

@@ -78,7 +78,7 @@ Einmalige Einrichtung (Details: `docs/03-technik.md`):
    `ssh -L 3000:127.0.0.1:3000 felix@<server>`, dann `http://localhost:3000`. Website dort anlegen,
    Script-URL (`https://<domain>/stats/script.js`) und Website-ID im Wagtail-Admin eintragen,
    danach Frontend neu bauen (die CSP entsteht beim Bauen).
-10. Optional: Monatsbericht aus Umami per E-Mail – `systemd/grabnar-umami-report.{service,timer}`, Einrichtung in `docs/05-tracking.md` („Monatsbericht per E-Mail“). `felix` muss dafür in der Gruppe `docker` sein.
+10. Optional: Wochenbericht aus Umami per E-Mail – `systemd/grabnar-umami-report.{service,timer}`, Einrichtung in `docs/05-tracking.md` („Wochenbericht per E-Mail“). `felix` muss dafür in der Gruppe `docker` sein.
 
 Jedes weitere Deployment: `./deploy.sh`. Es lädt das Image passend zum ausgecheckten Code (Tag `cms-<Tree-Hash von cms/>`) und wartet bis zu 15 Minuten, falls GitHub Actions noch baut. Auf dem Server wird nichts kompiliert.
 

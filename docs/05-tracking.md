@@ -166,21 +166,27 @@ eine nachgebaute API (Anlegen, Aktualisieren, Probelauf). Am 27.11.2026 gegen di
 erkennt alle 21 wieder und aktualisiert sie statt sie zu verdoppeln. Beim Nachsehen über die API
 beachten: `/segments` verlangt `?type=segment`, ohne den Parameter antwortet Umami mit 400.
 
-## Monatsbericht per E-Mail
+## Wochenbericht per E-Mail
 
-Am 1. jedes Monats um 07:15 Uhr verschickt der Server einen Bericht über den Vormonat (Vergleich mit
-dem Monat davor) – über dieselbe SMTP-Konfiguration wie die Formulare (`EMAIL_URL` in `cms.env`).
+Jeden Montag um 07:15 Uhr verschickt der Server einen Bericht über die abgeschlossene Woche
+(Montag bis Sonntag, Vergleich mit der Woche davor) – über dieselbe SMTP-Konfiguration wie die
+Formulare (`EMAIL_URL` in `cms.env`).
+
+Der Bericht kennt beide Zeiträume: ohne Argument die letzte Woche, mit `--month` den Vormonat.
+Jede Beschriftung kommt aus dem Zeitraum selbst (`targetPeriod()` in `report.mjs`), es gibt also
+keine zweite Fassung des Berichts für Monate. Für einen Monatsrückblick von Hand genügt
+`deploy/umami/send-report.sh --month`.
 
 Inhalt: automatische Hinweise („Auf einen Blick“: starke Veränderungen bei Kontakten und Besuchern,
 größter Absprung im Anfrage-Weg, neue 404-Adressen, häufigste Leistung), Besucherkennzahlen mit
-Vormonat, alle Ziele aus `reports.json` mit Anteil und Vormonat, Kontakte nach Weg und nach Leistung,
+Vorwoche, alle Ziele aus `reports.json` mit Anteil und Vorwoche, Kontakte nach Weg und nach Leistung,
 Anfrage-Funnel Schritt für Schritt, meistbesuchte Seiten, Herkunft, Kanäle, Geräte, UTM-Kampagnen
 und nicht gefundene Adressen. Nur Summen, keine Einzelbesuche.
 
 | Datei | Aufgabe |
 |---|---|
-| `deploy/umami/monthly-report.mjs` | holt die Zahlen über die Umami-API und baut die HTML-Mail (`--month=JJJJ-MM`, `--out=…`, `--demo` für eine Vorschau ohne Umami) |
-| `deploy/umami/send-monthly-report.sh` | erzeugt den Bericht und verschickt ihn über `manage.py send_report_mail` im CMS-Container |
+| `deploy/umami/report.mjs` | holt die Zahlen über die Umami-API und baut die HTML-Mail (`--week=JJJJ-WNN`, `--month`, `--month=JJJJ-MM`, `--out=…`, `--demo` für eine Vorschau ohne Umami) |
+| `deploy/umami/send-report.sh` | erzeugt den Bericht und verschickt ihn über `manage.py send_report_mail` im CMS-Container |
 | `deploy/umami/umami-report.env.example` | Vorlage für `/srv/grabnar/umami-report.env` (Umami-URL, API-Schlüssel, Website-ID, Empfänger) |
 | `deploy/systemd/grabnar-umami-report.{service,timer}` | Zeitplan |
 
@@ -188,19 +194,24 @@ Einrichten (nach dem Umami-Update und `setup-reports.mjs`):
 
     cp deploy/umami/umami-report.env.example /srv/grabnar/umami-report.env && chmod 600 /srv/grabnar/umami-report.env
     # Werte eintragen, dann einmal von Hand testen:
-    deploy/umami/send-monthly-report.sh
+    deploy/umami/send-report.sh
     sudo cp deploy/systemd/grabnar-umami-report.* /etc/systemd/system/
     sudo systemctl daemon-reload && sudo systemctl enable --now grabnar-umami-report.timer
 
 Die Units werden **kopiert**, nicht verlinkt; nach einer Änderung im Repo also erneut kopieren
 und `daemon-reload`. Die `OnCalendar`-Zeile nennt ausdrücklich `Europe/Berlin`, weil die
 Serveruhr auf UTC läuft – sonst käme der Bericht im Winter um 08:15 und im Sommer um 09:15 Uhr.
+`Persistent=true` holt einen Montag nach, an dem der Server aus war.
 
-Vorschau des Layouts ohne Umami: `node deploy/umami/monthly-report.mjs --demo --out=/tmp/bericht.html`.
+Vorschau des Layouts ohne Umami: `node deploy/umami/report.mjs --demo --out=/tmp/bericht.html`.
 
-Geprüft: Monatsgrenzen in Europe/Berlin (inkl. Sommerzeitwechsel), Abruf aller 13 Endpunkte gegen
-eine nachgebaute Umami-API, Versand über `send_report_mail` (Test in `cms/grabnar/tests/test_api.py`).
-Am 27.11.2026 erstmals gegen die echte Instanz gelaufen (`--month=2026-11`) und per Mail verschickt.
+Geprüft: Monats- und Wochengrenzen in Europe/Berlin (inkl. Sommerzeitwechsel), Abruf aller 13
+Endpunkte gegen eine nachgebaute Umami-API, Versand über `send_report_mail` (Test in
+`cms/grabnar/tests/test_api.py`). Am 27.11.2026 erstmals gegen die echte Instanz gelaufen
+(`--month=2026-11`) und per Mail verschickt; am 28.11.2026 die Wochenfassung (Woche 47 und 48).
+Die Wochenrechnung ist nach ISO: der Montag der Woche 1 wird über den 4. Januar bestimmt, und
+`isoWeekOf()` ist genau die Umkehrung davon – geprüft über den Jahreswechsel (Woche 1/2026 beginnt
+am 29.12.2025, 2026 hat 53 Wochen).
 
 ## Kampagnen-Links (UTM)
 

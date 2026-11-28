@@ -1,9 +1,9 @@
 """Send an HTML report (read from stdin) with the site's SMTP settings (EMAIL_URL).
 
-Used by deploy/umami/send-monthly-report.sh, so reports go out through the same mail
+Used by deploy/umami/send-report.sh, so reports go out through the same mail
 configuration as the contact forms:
 
-    node deploy/umami/monthly-report.mjs | docker compose … exec -T cms \\
+    node deploy/umami/report.mjs | docker compose … exec -T cms \\
         python manage.py send_report_mail --to a@x.de,b@y.de --subject "…"
 """
 
