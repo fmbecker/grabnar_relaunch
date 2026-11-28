@@ -66,5 +66,12 @@
     { "name": "Bewerber (Karriere)", "parameters": { "filters": [{ "name": "path", "operator": "c", "value": "/karriere" }], "match": "all" } },
     { "name": "Mobil", "parameters": { "filters": [{ "name": "device", "operator": "eq", "value": "mobile" }], "match": "all" } },
     { "name": "Desktop", "parameters": { "filters": [{ "name": "device", "operator": "eq", "value": "desktop" }], "match": "all" } }
+  ],
+  "$comment_journeys": "Journeys zeigen die tatsächlich gelaufenen Wege (anders als Funnels, die einen vorgegebenen Weg nachzählen). Ereignisse gelten als eigene Schritte; „filters.eventType: 1“ beschränkt die Schritte auf Seitenaufrufe, sonst stehen nav-click und mobile-menu-open zwischen den Seiten. endStep meint den letzten Schritt des Besuchs – ein Ereignis wie lead ist selten der letzte Schritt und liefert deshalb kaum Zeilen.",
+  "journeys": [
+    { "name": "Einstieg: von der Startseite weiter", "description": "Welche Seiten nach der Startseite kommen – nur Seitenaufrufe, ohne Klick-Ereignisse", "parameters": { "steps": 4, "startStep": "/", "filters": { "eventType": 1 } } },
+    { "name": "Weg zur Kontaktseite", "description": "Welche Seiten jemand vor /kontakt/ gesehen hat – zeigt, welche Leistungsseiten zum Kontakt führen", "parameters": { "steps": 5, "endStep": "/kontakt/", "filters": { "eventType": 1 } } },
+    { "name": "Weg zur Karriereseite", "description": "Welche Seiten Bewerber vor /karriere/ gesehen haben", "parameters": { "steps": 5, "endStep": "/karriere/", "filters": { "eventType": 1 } } },
+    { "name": "Wege mit Klicks (inkl. Ereignisse)", "description": "Wie oben, aber Ereignisse zählen als Schritte: zeigt, welcher Button oder Menüpunkt den nächsten Seitenaufruf ausgelöst hat", "parameters": { "steps": 4 } }
   ]
 }

@@ -122,6 +122,20 @@ Inhalt:
   Stellenportal (`/karriere/` → `job-portal-load`), Initiativbewerbung (`/karriere/` → `form-start` → `application-sent`),
   Startseite → Kategorie → Kontakt, und je Leistungskategorie `/<kategorie>/*` → `lead`
 - **4 Segmente:** Kunden (ohne Karriere), Bewerber (Karriere), Mobil, Desktop
+- **4 Journeys:** Einstieg von der Startseite weiter, Weg zur Kontaktseite, Weg zur Karriereseite,
+  und einmal dasselbe mit Klick-Ereignissen als Schritten
+
+Funnel und Journey beantworten verschiedene Fragen: der Funnel zählt einen **vorgegebenen** Weg
+nach („wie viele kommen von A bis D?“), die Journey zeigt die **tatsächlich gelaufenen** Wege, auch
+die, die niemand erwartet hat. Zwei Eigenheiten dabei:
+
+- Ereignisse gelten als eigene Schritte. Ohne Einschränkung stehen `nav-click` oder
+  `mobile-menu-open` zwischen den Seiten und verbrauchen die vier bis fünf Schritte. Drei der vier
+  Journeys setzen deshalb `filters.eventType: 1` (nur Seitenaufrufe); die vierte lässt die
+  Ereignisse ausdrücklich zu, weil dort interessiert, welcher Button den nächsten Aufruf ausgelöst hat.
+- `endStep` meint den **letzten** Schritt des Besuchs, nicht „irgendwann enthalten“. Ein Ereignis
+  wie `lead` ist selten das Letzte, was jemand tut – `endStep: "lead"` liefert fast keine Zeilen.
+  Für „wie kommt es zum Kontakt?“ ist deshalb `/kontakt/` der Endpunkt, und der Rest steht im Funnel.
 
 Ausführen (auf dem Server, Umami lauscht auf `127.0.0.1:3000`):
 
@@ -134,9 +148,13 @@ Ausführen (auf dem Server, Umami lauscht auf `127.0.0.1:3000`):
        node deploy/umami/setup-reports.mjs --dry-run
        node deploy/umami/setup-reports.mjs
 
-Nicht per API möglich (Umami 3.4 hat dafür keine Definitions-Endpunkte), daher einmal in der
-Oberfläche: **Journey** (Website → Journey, 5 Schritte, Ende = Ereignis `lead`) sowie bei Bedarf
-**Retention**, **Attribution** und **UTM** – diese Berichte brauchen keine Definition, nur den Zeitraum.
+Journeys liegen nicht unter der Website, sondern unter `/api/reports` (`type: "journey"`, die
+`websiteId` im Body) – dort liegen auch Ziele und Funnels, weshalb das Skript die Liste nach `type`
+filtert, damit der Namensabgleich nicht einen Funnel trifft. Sie werden also mitgepflegt, nichts
+davon ist Handarbeit.
+
+**Retention**, **Attribution** und **UTM** brauchen gar keine Definition, nur den Zeitraum – die
+öffnet man in der Oberfläche direkt.
 
 `pnpm check:tracking` (in CI und im Pre-Push-Hook) prüft, dass jedes in `reports.json` verwendete
 Ereignis in `web/src/lib/analytics.ts` existiert. Wer ein Ereignis umbenennt, muss also beide Stellen
@@ -144,25 +162,31 @@ anpassen.
 
 Geprüft: `reports.json` gegen die Eingabe-Schemas aus dem Umami-Quellcode v3.4.0, das Skript gegen
 eine nachgebaute API (Anlegen, Aktualisieren, Probelauf). Am 27.11.2026 gegen die echte Instanz
-(Umami 3.5.0) ausgeführt: 5 Ziele, 8 Funnels, 4 Segmente angelegt, ein zweiter Lauf erkennt alle
-17 wieder und aktualisiert sie statt sie zu verdoppeln. Beim Nachsehen über die API beachten:
-`/segments` verlangt `?type=segment`, ohne den Parameter antwortet Umami mit 400.
+(Umami 3.5.0) ausgeführt: 5 Ziele, 8 Funnels, 4 Segmente, 4 Journeys angelegt; ein zweiter Lauf
+erkennt alle 21 wieder und aktualisiert sie statt sie zu verdoppeln. Beim Nachsehen über die API
+beachten: `/segments` verlangt `?type=segment`, ohne den Parameter antwortet Umami mit 400.
 
-## Monatsbericht per E-Mail
+## Wochenbericht per E-Mail
 
-Am 1. jedes Monats um 07:15 Uhr verschickt der Server einen Bericht über den Vormonat (Vergleich mit
-dem Monat davor) – über dieselbe SMTP-Konfiguration wie die Formulare (`EMAIL_URL` in `cms.env`).
+Jeden Montag um 07:15 Uhr verschickt der Server einen Bericht über die abgeschlossene Woche
+(Montag bis Sonntag, Vergleich mit der Woche davor) – über dieselbe SMTP-Konfiguration wie die
+Formulare (`EMAIL_URL` in `cms.env`).
+
+Der Bericht kennt beide Zeiträume: ohne Argument die letzte Woche, mit `--month` den Vormonat.
+Jede Beschriftung kommt aus dem Zeitraum selbst (`targetPeriod()` in `report.mjs`), es gibt also
+keine zweite Fassung des Berichts für Monate. Für einen Monatsrückblick von Hand genügt
+`deploy/umami/send-report.sh --month`.
 
 Inhalt: automatische Hinweise („Auf einen Blick“: starke Veränderungen bei Kontakten und Besuchern,
 größter Absprung im Anfrage-Weg, neue 404-Adressen, häufigste Leistung), Besucherkennzahlen mit
-Vormonat, alle Ziele aus `reports.json` mit Anteil und Vormonat, Kontakte nach Weg und nach Leistung,
+Vorwoche, alle Ziele aus `reports.json` mit Anteil und Vorwoche, Kontakte nach Weg und nach Leistung,
 Anfrage-Funnel Schritt für Schritt, meistbesuchte Seiten, Herkunft, Kanäle, Geräte, UTM-Kampagnen
 und nicht gefundene Adressen. Nur Summen, keine Einzelbesuche.
 
 | Datei | Aufgabe |
 |---|---|
-| `deploy/umami/monthly-report.mjs` | holt die Zahlen über die Umami-API und baut die HTML-Mail (`--month=JJJJ-MM`, `--out=…`, `--demo` für eine Vorschau ohne Umami) |
-| `deploy/umami/send-monthly-report.sh` | erzeugt den Bericht und verschickt ihn über `manage.py send_report_mail` im CMS-Container |
+| `deploy/umami/report.mjs` | holt die Zahlen über die Umami-API und baut die HTML-Mail (`--week=JJJJ-WNN`, `--month`, `--month=JJJJ-MM`, `--out=…`, `--demo` für eine Vorschau ohne Umami) |
+| `deploy/umami/send-report.sh` | erzeugt den Bericht und verschickt ihn über `manage.py send_report_mail` im CMS-Container |
 | `deploy/umami/umami-report.env.example` | Vorlage für `/srv/grabnar/umami-report.env` (Umami-URL, API-Schlüssel, Website-ID, Empfänger) |
 | `deploy/systemd/grabnar-umami-report.{service,timer}` | Zeitplan |
 
@@ -170,19 +194,24 @@ Einrichten (nach dem Umami-Update und `setup-reports.mjs`):
 
     cp deploy/umami/umami-report.env.example /srv/grabnar/umami-report.env && chmod 600 /srv/grabnar/umami-report.env
     # Werte eintragen, dann einmal von Hand testen:
-    deploy/umami/send-monthly-report.sh
+    deploy/umami/send-report.sh
     sudo cp deploy/systemd/grabnar-umami-report.* /etc/systemd/system/
     sudo systemctl daemon-reload && sudo systemctl enable --now grabnar-umami-report.timer
 
 Die Units werden **kopiert**, nicht verlinkt; nach einer Änderung im Repo also erneut kopieren
 und `daemon-reload`. Die `OnCalendar`-Zeile nennt ausdrücklich `Europe/Berlin`, weil die
 Serveruhr auf UTC läuft – sonst käme der Bericht im Winter um 08:15 und im Sommer um 09:15 Uhr.
+`Persistent=true` holt einen Montag nach, an dem der Server aus war.
 
-Vorschau des Layouts ohne Umami: `node deploy/umami/monthly-report.mjs --demo --out=/tmp/bericht.html`.
+Vorschau des Layouts ohne Umami: `node deploy/umami/report.mjs --demo --out=/tmp/bericht.html`.
 
-Geprüft: Monatsgrenzen in Europe/Berlin (inkl. Sommerzeitwechsel), Abruf aller 13 Endpunkte gegen
-eine nachgebaute Umami-API, Versand über `send_report_mail` (Test in `cms/grabnar/tests/test_api.py`).
-Am 27.11.2026 erstmals gegen die echte Instanz gelaufen (`--month=2026-11`) und per Mail verschickt.
+Geprüft: Monats- und Wochengrenzen in Europe/Berlin (inkl. Sommerzeitwechsel), Abruf aller 13
+Endpunkte gegen eine nachgebaute Umami-API, Versand über `send_report_mail` (Test in
+`cms/grabnar/tests/test_api.py`). Am 27.11.2026 erstmals gegen die echte Instanz gelaufen
+(`--month=2026-11`) und per Mail verschickt; am 28.11.2026 die Wochenfassung (Woche 47 und 48).
+Die Wochenrechnung ist nach ISO: der Montag der Woche 1 wird über den 4. Januar bestimmt, und
+`isoWeekOf()` ist genau die Umkehrung davon – geprüft über den Jahreswechsel (Woche 1/2026 beginnt
+am 29.12.2025, 2026 hat 53 Wochen).
 
 ## Kampagnen-Links (UTM)
 
