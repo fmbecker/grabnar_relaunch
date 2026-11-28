@@ -177,7 +177,13 @@ vars().update(EMAIL_CONFIG)
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="website@localhost")
 # Django error mails to ADMINS use the same sender.
 SERVER_EMAIL = env("SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
-FORMS_NOTIFY_EMAIL = env("FORMS_NOTIFY_EMAIL", default="")
+# Kommagetrennte Liste: jede Adresse darin bekommt die Benachrichtigung. Die Liste wird hier
+# einmal zerlegt, damit die View sie unverändert an EmailMessage geben kann – ein einzelner
+# String käme beim Mailserver als eine kaputte Adresse an und die Mail wäre verloren.
+# env.list lässt die Leerzeichen um einen Eintrag stehen, deshalb das strip().
+FORMS_NOTIFY_EMAILS: list[str] = [
+    a.strip() for a in env.list("FORMS_NOTIFY_EMAIL", default=[]) if a.strip()
+]
 FORMS_MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 FORMS_ALLOWED_UPLOAD_TYPES = {
     "application/pdf",

@@ -111,7 +111,7 @@ def _site_host() -> str:
 
 
 def _notify(subject: str, body: str, reply_to: str = "") -> bool:
-    to = settings.FORMS_NOTIFY_EMAIL
+    to = settings.FORMS_NOTIFY_EMAILS
     if not to:
         log.warning("FORMS_NOTIFY_EMAIL not set; submission stored but no mail sent")
         return False
@@ -122,7 +122,7 @@ def _notify(subject: str, body: str, reply_to: str = "") -> bool:
             subject,
             body,
             settings.DEFAULT_FROM_EMAIL,
-            [to],
+            to,
             reply_to=[reply_to] if reply_to else None,
         ).send(fail_silently=False)
         return True
