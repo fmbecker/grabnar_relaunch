@@ -464,7 +464,7 @@ def test_certificate_seal(client):
 def test_form_mail_sender_reply_to_and_host(client, settings):
     from django.core import mail
 
-    settings.FORMS_NOTIFY_EMAIL = "info@grabnar.de"
+    settings.FORMS_NOTIFY_EMAILS = ["info@grabnar.de"]
     settings.DEFAULT_FROM_EMAIL = "Website Grabnar <website@aivii.de>"
     settings.FRONTEND_URL = "https://mbg.aivii.de"
     payload = {
@@ -483,6 +483,30 @@ def test_form_mail_sender_reply_to_and_host(client, settings):
     assert sent.to == ["info@grabnar.de"]
     assert sent.reply_to == ["kunde@example.com"]
     assert sent.subject == "Neue Kontaktanfrage über mbg.aivii.de"
+
+
+def test_form_mail_goes_to_every_recipient(client, settings):
+    """Mehrere Empfänger müssen als Liste beim Mailserver ankommen.
+
+    FORMS_NOTIFY_EMAIL ist in cms.env kommagetrennt; die Einstellung zerlegt den Wert.
+    Als ein String übergeben würde daraus eine einzige, kaputte Adresse – die
+    Benachrichtigung ginge verloren, während die Einsendung gespeichert bleibt.
+    """
+    from django.core import mail
+
+    settings.FORMS_NOTIFY_EMAILS = ["info@grabnar.de", "buero@grabnar.de"]
+    payload = {
+        "name": "A",
+        "email": "kunde@example.com",
+        "message": "Hi",
+        "consent": True,
+        "started_at": 1,
+    }
+    assert (
+        client.post("/api/forms/contact/", payload, content_type="application/json").status_code
+        == 201
+    )
+    assert mail.outbox[-1].to == ["info@grabnar.de", "buero@grabnar.de"]
 
 
 def test_rendition_sets_have_one_aspect_ratio_each():
